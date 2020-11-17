@@ -1,0 +1,172 @@
+@font-face {
+  font-family: california-sherif;
+  src: url(../fonts/THECALIFORNIASERIF.OTF);
+}
+
+@font-face {
+  font-family: california-script;
+  src: url(../fonts/THECALIFORNIASCRIPT.OTF);
+}
+
+@font-face {
+  font-family: medium-italic;
+  src: url(../fonts/GILL_SANS_MEDIUM_ITALIC.OTF);
+}
+
+@font-face {
+  font-family: medium;
+  src: url(../fonts/GILL_SANS_MEDIUM.OTF);
+}
+
+@font-face {
+  font-family: light-italic;
+  src: url(../fonts/GILL_SANS_LIGHT_ITALIC.OTF);
+}
+
+@font-face {
+  font-family: light;
+  src: url(../fonts/GILL_SANS_LIGHT.OTF);
+}
+
+@font-face {
+  font-family: italic;
+  src: url(../fonts/GILL_SANS_ITALIC.OTF);
+}
+
+@font-face {
+  font-family: heavy-italic;
+  src: url(../fonts/GILL_SANS_HEAVY_ITALIC.OTF);
+}
+
+@font-face {
+  font-family: heavy;
+  src: url(../fonts/GILL_SANS_HEAVY.OTF);
+}
+
+@font-face {
+  font-family: bold;
+  src: url(../fonts/GILL_SANS_BOLD.OTF);
+}
+
+@font-face {
+  font-family: bold-italic;
+  src: url(../fonts/GILL_SANS_BOLD_ITALIC.OTF);
+}
+
+@font-face {
+  font-family: gill;
+  src: url(../fonts/GILL_SANS.OTF);
+}
+
+@font-face {
+  font-family: anthery;
+  src: url(../fonts/ANTHERY_COLLECTION.OTF);
+}
+
+#header {
+    background-color: #fff;
+}
+
+.row {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+#header .col-md-12 {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+#header .container-fluid {
+    padding: 0;
+    margin: 0;
+}
+
+.notification-wrapper {
+    background: #D6AC23;
+    font-size: 27.7px;
+    color: #fff;
+    text-align: center;
+    height: 62px;
+    letter-spacing: 3px;
+    font-family: light;
+    line-height: 69px;
+}
+
+#main-logo {
+    text-align: center;
+}
+
+#main-logo img {
+    width: 265px;
+    margin-top: 25px;
+}
+
+#top-text h1 {
+    font-family: california-sherif;
+    font-size: 100px;
+    color: #D6AC23;
+}
+
+#bottom-text, #top-text {
+    text-align: center;
+    width: 100%;
+}
+
+#bottom-text h2 {
+    font-family: bold;
+    font-size: 28px;
+    color: #758689;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+}
+
+#submark-logo-wrapper {
+    text-align: center;
+}
+
+#submark-logo-wrapper img {
+    width: 200px;
+}
+
+#social {
+    margin-top: 30px;
+}
+
+#social img {
+    width: 65px;
+}
+
+#social #facebook, #social #instagram {
+    width: 50%;
+    float: left;
+}
+
+#social #facebook img {
+    float: right;
+    margin-right: 10px;
+}
+
+#social #instagram img {
+    margin-left: 10px;
+}
+
+footer .container-fluid {
+    padding: 0;
+}
+
+footer {
+    width: 640px;
+    margin: 0% -320px;
+    position: fixed;
+    left: 50%;
+    bottom: 2%;
+}
+
+#content-title {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
+}
