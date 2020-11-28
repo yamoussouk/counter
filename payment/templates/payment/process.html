@@ -1,0 +1,160 @@
+{% include "shop/base.html" with notification=notification cart_page=True payment=True %}
+{% load static %}
+
+{% block content %}
+  <div class="container process-page">
+      <div class="row">
+          <div class="col-12">
+              <div id="cart-header">
+                <h1 >ELLENŐRZÉS</h1>
+              </div>
+          </div>
+      </div>
+      <div class="row">
+          <div class="col-sm-12">
+              <p class="info">Az általad megadott adatok a következőek:</p>
+              <div class="check-form">
+                  <div class="check-form-key">
+                      Név:
+                  </div>
+                  <div class="check-form-value">
+                      <p>{{ order.full_name }}</p>
+                  </div>
+                  <div class="clearfix"></div>
+                  <div class="check-form-key">
+                      E-mail:
+                  </div>
+                  <div class="check-form-value">
+                      <p>{{ order.email }}</p>
+                  </div>
+                  <div class="clearfix"></div>
+                  <div class="check-form-key">
+                      Telefonszám:
+                  </div>
+                  <div class="check-form-value">
+                      <p>{{ order.phone }}</p>
+                  </div>
+                  <div class="clearfix"></div>
+                  <div class="check-form-key">
+                      Kiválasztott szállítási mód:
+                  </div>
+                  <div class="check-form-value">
+                      <p>{{ order.delivery_type }}</p>
+                  </div>
+                  <div class="clearfix"></div>
+                  {% if order.delivery_type == 'Személyes átvétel' %}
+                  <div class="check-form-key">
+                      Vezetéknév:
+                  </div>
+                  <div class="check-form-value">
+                      <p>{{ order.first_name }}</p>
+                  </div>
+                  <div class="clearfix"></div>
+                  <div class="check-form-key">
+                      Keresztnév:
+                  </div>
+                  <div class="check-form-value">
+                      <p>{{ order.last_name }}</p>
+                  </div>
+                  <div class="clearfix"></div>
+                  {% elif order.delivery_type == 'Csomagkuldo' %}
+                  <div class="check-form-key">
+                      Csomag átvételi pont:
+                  </div>
+                  <div class="check-form-value">
+                      <p>{{ order.csomagkuldo }}</p>
+                  </div>
+                  <div class="clearfix"></div>
+                  {% elif order.delivery_type == 'FoxPost' %}
+                  <div class="check-form-key">
+                      Csomag átvételi pont:
+                  </div>
+                  <div class="check-form-value">
+                      <p>{{ order.fox_post }}</p>
+                  </div>
+                  <div class="clearfix"></div>
+                  {% else %}
+                  <div class="check-form-key">
+                      Szállítási név:
+                  </div>
+                  <div class="check-form-value">
+                      <p>{{ order.delivery_name }}</p>
+                  </div>
+                  <div class="clearfix"></div>
+                  <div class="check-form-key">
+                      Utca, házszám:
+                  </div>
+                  <div class="check-form-value">
+                      <p>{{ order.address }}</p>
+                  </div>
+                  <div class="clearfix"></div>
+                  <div class="check-form-key">
+                      Irányítószám:
+                  </div>
+                  <div class="check-form-value">
+                      <p>{{ order.postal_code }}</p>
+                  </div>
+                  <div class="clearfix"></div>
+                  <div class="check-form-key">
+                      Település:
+                  </div>
+                  <div class="check-form-value">
+                      <p>{{ order.city }}</p>
+                  </div>
+                  <div class="clearfix"></div>
+                  <div class="check-form-key">
+                      Megjegyzés:
+                  </div>
+                  <div class="check-form-value">
+                      <p>{{ order.note }}</p>
+                  </div>
+                  <div class="clearfix"></div>
+                  {% endif %}
+                  {% if order.coupon %}
+                  <div class="check-form-key">
+                      Felhasznált kupon:
+                  </div>
+                  <div class="check-form-value">
+                      <p>{{ order.coupon }}</p>
+                  </div>
+                  <div class="clearfix"></div>
+                  {% endif %}
+              </div>
+          </div>
+      </div>
+      <div class="row">
+          <div class="col-12">
+              <div id="end-total">
+                <div class="end-total-wrapper">
+                    <div id="end-total-text">
+                      <p>Összesen fizetendő:</p>
+                    </div>
+                    <div id="end-total-amount">
+                      <p id="total_price" data-price="{{ cart.calculated_total_price|floatformat:0 }}">
+                          {{ cart.calculated_total_price|floatformat:"0" }} Ft</p>
+                    </div>
+                  <div class="clearfix"></div>
+                </div>
+              </div>
+          </div>
+      </div>
+      <div class="row">
+          <div class="col-12">
+              <div id="purchase-button-wrapper">
+                  {% if cart.calculated_total_price != 0 %}
+                  <button class="button is-primary" id="submitBtn">FIZETÉS</button>
+                  {% else %}
+                  <form action="{% url 'payment:finalize_gift_card_payment' %}" method="post">
+                      {% csrf_token %}
+                      <input type="hidden" value="{{ order.id }}" name="order_id" />
+                      <button class="button is-primary" id="submit-gift-card">Megrendelem</button>
+                  </form>
+                  {% endif %}
+              </div>
+          </div>
+      </div>
+  </div>
+
+{% endblock %}
+
+{% include 'shop/footer.html' with stripe=True %}

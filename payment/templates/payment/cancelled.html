@@ -1,0 +1,25 @@
+{% include "shop/base.html" with notification=notification payment=True %}
+{% load static %}
+
+{% block content %}
+<div id="payment-result-container">
+  <div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+          <div class="success-wrapper">
+            <div class="success-icon">
+              <img src="{% static 'images/untick.png' %}" alt="Sikertelen vásárlás" />
+            </div>
+            <div class="success-text">
+              <p>Sikertelen megrendelés!</p>
+              <p>Kérlek, ellenőrizd a bankkártya adataid és próbáld újra.</p>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% include 'shop/footer.html' %}
