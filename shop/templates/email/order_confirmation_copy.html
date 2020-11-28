@@ -1,0 +1,409 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+          integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <title>Email confirmation</title>
+    <style>
+        #header {
+            text-align: center;
+            background: #D6AC23;
+            height: 150px;
+        }
+        #header-image-wrapper {
+            height: 150px;
+            line-height: 150px;
+        }
+        #header img {
+            width: 10rem;
+        }
+        #top-content-wrapper {
+            text-align: center;
+        }
+        h1 {
+            font-family: 'Raleway', sans-serif;
+            font-weight: 700;
+            color: #758689;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+            margin-top: 2rem;
+            font-size: 2rem;
+            letter-spacing: 0.255rem;
+        }
+        h4 {
+            font-family: 'Raleway', sans-serif;
+            font-weight: 400;
+            color: #758689;
+        }
+        h3 {
+            padding-bottom: .5rem;
+        }
+        #top-header-content-inner {
+            background: rgba(252, 237, 228, .7);
+            font-family: 'Raleway', sans-serif;
+            font-weight: 600;
+            color: #758689;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            letter-spacing: .055rem;
+        }
+        #top-header-content-inner p {
+            font-size: 1.2rem;
+            font-weight: 300;
+            margin-bottom: .5rem;
+        }
+        #summary-wrapper h1 {
+            margin-bottom: .5rem;
+        }
+        #summary-wrapper h4 {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+        #summary-wrapper h1, #summary-wrapper h4, #delivery-summary-wrapper h1, #delivery-summary-inner {
+            text-align: center;
+        }
+        #creator {
+            background: #FCEDE4;
+            height: 80px;
+            text-align: center;
+            margin-top: 1rem;
+        }
+        #creator-inner {
+            height: 80px;
+            line-height: 80px;
+        }
+        #creator a {
+            font-family: 'Raleway', sans-serif;
+            font-weight: 700;
+            color: #D3927C;
+            font-size: 1.2rem;
+            letter-spacing: .08rem;
+        }
+        a, a:hover {
+            text-decoration: none;
+        }
+        #submark-logo-wrapper {
+            text-align: center;
+        }
+        #submark-logo-wrapper img {
+            width: 10rem;
+        }
+        #social {
+            margin-top: 1rem;
+        }
+        #social img {
+            width: 65px;
+        }
+        #social #facebook, #social #instagram {
+            width: 50%;
+            float: left;
+        }
+        #social #facebook img {
+            float: right;
+            margin-right: 10px;
+        }
+        #social #instagram img {
+            margin-left: 10px;
+        }
+
+        footer .container-fluid {
+            padding: 0;
+        }
+        .row {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+        }
+        .col-md-12 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+        .container-fluid {
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        .cart-item-row {
+            height: 144px;
+        }
+        .item-index span {
+            height: 144px;
+            line-height: 144px;
+        }
+        .item-details-image-wrapper {
+            width: 120px;
+            float: left;
+            height: 144px;
+            line-height: 144px;
+        }
+        .item-details-wrapper {
+            float: left;
+            margin-left: 1.5rem;
+            margin-top: 1.6rem;
+        }
+        .item-details-wrapper span.item-details-name {
+            color: #758689;
+            font-family: 'Raleway';
+            font-weight: 700;
+            font-size: 1.4rem;
+            letter-spacing: 2px;
+        }
+        .item-details-wrapper span.item-details-collection {
+            color: rgba(117, 134, 137, .4);
+            font-family: light;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .item-details-wrapper span.item-details-color, .item-details-wrapper span.item-details-stud {
+            display: block;
+            color: rgba(139, 139, 139, .8);
+            font-family: 'Raleway';
+            font-weight: 300;
+            font-size: 18px;
+            letter-spacing: 2px;
+        }
+        .item-price span {
+            height: 144px;
+            line-height: 144px;
+            font-family: 'Roboto';
+            font-weight: 500;
+            font-size: 1.4rem;
+            color: #758689;
+        }
+        .item-index {
+            border-left: 1px solid #758689;
+            border-top: 1px solid #758689;
+            text-align: center;
+            max-height: 100%;
+        }
+        .item-details {
+            border-left: 1px solid #758689;
+            border-right: 1px solid #758689;
+            border-top: 1px solid #758689;
+            max-height: 100%;
+        }
+        .item-price {
+            border-top: 1px solid #758689;
+            border-bottom: 1px solid #758689;
+            border-right: 1px solid #758689;
+            text-align: center;
+        }
+        .coupon-in-cart-row, .total-price-row {
+            height: 80px;
+        }
+        .coupon-in-cart-row .total, .coupon-in-cart-row .total-price, .total-price-row .total, .total-price-row .total-price {
+            height: 80px;
+            line-height: 80px;
+        }
+        .coupon-in-cart-row .total span, .total-price-row .total span {
+            float: right;
+            margin-right: 10px;
+            font-family: 'Raleway';
+            font-weight: 700;
+            letter-spacing: .075rem;
+            font-size: 1.4rem;
+        }
+        .coupon-in-cart-row .total-price, .total-price-row .total-price {
+            text-align: center;
+            color: #758689;
+        }
+        .coupon-in-cart-row .total-price span, .total-price-row .total-price span {
+            font-family: 'Roboto';
+            font-weight: 500;
+            font-size: 1.4rem;
+            color: #758689;
+        }
+        .coupon-in-cart-row {
+            border-bottom: 1px solid rgba(0,0,0,.5);
+            border-top: 1px solid rgba(0,0,0,.5);
+            margin-bottom: 1.2rem;
+            color: #758689;
+        }
+        .price-row {
+            height: 45px;
+            line-height: 45px;
+            color: #758689;
+        }
+        .price-row .total {
+            text-align: center;
+            color: #758689;
+        }
+        .price-row .total span:nth-child(1) {
+            font-family: 'Raleway';
+            font-weight: 500;
+            letter-spacing: .05rem;
+            font-size: 1rem;
+            color: #758689;
+        }
+        .price-row .total span:nth-child(2) {
+            font-family: 'Raleway';
+            font-weight: 400;
+            letter-spacing: .05rem;
+            display: block;
+            line-height: 0px;
+            font-size: .7rem;
+            color: #758689;
+        }
+        .price-row .total-price span {
+            font-family: 'Roboto';
+            font-weight: 500;
+            letter-spacing: .05rem;
+            font-size: 1.4rem;
+            color: #758689;
+        }
+        .price-row .total-price {
+            text-align: center;
+            color: #758689;
+        }
+        .total-price-row .total-price span {
+            color: #D6AC23;
+        }
+        .total-price-row {
+            border-top: 1px solid rgba(0,0,0,.5);
+            margin-top: 1.2rem;
+            color: #758689;
+        }
+        #delivery-summary-inner p {
+            font-family: 'Raleway';
+            font-weight: 500;
+            letter-spacing: .05rem;
+            color: #758689;
+            font-size: 1.2rem;
+        }
+        #delivery-summary-wrapper {
+            margin-bottom: 3rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid" id="header-wrapper">
+    <div class="row">
+        <div class="col-12">
+            <div id="header">
+                <div id="header-image-wrapper">
+                    <img src="https://www.pythonanywhere.com/user/minervastudio/files/home/minervastudio/counter/home/static/images/email_logo.png" alt="minervastudio" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="content">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div id="top-content-wrapper">
+                    <h1>sikeres rendelés</h1>
+                    <div id="top-header-content-inner">
+                        <h3>Kedves {{ name }}, köszönöm a megrendelésed!</h3>
+                        <p>Rendelésed eljutott hozzám és amint feladásra kerül, egy újabb e-mail értesítést küldök.</p>
+                        <p>Vásárlásod részleteit lejjebb találod.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div id="summary-wrapper">
+                    <h1>összegzés</h1>
+                    <h4>{{ order.updated|convert_date }}</h4>
+                    <div id="summary-content">
+                        {% for item in order.items.all %}
+                        <div class="row cart-item-row">
+                              <div class="col-1 item-index"><span>{{ forloop.counter }}</span></div>
+                              <div class="col-7 item-details">
+                                  <div class="item-details-image-wrapper">
+                                      <img class="img-fluid" src="https://www.pythonanywhere.com/user/minervastudio/files/home/minervastudio/counter/home/static/images/index.jpg" alt="{{ item.product_name }}" />
+                                  </div>
+                                  <div class="item-details-wrapper">
+                                    <span class="item-details-name">{{ item.product.name }}</span>{% if item.collection %} <span class="item-details-collection-divider">- </span><span class="item-details-collection">{{ item.collection }} kollekció</span>{% endif %}
+                                    <span class="item-details-color">{% if item.color != '' %}{{ item.color|lower }}{% else %}&nbsp;{% endif %}</span>
+                                    <span class="item-details-stud">{{ item.stud }}</span>
+                                  </div>
+                                  <div class="clearfix"></div>
+                              </div>
+                              <div class="col-4 item-price"><span>{{ item.price|calculate_item_price:item.quantity }} Ft.-</span></div>
+                          </div>
+                        {% endfor %}
+                        {% if order.coupon %}
+                          <div class="row total-row coupon-in-cart-row">
+                              <div class="col-8 total"><span>Kedvezmény:</span></div>
+                              <div class="col-4 total-price"><span>- {{ order.discount_amount|floatformat:"0" }} Ft</span></div>
+                          </div>
+                        {% endif %}
+                        <div class="row price-row">
+                            <div class="col-8 total"><span>Termékek</span>{% if order.coupon %}<span>(kedvezmény levonása után)</span>{% endif %}</div>
+                            <div class="col-4 total-price"><span>{% if order.coupon %}{{ order.subtotal|floatformat:"0" }}{% else %}{{ order.total|floatformat:"0" }}{% endif %} Ft</span></div>
+                            <div class="col-1"></div>
+                        </div>
+                        <div class="row price-row">
+                            <div class="col-8 total"><span>Szállítás</span></div>
+                            <div class="col-4 total-price"><span>{{ delivery_price|floatformat:"0" }} Ft</span></div>
+                            <div class="col-1"></div>
+                        </div>
+                        <div class="row total-row total-price-row">
+                              <div class="col-8 total"><span>Végösszeg:</span></div>
+                              <div class="col-4 total-price"><span>{{ order_total|floatformat:"0" }} Ft</span></div>
+                          </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div id="delivery-summary-wrapper">
+                    <h1>szállítási mód és cím</h1>
+                    <div id="delivery-summary-inner">
+                        <p>Szállítási mód: {{ order.delivery_type }}</p>
+                        {% for key, value in delivery_info.items %}
+                            <p>{{ key }}: {{ value }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<footer>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div id="submark-logo-wrapper">
+                    <a href="https://www.minervastudio.hu">
+                        <img src="https://www.pythonanywhere.com/user/minervastudio/files/home/minervastudio/counter/home/static/images/submark_150.png" alt="Minerva Logo">
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div id="social">
+                    <div id="facebook">
+                        <a href="https://www.facebook.com/minervastudio.hu">
+                            <img src="https://www.pythonanywhere.com/user/minervastudio/files/home/minervastudio/counter/home/static/images/facebook_150.png" alt="facebook icon" />
+                        </a>
+                    </div>
+                    <div id="instagram">
+                        <a href="https://www.instagram.com/minervastudio.hu/">
+                            <img src="https://www.pythonanywhere.com/user/minervastudio/files/home/minervastudio/counter/home/static/images/instagram_150.png" alt="instagram icon" />
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div id="creator">
+                    <div id="creator-inner">
+                        <a href="https://www.minervastudio.hu" title="https://www.minervastudio.hu">www.minervastudio.hu</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

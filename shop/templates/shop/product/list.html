@@ -1,0 +1,83 @@
+{% include "shop/base.html" with notification=notification product_list=True %}
+{% load static %}
+
+{% block content %}
+<div class="content product-list">
+    <div class="container-fluid">
+        <div class="row list-filter-row">
+            <div id="detail-page-filter-button"></div>
+            <div class="col-sm-3 list-page-filter">
+                <div id="mobile-filter-close"></div>
+                {% include 'shop/product/filter.html' %}
+            </div>
+            <div class="col-sm-9">
+                <div id="products-wrapper">
+                    {% for product in products %}
+                    <div class="{% if not product_stock.items|is_stock:product.id %}out-of-stock{% endif %} product-element">
+                        <div class="product-element-image-wrapper">
+                            {% if product.image %}
+                            <a href="{% url 'shop:product_detail' id=product.id %}" title="Termék oldal">
+                                <img src="{{ product.image.url }}" alt="{{ product.name }}"
+                                     class="product-element-image"/>
+                                {% endif %}
+                                <img src="{% static 'images/sold_out_150.png' %}" alt="Elfogyott" title="Elfogyott"
+                                     class="sold-out-icon"/>
+                            </a>
+                        </div>
+                        <div class="product-element-description-wrapper">
+                            <a href="{% url 'shop:product_detail' id=product.id %}" title="Termék oldal">
+                                <span class="product-element-name">{{ product.name }} | {{ product.price }} Ft.-</span>
+                            </a>
+                            <span class="product-element-collection">{{ product.collection.name }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <div class="clearfix"></div>
+
+                    {% if page_obj.paginator.num_pages > 1 %}
+
+                    {% include 'shop/_pagination.html' with page_obj=page_obj %}
+
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+                <div class="col-2"></div>
+                <div class="col-8">
+                {% if gift_card %}
+                        <div class="gift-card-wrapper">
+                            <div class="gift-card-image-wrapper">
+                                <img src="{% static 'images/giftcard.png' %}" alt="Ajándékkártya" />
+                            </div>
+                            <div class="gift-card-description-wrapper">
+                                <div class="gift-card-name">Ajándékkártya</div>
+                                <div class="gift-card-price">5000 Ft.-</div>
+                                <form action="{% url 'cart:cart_add_gift_card' 0 %}" method="post">
+                                    <div class="gift-card-amount">
+                                        <select required>
+                                            {% for gc in gift_card %}
+                                                <option value="{{ gc.price }}" data-id="{{ gc.id }}"
+                                                        data-price="{{ gc.price }}">{{ gc.price }} Ft.-</option>
+                                            {% endfor %}
+                                            {{ card_gift_cart_product_form }}
+                                            {% csrf_token %}
+                                        </select>
+                                    </div>
+                                    <div class="gift-card-button-wrapper">
+                                        <input id="add_to_cart_button" type="submit" value="Kosárba">
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                    {% endif %}
+                <div class="col-2"></div>
+            </div>
+    </div>
+</div>
+{% endblock %}
+
+{% include 'shop/footer.html' with product_list=True %}

@@ -25,7 +25,7 @@ SECRET_KEY = 'vx7=8568%&#%hf0cg&vc&_%eteg#=aq=4mgou@r25b$=ecxf$l'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['www.minervastudio.hu']
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -37,7 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'home',
+    'shop',
+    'cart',
+    'coupon',
+    'order',
 ]
 
 MIDDLEWARE = [
@@ -63,6 +66,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'cart.context_processors.cart',
             ],
         },
     },
@@ -122,3 +126,11 @@ STATIC_URL = '/static/'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+
+CART_SESSION_ID = 'cart'
+
+FOXPOST_PRICE = 862
+DELIVERY_PRICE = 1735
+CSOMAGKULDO_PRICE = 460
+
+CURRENCY = 'huf'

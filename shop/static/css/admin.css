@@ -1,0 +1,27 @@
+#content {
+    max-width: 100%;
+}
+
+.object-tools {
+    float: initial;
+    width: 100%;
+    font-size: 14px;
+    margin-top: 0;
+}
+
+h1 {
+    text-align: center;
+    font-weight: 700;
+    font-size: 24px;
+    margin-bottom: 30px;
+}
+
+#print-wrapper {
+    float: right;
+    padding: 5px;
+    background: #eee;
+    border: 1px solid #000;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #fff;
+}

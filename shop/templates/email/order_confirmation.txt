@@ -1,0 +1,32 @@
+SIKERES RENDELÉS
+Kedves {{ name }}, köszönöm a megrendelésed!
+Rendelésed eljutott hozzám és amint feladásra kerül, egy újabb e-mail értesítést küldök.
+Vásárlásod részleteit lejjebb találod.
+
+ÖSSZEGZÉS
+{{ order.updated|convert_date }}
+
+{% for item in order.items.all %}
+{{ forloop.counter }} {{ item.product.name }} - {{ item.product.collection.name }} kollekció
+{{ item.color|lower }}
+{{ item.stud }}
+{{ item.price|calculate_item_price:item.quantity }} Ft.
+{% endfor %}
+
+{% if order.coupon %}
+Kedvezmény: - {{ order.discount_amount|floatformat:"0" }} Ft
+{% endif %}
+
+Termékek {% if order.coupon %}(kedvezmény levonása után){% endif %}
+{% if order.coupon %}{{ order.subtotal|floatformat:"0" }}{% else %}{{ order.total|floatformat:"0" }}{% endif %} Ft
+
+Szállítás {{ delivery_price|floatformat:"0" }} Ft
+Végösszeg: {{ order_total|floatformat:"0" }} Ft
+
+SZÁLLÍTÁSI MÓD ÉS CÍM
+Szállítási mód: {{ order.delivery_type }}
+{% for key, value in delivery_info.items %}
+    {{ key }}: {{ value }}
+{% endfor %}
+
+www.minervastudio.hu

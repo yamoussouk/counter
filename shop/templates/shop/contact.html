@@ -1,0 +1,36 @@
+{% include "shop/base.html" with notification=notification contact=True %}
+{% load static %}
+
+{% block content %}
+<div id="contact-page">
+    <div class="container-md">
+        <div class="row">
+            <div class="col-12">
+                <form id="contact-form" action="{% url 'shop:contact_message' %}" method="post">
+                    <div class="form-group">
+                        <label for="contact-email">E-mail cím*</label>
+                        <input type="email" class="form-control" id="contact-email" name="contact-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="contact-subject">Tárgy</label>
+                        <input type="text" class="form-control" id="contact-subject" name="contact-subject">
+                    </div>
+                    <div class="form-group">
+                        <label for="contact-message">Üzenet*</label>
+                        <textarea class="form-control" id="contact-message" name="contact-message"
+                                  rows="4" maxlength="2000" required></textarea>
+                    </div>
+                    {{ contact_form }}
+                    {% csrf_token %}
+                    <div class="text-center">
+                        <input type="submit" form="contact-form" value="Küldés" id="contact-submit" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% include 'shop/footer.html' with contact=True %}

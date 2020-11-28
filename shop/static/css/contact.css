@@ -1,0 +1,110 @@
+@font-face {
+  font-family: california-sherif;
+  src: url(../fonts/THECALIFORNIASERIF.OTF);
+}
+
+@font-face {
+  font-family: california-script;
+  src: url(../fonts/THECALIFORNIASCRIPT.OTF);
+}
+
+@font-face {
+  font-family: medium-italic;
+  src: url(../fonts/GILL_SANS_MEDIUM_ITALIC.OTF);
+}
+
+@font-face {
+  font-family: medium;
+  src: url(../fonts/GILL_SANS_MEDIUM.OTF);
+}
+
+@font-face {
+  font-family: light-italic;
+  src: url(../fonts/GILL_SANS_LIGHT_ITALIC.OTF);
+}
+
+@font-face {
+  font-family: light;
+  src: url(../fonts/GILL_SANS_LIGHT.OTF);
+}
+
+@font-face {
+  font-family: italic;
+  src: url(../fonts/GILL_SANS_ITALIC.OTF);
+}
+
+@font-face {
+  font-family: heavy-italic;
+  src: url(../fonts/GILL_SANS_HEAVY_ITALIC.OTF);
+}
+
+@font-face {
+  font-family: heavy;
+  src: url(../fonts/GILL_SANS_HEAVY.OTF);
+}
+
+@font-face {
+  font-family: bold;
+  src: url(../fonts/GILL_SANS_BOLD.OTF);
+}
+
+@font-face {
+  font-family: bold-italic;
+  src: url(../fonts/GILL_SANS_BOLD_ITALIC.OTF);
+}
+
+@font-face {
+  font-family: gill;
+  src: url(../fonts/GILL_SANS.OTF);
+}
+
+@font-face {
+  font-family: anthery;
+  src: url(../fonts/ANTHERY_COLLECTION.OTF);
+}
+
+@media only screen and (max-width: 2560px) {
+    /* Contact page */
+    #contact-page {
+        margin-top: 40px;
+        margin-bottom: 40px;
+    }
+
+    #contact-page .form-group input {
+        height: 75px;
+        color: rgba(117, 134, 137, .3);
+        font-family: light;
+        font-size: 30px;
+        border: 1px solid rgba(117, 134, 137, .5);
+        border-radius: 6px;
+    }
+
+    #contact-page .form-group textarea {
+        color: rgba(117, 134, 137, .3);
+        font-family: light;
+        font-size: 30px;
+        border: 1px solid rgba(117, 134, 137, .5);
+        border-radius: 6px;
+    }
+
+    #contact-page .form-group label {
+        font-family: light;
+        color: #878787;
+        font-size: 24px;
+        letter-spacing: 2px;
+    }
+
+    #contact-submit {
+        background: rgba(214, 172, 35, .8);
+        font-family: bold;
+        font-size: 18px;
+        color: #FFF;
+        letter-spacing: 4px;
+        border: none;
+        border-radius: 6px;
+        width: 250px;
+        height: 65px;
+        margin-top: 20px;
+        text-transform: uppercase;
+    }
+}

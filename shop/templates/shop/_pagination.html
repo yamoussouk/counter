@@ -1,0 +1,33 @@
+{% load static %}
+
+<div class="pagination">
+    <div class="pagination-wrapper">
+        <div class="pagination-inner">
+            {% if page_obj.has_previous %}
+            <a class="pagination-action" href="?page={{ page_obj.previous_page_number }}">
+                <img class="previous-page" src="{% static 'images/arrow_left_150.png' %}"
+                     alt="előző oldal" title="előző oldal" />
+            </a>
+            {% else %}
+            <img class="previous-page" src="{% static 'images/arrow_left_150.png' %}"
+                     alt="előző oldal" title="előző oldal" />
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <span class="pagination-number pagination-current">{{ num }}</span>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a class="pagination-number" href="?page={{ num }}">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+                <a class="pagination-action" href="?page={{ page_obj.next_page_number }}">
+                    <img class="next-page" src="{% static 'images/arrow_right_150.png' %}"
+                         alt="következő oldal" title="következő oldal" />
+                </a>
+            {% else %}
+                <img class="next-page" src="{% static 'images/arrow_right_150.png' %}"
+                             alt="következő oldal" title="következő oldal" />
+            {% endif %}
+        </div>
+    </div>
+</div>

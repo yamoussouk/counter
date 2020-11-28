@@ -1,0 +1,294 @@
+{% include "shop/base.html" with notification=notification cart_border=True cart_page=True api_key=api_key %}
+{% load static %}
+
+{% block content %}
+  <div class="container-md">
+      <div id="cart-header">
+        <h1 >KOSÁR</h1>
+      </div>
+      {% if cart|length > 0 %}
+      <div id="cart-item-rows">
+          {% for key, value in cart.cart.items %}
+          <div class="row cart-item-row">
+              <div class="col-1 item-index"><span>{{ forloop.counter }}</span></div>
+              <div class="col-7 item-details">
+                  <div class="item-details-image-wrapper">
+                      {% if value.type == 'product' or value.type == 'product_type' %}
+                        <img src="{% if value.image == '' %}{{ value.image.url }}{% else %}{{ value.image }}{% endif %}" alt="{{ value.product_name }}" />
+                      {% else %}
+                        <img src="{% static 'images/giftcard_thumbnail.png' %}" alt="Ajándékkártya"/>
+                      {% endif %}
+                  </div>
+                  <div class="item-details-wrapper">
+                    <span class="item-details-name">{{ value.product_name }}</span>{% if value.collection %} <span class="item-details-collection-divider">- </span><span class="item-details-collection">{{ value.collection }} kollekció</span>{% endif %}
+                    <span class="item-details-color">{% if value.color != '' %}{{ value.color|lower }}{% else %}&nbsp;{% endif %}</span>
+                    <span class="item-details-stud">{{ value.stud }}</span>
+                  </div>
+                  <div class="clearfix"></div>
+              </div>
+              <div class="col-3 item-price"><span>{{ value.price|calculate_item_price:value.quantity }} Ft.-</span></div>
+                <div class="col-1 item-remove">
+                  <a href="{% url 'cart:cart_remove' item_id=key %}">
+                    <span>
+                      <img src="{% static 'images/remove_icon.png' %}" alt="Eltávolítás ikon" />
+                    </span>
+                  </a>
+                </div>
+          </div>
+          {% endfor %}
+      </div>
+    {% if cart.coupon %}
+      <div class="row total-row coupon-in-cart-row">
+          <div class="col-8 total"><span>"{{ cart.coupon.code }}" kupon ({{ cart.coupon.discount }}% kedvezmény)</span></div>
+          <div class="col-3 total-price"><span>- {{ cart.get_discount|floatformat:"0" }} Ft.-</span></div>
+      </div>
+      <div class="row total-row">
+          <div class="col-8 total"><span>Összesen:</span></div>
+          <div class="col-3 total-price"><span>{{ cart.get_total_price_after_discount|floatformat:"0" }} Ft.-</span></div>
+          <div class="col-1"></div>
+      </div>
+    {% else %}
+    <div class="row total-row">
+        <div class="col-8 total"><span>Összesen:</span></div>
+        <div class="col-3 total-price"><span>{{ cart.get_total_price|floatformat:"0" }} Ft.-</span></div>
+        <div class="col-1"></div>
+    </div>
+    {% endif %}
+    {% if cart|length > 0 and not cart.coupon %}
+    <div class="row coupon-row">
+      <form action="{% url 'coupon:apply' %}" method="post">
+        <div class="col-8">
+            <div class="coupon-form-wrapper">
+                <span class="coupon-text">kuponkód:</span>
+                {{ coupon_apply_form }}
+            </div>
+        </div>
+        <div class="col-3">
+            <input type="submit" value="BEVÁLTÁS" id="coupon-apply-button">
+            {% csrf_token %}
+        </div>
+        <div class="clearfix"></div>
+      </form>
+    </div>
+{% endif %}
+  </div>
+
+<div class="container-md" id="delivery-options">
+  <h1>megrendelő adatok</h1>
+  <form method="post" id="delivery-form">
+      <div class="mandatory-fields-wrapper">
+          <div class="form-group">
+            <label for="full_name">Teljes név*</label>
+            <input type="text" class="form-control" id="full_name" name="full_name" {% if 'mandatory' in session %}value="{{ session.mandatory.full_name }}" {% endif %} required>
+          </div>
+          <div class="form-group">
+            <label for="phone_number">Telefonszám*</label>
+            <input type="text" class="form-control" id="phone_number" name="phone_number" {% if 'mandatory' in session %}value="{{ session.mandatory.phone }}" {% endif %} required>
+          </div>
+          <div class="form-group">
+            <label for="email_address">E-mail cím*</label>
+            <input type="email" class="form-control" id="email_address" name="email_address" {% if 'mandatory' in session %}value="{{ session.mandatory.email }}" {% endif %} required>
+          </div>
+          <div class="clearfix"></div>
+      </div>
+      {% if is_product_in_cart %}
+      <h1>szállítási információk</h1>
+      <div id="accordion">
+        <div class="card">
+          <div class="card-header" id="personal">
+            <h5 class="mb-0">
+              <button class="btn btn-link{% if 'delivery' in session and session.delivery.delivery_type != 'Személyes átvétel' %} collapsed{% endif %}" type="button" data-toggle="collapse" data-target="#collapseOne"
+                      {% if 'delivery' in session and session.delivery.delivery_type == 'Személyes átvétel' %}
+                        aria-expanded="true"
+                      {% elif 'delivery' in session and session.delivery.delivery_type != 'Személyes átvétel' %}
+                        aria-expanded="false"
+                      {% else %}
+                        aria-expanded="true"
+                      {% endif %}
+                      aria-controls="collapseOne">
+                <img src="{% static 'images/personal.png' %}" alt="Személyes átvétel" />
+                <span>Személyes átvétel</span>
+              </button>
+            </h5>
+          </div>
+
+          <div id="collapseOne" class="collapse{% if 'delivery' in session and session.delivery.delivery_type == 'Személyes átvétel' %} show{% elif 'delivery' in session and session.delivery.delivery_type != 'Személyes átvétel' %} {% else %} show{% endif %}" aria-labelledby="personal" data-parent="#accordion">
+            <div class="card-body">
+              <div class="personal-left-wrapper">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Vezetéknév" {% if 'delivery' in session %}value="{{ session.delivery.first_name }}" {% endif %} {% if 'delivery' in session and session.delivery.delivery_type == 'Személyes átvétel' %} required{% endif %}>
+                </div>
+                <div class="personal-data-text">
+                  <span>Átvételi cím</span>
+                  <span>1119 Budapest</span>
+                  <span>Tétényi út, Bikás park</span>
+                </div>
+              </div>
+              <div class="personal-right-wrapper">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Keresztnév" {% if 'delivery' in session %}value="{{ session.delivery.last_name }}" {% endif %} {% if 'delivery' in session and session.delivery.delivery_type == 'Személyes átvétel' %} required{% endif %}>
+                </div>
+                <div class="personal-data-text">
+                  <span>Átvétel menete</span>
+                  <span>A megrendelésed véglegesítése után e-mailben</span>
+                  <span>egyeztetünk átvételi időpontot.</span>
+                </div>
+              </div>
+              <div class="clearfix"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header" id="csomagkuldo">
+            <h5 class="mb-0">
+              <button class="btn btn-link{% if 'delivery' in session and session.delivery.delivery_type != 'Csomagkuldo' %} collapsed{% endif %}" type="button" data-toggle="collapse" data-target="#collapseFour"
+                      {% if 'delivery' in session and session.delivery.delivery_type == 'Csomagkuldo' %}
+                        aria-expanded="true"
+                      {% elif 'delivery' in session and session.delivery.delivery_type != 'Csomagkuldo' %}
+                        aria-expanded="false"
+                      {% else %}
+                        aria-expanded="true"
+                      {% endif %}
+                      aria-controls="collapseFour" onClick="inlineFullHU()">
+                <img src="{% static 'images/foxpost.png' %}" alt="csomagkuldo" />
+                <span>Csomagküldő átvevőhely + <span id="csomagkuldo_price">{{ csomagkuldo_price }}</span> Ft</span>
+              </button>
+            </h5>
+          </div>
+
+          <div id="collapseFour" class="collapse{% if 'delivery' in session and session.delivery.delivery_type == 'Csomagkuldo' %} show{% endif %}" aria-labelledby="personal" data-parent="#accordion">
+            <div id="csomagkuldo-body" class="card-body"></div>
+         </div>
+        </div>
+        <div class="card">
+          <div class="card-header" id="foxt-post">
+            <h5 class="mb-0">
+              <button class="btn btn-link{% if 'delivery' in session and session.delivery.delivery_type != 'FoxPost' %} collapsed{% endif %}" type="button" data-toggle="collapse" data-target="#collapseTwo"
+                      {% if 'delivery' in session and session.delivery.delivery_type == 'FoxPost' %}
+                        aria-expanded="true"
+                      {% elif 'delivery' in session and session.delivery.delivery_type != 'FoxPost' %}
+                        aria-expanded="false"
+                      {% else %}
+                        aria-expanded="false"
+                      {% endif %}
+                      aria-controls="collapseTwo">
+                <img src="{% static 'images/foxpost.png' %}" alt="Foxpost csomagautomata" />
+                  <span>Foxpost csomagautomata + <span id="fox_price">{{ fox_price }}</span> Ft</span>
+              </button>
+            </h5>
+          </div>
+          <div id="collapseTwo" class="collapse{% if 'delivery' in session and session.delivery.delivery_type == 'FoxPost' %} show{% endif %}" aria-labelledby="foxt-post" data-parent="#accordion">
+            <div class="card-body">
+                <iframe frameborder="0" loading="lazy" src="https://cdn.foxpost.hu/apt-finder/v1/app/?discount=1" width="100%" height="600px"></iframe>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header" id="delivery">
+            <h5 class="mb-0">
+              <button class="btn btn-link{% if 'delivery' in session and session.delivery.delivery_type != 'Házhozszállítás' %} collapsed{% endif %}" type="button" data-toggle="collapse" data-target="#collapseThree"
+                      {% if 'delivery' in session and session.delivery.delivery_type == 'Házhozszállítás' %}
+                        aria-expanded="true"
+                      {% elif 'delivery' in session and session.delivery.delivery_type != 'Házhozszállítás' %}
+                        aria-expanded="false"
+                      {% else %}
+                        aria-expanded="false"
+                      {% endif %}
+                      aria-controls="collapseThree">
+                <img src="{% static 'images/delivery.png' %}" alt="Házhozszállítás" />
+                  <span>Házhozszállítás + <span id="delivery_price">{{ delivery_price }}</span> Ft</span>
+              </button>
+            </h5>
+          </div>
+          <div id="collapseThree" class="collapse{% if 'delivery' in session and session.delivery.delivery_type == 'Házhozszállítás' %} show{% endif %}" aria-labelledby="delivery" data-parent="#accordion">
+            <div class="card-body">
+              <div class="form-group">
+                <label for="delivery_full_name">Név*</label>
+                <input type="text" class="form-control" id="delivery_full_name" name="delivery_full_name" {% if 'delivery' in session %}value="{{ session.delivery.delivery_name }}" {% endif %}>
+              </div>
+              <div class="form-group">
+                <label for="d_address">Utca, házszám*</label>
+                <input type="text" class="form-control" id="d_address" name="d_address" {% if 'delivery' in session %}value="{{ session.delivery.address }}" {% endif %}>
+              </div>
+              <div class="form-group">
+                <label for="d_zip">Irányítószám*</label>
+                <input type="text" class="form-control" id="d_zip" name="d_zip" {% if 'delivery' in session %}value="{{ session.delivery.postal_code }}" {% endif %}>
+              </div>
+              <div class="form-group">
+                <label for="d_city">Település*</label>
+                <input type="text" class="form-control" id="d_city" name="d_city" {% if 'delivery' in session %}value="{{ session.delivery.city }}" {% endif %}>
+              </div>
+              <div class="clearfix"></div>
+              <div class="form-group">
+                <label for="d_note">Megjegyzés</label>
+                <input type="text" class="form-control" id="d_note" name="d_note" {% if 'delivery' in session %}value="{{ session.delivery.note }}" {% endif %}>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <input type="hidden" id="delivery_safe" {% if 'delivery' in session and session.delivery.delivery_type == 'FoxPost' %}value="fp;{{ session.delivery.fox_post }}" {% elif 'delivery' in session and session.delivery.delivery_type == 'Csomagkuldo' %}value="cs;{{ session.delivery.csomagkuldo }}" {% endif %} />
+      <div id="payment-form">
+          {{ delivery_form }}
+          {% csrf_token %}
+      </div>
+      </form>
+      {% endif %}
+
+      <div id="end-total">
+        <div class="end-total-wrapper">
+            <div id="end-total-text">
+              <p>Összesen fizetendő:</p>
+            </div>
+            <div id="end-total-amount">
+              <p id="total_price" data-price="{{ cart|calculate_price:"calculated_total_price,False" }}">
+                  {{ cart|calculate_price:"calculated_total_price,False" }} Ft</p>
+            </div>
+          <div class="clearfix"></div>
+        </div>
+      </div>
+
+    <div id="payment-form-submit-button-wrapper">
+        <input id="payment-form-submit-button" type="submit" value="ELLENŐRZÉS" form="delivery-form" />
+    </div>
+
+    {% else %}
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="empty-cart">
+                    <p>Az ön kosara jelenleg üres!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    <button type="button" id="error_button" class="btn btn-primary" data-toggle="modal" data-target="#errorModal">e</button>
+        <div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="errorModalLabel">Hiba</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Értem</button>
+              </div>
+            </div>
+          </div>
+        </div>
+</div>
+{% endblock %}
+
+{% include 'shop/footer.html' with cart_page=True %}

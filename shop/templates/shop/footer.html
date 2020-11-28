@@ -1,0 +1,97 @@
+{% load static %}
+
+<footer>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <div id="submark-logo-wrapper">
+                    <a href="{% url 'shop:index' %}">
+                        <img src="{% static 'images/submark_150.png' %}" alt="Minerva Logo">
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div id="social">
+                    <div id="facebook">
+                        <a href="https://www.facebook.com/minervastudio.hu">
+                            <img src="{% static 'images/facebook_150.png' %}" alt="facebook icon" />
+                        </a>
+                    </div>
+                    <div id="instagram">
+                        <a href="https://www.instagram.com/minervastudio.hu/">
+                            <img src="{% static 'images/instagram_150.png' %}" alt="instagram icon" />
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row navigation-row" {% if request.path != '/' %}style="background: #FCEDE4;"{% endif %}>
+            <div class="col-sm-12">
+                <div class="navigation">
+                    <ul class="mainmenu">
+                        <li class="menu-item">
+                            <a title="Termékek" href="{% url 'shop:products_view' %}" >Termékek</a>
+                        </li>
+                        <li class="menu-item">
+                            <a title="GYIK" href="{% url 'shop:faq' %}" >GYIK</a>
+                        </li>
+                        <li class="menu-item">
+                            <a title="Kapcsolat" href="{% url 'shop:contact' %}" >Kapcsolat</a>
+                        </li>
+                        <li class="menu-item">
+                            <a title="ÁSZF" href="{% url 'shop:aszf' %}" >ÁSZF</a>
+                        </li>
+                        <li class="menu-item">
+                            <a title="Impresszum" href="{% url 'shop:impresszum' %}" >Impresszum</a>
+                        </li>
+                        <li class="menu-item">
+                            <a title="Adatkezelési Tájékoztató" href="{% url 'shop:data_handling' %}" >Adatkezelési Tájékoztató</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+<section id="cookie-consent" class="cookie-consent">
+	<div class="cookie-consent-inner">
+		<div class="cookie">
+
+			<div class="cookie-msg">Kedves látogató. Tájékoztatlak, hogy a honlap felhasználói élmény fokázásnak érdekében sütiket alkalmazunk. A honlap használatával a tájékoztatást tudomásul veszed.</div>
+			<div class="cookie-accept">
+				<button id="cookie" class="cookie-button" onclick='SetCookieAndHideDiv();'>OK</button>
+			</div>
+
+		</div>
+	</div>
+</section>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+    <script src="{% static 'js/main.js' %}"></script>
+    <script src="{% static 'js/cookies.js' %}"></script>
+    {% if stripe %}
+        <script src="https://js.stripe.com/v3/"></script>
+        <script src="{% static 'js/stripe_payment.js' %}"></script>
+    {% endif %}
+    {% if contact %}
+        <script src="{% static 'js/contact.js' %}"></script>
+    {% endif %}
+    {% if home %}
+        <script src="{% static 'js/home.js' %}"></script>
+    {% endif %}
+    {% if product_list %}
+        <script src="{% static 'js/product_list.js' %}"></script>
+    {% endif %}
+    {% if product_details %}
+        <script src="{% static 'js/product_details.js' %}"></script>
+    {% endif %}
+    {% if cart_page %}
+        <script src="{% static 'js/cart.js' %}"></script>
+    {% endif %}
+  </body>
+</html>
