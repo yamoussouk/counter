@@ -1,0 +1,25 @@
+{% include "shop/base.html" with notification=notification payment=True %}
+{% load static %}
+
+{% block content %}
+<div id="payment-result-container">
+  <div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+          <div class="success-wrapper">
+            <div class="success-icon">
+              <img src="{% static 'images/tick.png' %}" alt="Sikeres vásárlás" />
+            </div>
+            <div class="success-text">
+              <p>Sikeres megrendelés!</p>
+              <p>A megerősítő e-mailt a rendelésszámmal és számlával a megadott e-mail címre küldjük ki.</p>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% include 'shop/footer.html' %}
