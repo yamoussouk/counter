@@ -1,0 +1,142 @@
+{% load static %}
+<!DOCTYPE html>
+<html{% if cart_border %} id="cart"{% endif %}>
+  <head>
+    <meta charset="utf-8" />
+    <title>Minerva Studio</title>
+    <link href="{% static "css/base.css" %}" rel="stylesheet" />
+    <link href="{% static "css/footer.css" %}" rel="stylesheet" />
+    {% if payment %}
+      <link href="{% static "css/payment.css" %}" rel="stylesheet" />
+    {% endif %}
+    {% if index %}
+      <link href="{% static "css/home.css" %}" rel="stylesheet" />
+    {% endif %}
+    {% if product_list %}
+      <link href="{% static "css/product_list.css" %}" rel="stylesheet" />
+    {% endif %}
+    {% if product_details %}
+      <link href="{% static "css/product_details.css" %}" rel="stylesheet" />
+    {% endif %}
+    {% if contact %}
+      <link href="{% static "css/contact.css" %}" rel="stylesheet" />
+    {% endif %}
+    {% if data %}
+      <link href="{% static "css/data.css" %}" rel="stylesheet" />
+    {% endif %}
+    {% if impresszum %}
+      <link href="{% static "css/impresszum.css" %}" rel="stylesheet" />
+    {% endif %}
+    {% if cart_page %}
+      <script src="https://widget.packeta.com/www/js/library.js"></script>
+      <link href="{% static "css/cart.css" %}" rel="stylesheet" />
+      <meta name="cs_a" content="{{ api_key }}">
+    {% endif %}
+    {% if faq %}
+      <link href="{% static "css/faq.css" %}" rel="stylesheet" />
+    {% endif %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}"/>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+          integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+  </head>
+  <body>
+    <header id="header">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="notification-wrapper">
+              {% for n in notification %}
+              <p class="notification">{{ n.text }}</p>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <div id="main-logo">
+              <a href="{% url 'shop:index' %}">
+                  <img class="c_logo" src="{% static 'images/logo_150.png' %}" alt="Minerva Studio Logo"/>
+              </a>
+            </div>
+            <div class="tablet-menu">
+              <div class="navigation">
+                <ul class="mainmenu">
+                  <li class="{% if request.path == '/' %}current{% endif %} menu-item">
+                    <a title="Kezdőlap" href="{% url 'shop:index' %}" >Kezdőlap</a>
+                  </li>
+                  <li class="{% if '/termek' in request.path %}current{% endif %} menu-item">
+                    <a title="Termékek" href="{% url 'shop:products_view' %}" >Termékek</a>
+                  </li>
+                  <li class="{% if '/gyik' in request.path %}current{% endif %} menu-item">
+                    <a title="GYIK" href="{% url 'shop:faq' %}" >GYIK</a>
+                  </li>
+                  <li class="{% if '/kapcsolat' in request.path %}current{% endif %} menu-item">
+                    <a title="Kapcsolat" href="{% url 'shop:contact' %}" >Kapcsolat</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div id="cart-icon-wrapper">
+              {% with total_items=cart|length %}
+                {% if cart|length > 0 %}
+                <a href="{% url 'cart:cart_detail' %}">
+                    {% with total_items_plural=total_items|pluralize %}
+                  <div class="item-in-cart-indicator"><span>{{ total_items }}</span></div>
+                      <img class="c_logo" src="{% static 'images/cart_150.png' %}" alt="Minerva Studio Cart Icon"/>
+                    {% endwith %}
+                  </a>
+                {% else %}
+                  <div class="cart-icon-inner">
+                    <img class="c_logo" src="{% static 'images/cart_150.png' %}" alt="Minerva Studio Cart Icon"/>
+                  </div>
+                {% endif %}
+              {% endwith %}
+            </div>
+            <div id="mobile-menu-wrapper">
+              <div id="menu-btn"></div>
+            </div>
+          </div>
+          <div class="col-sm-12 mobile-menu">
+            <div class="navigation">
+              <div id="mobile-menu-close"></div>
+              <ul class="mainmenu">
+                <li class="{% if request.path == '/' %}current{% endif %} menu-item">
+                  <a title="Kezdőlap" href="{% url 'shop:index' %}" >Kezdőlap</a>
+                </li>
+                <li class="{% if '/termek' in request.path %}current{% endif %} menu-item">
+                  <a title="Termékek" href="{% url 'shop:products_view' %}" >Termékek</a>
+                </li>
+                <li class="{% if '/gyik' in request.path %}current{% endif %} menu-item">
+                  <a title="GYIK" href="{% url 'shop:faq' %}" >GYIK</a>
+                </li>
+                <li class="{% if '/kapcsolat' in request.path %}current{% endif %} menu-item">
+                  <a title="Kapcsolat" href="{% url 'shop:contact' %}" >Kapcsolat</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="row desktop-menu">
+          <div class="navigation">
+            <ul class="mainmenu">
+              <li class="{% if request.path == '/' %}current{% endif %} menu-item">
+                <a title="Kezdőlap" href="{% url 'shop:index' %}" >Kezdőlap</a>
+              </li>
+              <li class="{% if '/termek' in request.path %}current{% endif %} menu-item">
+                <a title="Termékek" href="{% url 'shop:products_view' %}" >Termékek</a>
+              </li>
+              <li class="{% if '/gyik' in request.path %}current{% endif %} menu-item">
+                <a title="GYIK" href="{% url 'shop:faq' %}" >GYIK</a>
+              </li>
+              <li class="{% if '/kapcsolat' in request.path %}current{% endif %} menu-item">
+                <a title="Kapcsolat" href="{% url 'shop:contact' %}" >Kapcsolat</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </header>

@@ -1,0 +1,55 @@
+{% include "shop/base.html" with notification=notification faq=True %}
+{% load static %}
+
+{% block content %}
+<div class="container faq-page">
+    <div class="row">
+        <div class="col-sm-12">
+            <div id="faq-header">
+                <h1 >INFORMÁCIÓK</h1>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <p class="faq-top"><span class="faq-medium">ÁPOLÁS,</span> <span class="faq-regular">azaz hogyan óvjuk fülbevalónkat?</span></p>
+            <ul>
+                <li>- Tartsuk hűvös, száraz helyen a réz elemek elszíneződésének elkerülése végett.</li>
+                <li>- Kerüljük a leejtést, rálépést, ráülést.</li>
+                <li>- Ne tegyük zsebbe, táskába, ahol megkarcolódhat.</li>
+                <li>- Kerüljük a vizet: fürdéskor, úszáskor ne viseljük.</li>
+                <li>- A smink/hajápoló termékek felvitele után tegyük fel.</li>
+                <li>- Amennyiben koszos lesz, nedves baba törlőkendővel vagy szappanos vizes kendővel töröljük át.</li>
+            </ul>
+            <p class="faq-top"><span class="faq-medium">MINŐSÉG</span>: minden egyes darab kézzel készül, napokig tartó munka befektetésével.</p>
+            <p>A fülbevaló alapok nikkelmentes fémek vagy műanyagok, erősragasztóval vannak rögzítve és minden darab tesztelve van a megfelelő rögzítést így ellenőrizve.</p>
+            <p>A levegőbuborékok, szöszök, karcok és egyéb apró szépséghibák elkerülése elsődleges prioritás számomra, de kézműves termék lévén ezek előfordulhatnak. </p>
+            <p>Egyes réz elemek, charmok, karikák a használat során és bizonyos idő elteltével elszíneződhetnek, hiszen ezek az anyagok erre hajlamosak. Kérlek értsétek meg ezt és tartsátok be az ápolási instrukciókat, hogy minél tovább ragyoghassatok a fülbevalókban.</p>
+            <p>Amennyiben a Minervától vásárolsz, elfogadod ezeket.</p>
+            <p class="faq-top"><span class="faq-medium">VISSZAKÜLDÉS</span></p>
+            <p>Csomagoláskor minden fülbevalót ellenőrzünk.</p>
+            <p>Amennyiben rongált terméket találsz a csomagban, az már a postai úton történt. A hibás termék cseréje lehetséges, amennyiben azt a csomagod átvétele után <span class="faq-bold">72 órán belül</span> jelzed felénk.</p>
+            <p>A visszaküldés költsége a vásárlót terheli, az újraküldésé pedig a Minervát.</p>
+            <p class="faq-top"><span class="faq-medium">SZÁLLíTÁS ÉS FIZETÉS</span></p>
+            <p>A termékek feladása a rendelést követő 3 munkanapon belül megtörténik. A feladások pontos időpontját a weboldalunk felső sávjában közöljük, illetve e-mail értesítést küldünk a vásárláskor megadott e-mail címre.</p>
+            <p>Lehetőség van:</p>
+            <ul>
+                <li>- készpénzes fizetésre személyes átvétel esetén,</li>
+                <li>- bankkártyás fizetésre szállítás esetén.</li>
+            </ul>
+            <p>Szállítási módok:</p>
+            <ul>
+                <li><span class="faq-delivery">- személyes átvétel</span><span class="faq-bold">0 Ft</span></li>
+                <li><span class="faq-delivery">- Foxpost automata</span><span class="faq-bold">{{ foxpost }} Ft</span></li>
+                <li><span class="faq-delivery">- házhozszállítás Magyar Postával</span><span class="faq-bold">{{ delivery }} Ft</span></li>
+            </ul>
+            <p>A feladást követően a Minerva Studio nem vállal felelősséget az elveszett csomagokért és nem tartozik felelősséggel azok pótlásáért.</p>
+            <p class="faq-top"><span class="faq-medium">KÖSZÖNJÜK MEGÉRTÉSED!</span></p>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% include 'shop/footer.html' %}

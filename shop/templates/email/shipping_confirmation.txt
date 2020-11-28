@@ -1,0 +1,4 @@
+Kedves {{ name }}
+Az általad megrendelt termék feladásra került.
+Hamarosan megérkezik hozzád
+www.minervastudio.hu

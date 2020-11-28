@@ -1,0 +1,118 @@
+{% extends "admin/base.html" %}
+
+{% load static %}
+
+{% block extrastyle %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/admin.css" %}" />
+{% endblock %}
+
+{% block title %}Order {{ order.id }} {{ block.super }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">Home</a>
+</div>
+{% endblock %}
+
+{% block content %}
+  <h1>Order {{ order.id }}</h1>
+    <div id="print-wrapper">
+      <a href="#" onclick="window.print();">Print order</a>
+    </div>
+    <table>
+      <tr>
+        <th>Created</th>
+        <td>{{ order.created }}</td>
+      </tr>
+      <tr>
+        <th>Teljes név</th>
+        <td>{{ order.full_name }}</td>
+      </tr>
+      <tr>
+        <th>Telefonszám</th>
+        <td>{{ order.phone }}</td>
+      </tr>
+      <tr>
+        <th>E-mail</th>
+        <td><a href="mailto:{{ order.email }}">{{ order.email }}</td>
+      </tr>
+      <tr>
+        <th><strong>Szállítási részletek</strong></th>
+        <td></td>
+      </tr>
+      <tr>
+        <th>Vezetéknév</th>
+        <td>{{ order.first_name }}</td>
+      </tr>
+      <tr>
+        <th>Keresztnév</th>
+        <td>{{ order.last_name }}</td>
+      </tr>
+      <tr>
+        <th>Cím</th>
+        <td>{{ order.address }}{{ order.postal_code }} {{ order.city }}</td>
+      </tr>
+      <tr>
+        <th>Település</th>
+        <td>{{ order.city }}</td>
+      </tr>
+      <tr>
+        <th>Irányítószám</th>
+        <td>{{ order.postal_code }}</td>
+      </tr>
+      <tr>
+        <th>Vásárlás teljes összege</th>
+        <td>${{ order.total|floatformat:"0" }}</td>
+      </tr>
+      <tr>
+        <th>Vásárlás részösszege</th>
+        <td>${{ order.subtotal|floatformat:"0" }}</td>
+      </tr>
+      <tr>
+        <th>Felhasznált kupon</th>
+        <td>{{ order.get_coupon_code }}</td>
+      </tr>
+      <tr>
+        <th>Kupon összege</th>
+        <td>-${{ order.get_discount_amount|floatformat:"0" }}</td>
+      </tr>
+      <tr>
+        <th>Rendelés státusza</th>
+        <td>{% if order.paid %}Fizetve{% else %}Fizetés függőben{% endif %}</td>
+      </tr>
+    </table>
+
+    <div class="module">
+      <div class="tabular inline-related last-related">
+        <table>
+          <h2>Vásárolt termékek</h2>
+          <thead>
+            <tr>
+              <th>Termék</th>
+              <th>Ár</th>
+              <th>Mennyiség</th>
+              <th>Összesen</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in order.items.all %}
+              <tr class="row{% cycle "1" "2" %}">
+                <td>{{ item.product.name }}</td>
+                <td class="num">${{ item.price }}</td>
+                <td class="num">{{ item.quantity }}</td>
+                <td class="num">${{ item.get_cost|rjust:"10" }}</td>
+              </tr>
+            {% endfor %}
+              <tr class="coupon">
+                <td colspan="3">Coupon</td>
+                <td class="num">- ${{ order.get_discount_amount|floatformat:"2"|rjust:"10" }}</td>
+              </tr>
+              <tr class="total">
+                <td colspan="3">Total</td>
+                <td class="num">${{ order.get_total_cost|floatformat:"2"|rjust:"10" }}</td>
+              </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+{% endblock %}

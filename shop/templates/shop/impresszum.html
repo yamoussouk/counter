@@ -1,0 +1,24 @@
+{% include "shop/base.html" with notification=notification impresszum=True %}
+{% load static %}
+
+{% block content %}
+<div id="content" class="impresszum">
+    <div class="container">
+        <div class="col-sm-12">
+            <h1>IMPRESSZUM</h1>
+                <p>Cégnév: Berta Bettina e.v.</p>
+                <p>Székhely: 6722 Szeged, Mars tér 17. 2/12</p>
+                <p>Telefon: +36 70 236 7315</p>
+                <p>E-mail: info@minervastudio.hu</p>
+                <p>Webcím: www.minervastudio.hu</p>
+                <p>Adószám: 56628829-1-26</p>
+                <p>Nyilvántartási szám: 55295718</p>
+                <p>Kamara: Csongrád megyei Kereskedelmi és Iparkamara</p>
+                <p>Tárhelyszolgáltató: https://dotroll.com/</p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% include 'shop/footer.html' with contact=True %}

@@ -1,0 +1,143 @@
+{% include "shop/base.html" with notification=notification product_details=True %}
+{% load static %}
+
+{% block content %}
+<div class="content product-detail">
+    <div class="container-fluid">
+        <div class="row detail-filter-row">
+            <div id="detail-page-filter-button"></div>
+            <div class="col-sm-3 detail-page-filter">
+                <div id="mobile-filter-close"></div>
+                {% include 'shop/product/filter.html' %}
+            </div>
+            <div class="col-sm-9">
+                <div class="{% if types %}multi-product{% else %}singe-product{% endif %} product-wrapper"
+                     {% if not types %}data-stock="{{ product.stock }}"{% endif %}>
+                    <div class="product-image-wrapper">
+                        <div class="product-image">
+<!--                            <img src="{% static 'images/carrot_150.png' %}" alt="Előző termék kép" title="Előző termék kép" class="prev-image" />-->
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product_image" />
+<!--                            <img src="{% static 'images/carrot_150.png' %}" alt="Következő termék kép" title="Következő termék kép" class="next-image" />-->
+                        </div>
+                        <div class="product-thumbnails-wrapper">
+                            <div class="product-thumbnail selected">
+                                <img src="{{ product.image.url }}" alt="{{ product.name }}" />
+                            </div>
+                            {% if types %}
+                                {% for type in types %}
+                                    <div class="product-thumbnail">
+                                        <img src="{{ type.image.url }}" alt="{{ product.name }}"
+                                             data-name="{{ type.color }}" />
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                {% for img in images %}
+                                    <div class="product-thumbnail">
+                                        <img src="{{ img.image.url }}" alt="{{ product.name }}" />
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                    <div class="product-description-wrapper">
+                        <div class="product-name">
+                            <h1>{{ product.name }}</h1>
+                        </div>
+                        <div class="product-collection-name">
+                            {{ product.collection.name }}
+                        </div>
+                        <div class="product-price">
+                            {{ product.price }} Ft.-
+                        </div>
+                        <div class="product-interactions">
+                            {% if is_stock %}
+                            <form action="{% url 'cart:cart_add' product.id %}" method="post">
+                                <div class="minus"><span>-</span></div>
+                              {{ cart_product_form }}
+                                <div class="plus"><span>+</span></div>
+                              {% csrf_token %}
+                                <input id="add_to_cart_button" type="submit" value="Kosárba">
+                            </form>
+                            {% else %}
+                                <div id="out_of_stock_button"><span>Elfogyott</span></div>
+                            {% endif %}
+                        </div>
+                        <div class="product-attributes">
+                            {% if is_stock %}
+                                <div class="product-attributes-color">
+                                    {% if types %}
+                                    <p>Szín:</p>
+                                    <select required>
+    <!--                                    <option value="">Válassz színt</option>-->
+                                        {% for type in types %}
+                                        <option value="{{ type.color }}" data-stock="{{ type.stock }}"
+                                                data-img-src="{{ type.image.url }}"
+                                                {% if type.stock == 0%}disabled{% endif %}>{{ type.color }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    {% endif %}
+                                </div>
+                            <div class="product-attributes-studs">
+                                {% for stud in product.studs %}
+                                <label class="studs-container"><span class="label-text">{{ product|get_stud:stud }}</span>
+                                <input type="radio" {% if forloop.counter == 1 %}checked="checked"{% endif %}
+                                       name="stud" value="{{ product|get_stud:stud }}" >
+                                    <span class="checkmark"></span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="product-description">
+                            <p>{{ product.size }}</p>
+                            {% for d in product.description|new_line %}
+                            <p>{{ d }}</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="back-to-link">
+                    <a href="{% url 'shop:products_view' collection_name %}" title="Vissza a kollekcióhoz" alt="Vissza a kollekcióhoz">
+                        <img src="{% static 'images/arrow_left_150.png' %}" alt="Vissza a kollekcióhoz" />
+                        <span>VISSZA A KOLLEKCIÓHOZ</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <button type="button" id="error_button" class="btn btn-primary" data-toggle="modal" data-target="#errorModal">e</button>
+        <div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="errorModalLabel">Hiba</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Értem</button>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% include 'shop/footer.html' with product_details=True %}
