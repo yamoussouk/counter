@@ -1,0 +1,95 @@
+{% include "shop/base.html" with notification=notification index=True %}
+{% load static %}
+
+{% block content %}
+<div class="content">
+    <section class="home-image">
+        <div class="row">
+            <div class="fluid-image-wrapper">
+                <img id="desktop-image" src="{% static 'images/home.png' %}" alt="Minerva home image" />
+                <img id="mobile-image" src="{% static 'images/home_mobile.png' %}" alt="Minerva home image" />
+            </div>
+        </div>
+    </section>
+    <section id="home-handmade">
+        <h2>handmade in budapest</h2>
+    </section>
+    <section class="home-information" id="top">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="fluid-text-wrapper">
+                    <p>A Minerva Studio ékszerei kézzel készülnek, minden egyes darab különleges</p>
+                    <p>odafigyelést kap, hogy a lehető legjobb minőségben kerüljön hozzád!</p>
+                    <div class="fluid-text-anchor">
+                        <a title="Termékek" href="{% url 'shop:products_view' %}">Termékek</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section id="home-collections">
+        <div class="row">
+            <div class="header-text-wrapper">
+                <h2>KOLLEKCIÓK</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="home-collection-wrapper">
+                {% for collection in collections %}
+                <div class="home-collection-item">
+                    <div class="text-on-image-image-wrapper">
+                        <img src="{{ collection.image.url }}" alt="{{ collection.name }}" />
+                    </div>
+                    <div class="text-on-image-wrapper">
+                        <a title="{{ collection.name }}" href="{% url 'shop:products_view' collection_name=collection.name %}">
+                            <span class="home-collection-title">{{ collection.name }}</span>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    <section class="home-image">
+        <div class="row">
+            <div class="fluid-image-wrapper">
+                <img src="{% static 'images/home2.png' %}" alt="Minerva home image" />
+            </div>
+        </div>
+    </section>
+    <section class="home-information" id="bottom">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="fluid-text-wrapper">
+                    <p>Saját színkeverés, így ezek is egyediek pont, mint Te!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="home-image-with-text">
+        <div class="row">
+            <div class="home-image-with-text-wrapper">
+                <div class="home-image-wrapper">
+                    <img src="{% static 'images/home3.png' %}" alt="Környezetbarát csomagolás">
+                </div>
+                <div class="home-text-wrapper">
+                    <div class="home-text-header">
+                        <h3>KÖRNYEZETBARÁT CSOMAGOLÁS</h3>
+                    </div>
+                    <ul>
+                        <li>100% újrafelhasználható papírból készült natúr</li>
+                        <li>kraft barna doboz színezés nélkül.</li>
+                        <li>Papír ragasztószalag.</li>
+                        <li>100%-ban papírként szelektíven gyűjthető fehér</li>
+                        <li>csomagolópapír.</li>
+                        <li>0% műanyag.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+{% endblock %}
+
+{% include 'shop/footer.html' with home=True %}

@@ -8,16 +8,18 @@ fetch("config/")
   // new
   // Event handler
   document.querySelector("#submitBtn").addEventListener("click", () => {
-    // Get Checkout Session ID
-    fetch("create-checkout-session/")
-    .then((result) => { return result.json(); })
-    .then((data) => {
-      console.log(data);
-      // Redirect to Stripe Checkout
-      return stripe.redirectToCheckout({sessionId: data.sessionId})
-    })
-    .then((res) => {
-      console.log(res);
-    });
+    if (document.querySelector('#aszf-check').checked) {
+        // Get Checkout Session ID
+        fetch("create-checkout-session/")
+        .then((result) => { return result.json(); })
+        .then((data) => {
+          console.log(data);
+          // Redirect to Stripe Checkout
+          return stripe.redirectToCheckout({sessionId: data.sessionId})
+        })
+        .then((res) => {
+          console.log(res);
+        });
+    }
   });
 });

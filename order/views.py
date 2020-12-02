@@ -100,6 +100,7 @@ def order_create(request):
                         found = len([i for i in cart if int(i.get('product_id')) == int(product.id) and i.get('color') == color and i.get('stud') == stud]) > 0
                         if not found:
                             item.delete()
+                product_price = 0
                 for item in cart:
                     OrderItem.objects.get_or_create(order=order, price=item['price'], quantity=item['quantity'],
                                                     color=item['color'] if 'color' in item else '',
@@ -108,6 +109,11 @@ def order_create(request):
                                                     **({"product": item['product']} if item['type']
                                                                                        in ['product', 'product_type']
                                                        else {"gift_card": item['product']}))
+                    product_price += int(item['price'])
+                order.products_price = product_price
+                if cart.coupon:
+                    order.products_price_with_discount = product_price - order.discount_amount
+                order.save()
         else:
             print('error', form.errors.as_data())
         if not out_of_stock:
@@ -129,9 +135,25 @@ def order_create(request):
                             if isinstance(request.session['cart'][key][key2][key3], Decimal):
                                 request.session['cart'][key][key2][str(key3)] = str(
                                     request.session['cart'][key][key2][key3])
-            # order_created.delay(order.id)
             request.session['order_id'] = order.id
             request.session['delivery_type'] = order.delivery_type
+            # o = Order.objects.prefetch_related('items').filter(id=order.id)[0]
+            # prices = dict(FoxPost=settings.FOXPOST_PRICE, Csomagkuldo=settings.CSOMAGKULDO_PRICE,
+            #               Házhozszállítás=settings.DELIVERY_PRICE, Személyesátvétel=0)
+            # delivery_info = dict(FoxPost={'Átvételi pont': o.fox_post},
+            #                      Csomagkuldo={'Átvételi pont': o.csomagkuldo},
+            #                      Házhozszállítás={'Szállítási név': o.delivery_name, 'Szállítási cím': o.address,
+            #                                       'Postakód': o.postal_code, 'Település': o.city, 'Megjegyzés': o.note},
+            #                      Személyesátvétel={'Vezetéknév': o.first_name, 'Keresztnév': o.last_name})
+            # delivery_price = prices[o.delivery_type.replace(' ', '')]
+            # delivery_data = delivery_info[o.delivery_type.replace(' ', '')]
+            # order_total = o.total
+            # result, msg = MessageSender(subject=f'Rendelés megerősítése #{str(o.id)}', to=o.email,
+            #                             sender='www.minervastudio.hu').send_order_confirmation_email(
+            #     {'name': o.full_name, 'order': o,
+            #      'delivery_price': delivery_price,
+            #      'delivery_info': delivery_data,
+            #      'order_total': order_total})
             return redirect(reverse('payment:process'))
     else:
         form = OrderCreateForm()

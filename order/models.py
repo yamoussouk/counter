@@ -20,6 +20,8 @@ class Order(models.Model):
     note = models.CharField(max_length=250, default='', blank=True)
     fox_post = models.CharField(max_length=250, default='', blank=True)
     csomagkuldo = models.CharField(max_length=250, default='', blank=True)
+    products_price = models.IntegerField(default=0)
+    products_price_with_discount = models.IntegerField(default=0)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     paid = models.BooleanField(default=False)

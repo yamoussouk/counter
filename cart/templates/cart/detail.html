@@ -75,7 +75,7 @@
 
 <div class="container-md" id="delivery-options">
   <h1>megrendelő adatok</h1>
-  <form method="post" id="delivery-form">
+  <form action="{% url 'order:order_create' %}" method="post" id="delivery-form">
       <div class="mandatory-fields-wrapper">
           <div class="form-group">
             <label for="full_name">Teljes név*</label>

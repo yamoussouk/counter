@@ -15,5 +15,6 @@ class BoughtGiftCard(models.Model):
         return super(BoughtGiftCard, self).save(*args, **kwargs)
 
     class Meta:
+        app_label = 'giftcardpayment'
         verbose_name = 'Megvásárolt ajándékkártya'
         verbose_name_plural = 'Megvásárolt ajándékkártyák'

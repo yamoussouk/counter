@@ -11,8 +11,14 @@ from .models import Collection, Product, Notification, ProductType, GiftCard, Me
 from django.db.utils import OperationalError
 
 
-def index(request):
+def index_hid(request):
     return render(request, 'shop/index.html')
+
+
+def index(request):
+    collections = Collection.objects.all()[:6]
+    notification = Notification.objects.all()
+    return render(request, 'shop/index_hid.html', {'collections': collections, 'notification': notification})
 
 
 def product_list_by_collection(request, collection_name=None):
@@ -69,8 +75,9 @@ def product_detail(request, id):
 def faq(request):
     foxpost = settings.FOXPOST_PRICE
     delivery = settings.DELIVERY_PRICE
+    csomagkuldo = settings.CSOMAGKULDO_PRICE
     notification = Notification.objects.all()
-    return render(request, 'shop/faq.html', {'foxpost': foxpost, 'delivery': delivery, 'notification': notification})
+    return render(request, 'shop/faq.html', {'csomagkuldo': csomagkuldo, 'foxpost': foxpost, 'delivery': delivery, 'notification': notification})
 
 
 def contact(request):
@@ -96,8 +103,7 @@ def contact_message(request):
         subject = cd['subject']
         email = cd['email']
         message = cd['message']
-        result = MessageSender(subject, 'tamas.kakuszi@gmail.com', f'Email from {email} \n{message}',
-                               'System message from Minerva Studio').send_mail()
+        result = MessageSender('Kapcsolat e-mail a minervastudio.hu oldalról', settings.EMAIL_HOST_USER, email, f'{subject}\n{message}').send_mail()
         sent = True if result == 1 else False
         Message.objects.create(subject=subject, email=email, message=message,
                                sender='System message from Minerva Studio', sent=sent)

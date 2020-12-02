@@ -130,7 +130,11 @@
     }
 
     footer .navigation .menu-item:nth-child(1) {
-        margin-left: 20%;
+        margin-left: 15%;
+    }
+
+    footer .navigation a {
+        color: #D3927C !important;
     }
 
     /* COOKIE */
@@ -282,14 +286,6 @@
 
     footer .navigation {
         line-height: 40px;
-    }
-
-    .navigation .mainmenu li a, .navigation .mainmenu li a:hover {
-        color: #fff;
-    }
-
-    footer .navigation .mainmenu li a, footer .navigation .mainmenu li a:hover {
-        color: #758689;
     }
 }
 

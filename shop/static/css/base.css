@@ -330,7 +330,7 @@
     }
 
     .navigation .mainmenu li a, .navigation .mainmenu li a:hover {
-        color: #fff;
+        color: #758689;
     }
 
     #cart-icon-wrapper {
@@ -379,10 +379,6 @@
         margin-top: 0;
         height: 110px;
         line-height: 110px;
-    }
-
-    .navigation .mainmenu li a, .navigation .mainmenu li a:hover {
-        color: #758689 !important;
     }
 
     .tablet-menu {

@@ -139,11 +139,41 @@
         float: right;
         text-align: justify;
     }
+
+    .confirmation-row {
+        font-family: light;
+        font-size: 20px;
+        color: #758689;
+        letter-spacing: 2px;
+        text-align: justify;
+        margin: 2% 0;
+    }
+
+    .data-alert a, .data-alert a:hover, .aszf-confirmation a, .aszf-confirmation a:hover {
+        text-decoration: none;
+        color: #000;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .form-check-input {
+        width: 20px;
+        height: 20px;
+        margin-top: .4rem !important;
+    }
+
+    .form-check-label {
+        margin-left: .4rem;
+    }
 }
 
 @media only screen and (max-width: 1280px) {
     .check-form-key, .check-form-value {
         font-size: 18px;
+    }
+
+    .form-check-input {
+        margin-top: .3rem !important;
     }
 }
 
@@ -186,6 +216,12 @@
     }
 }
 
+@media only screen and (max-width: 834px) {
+    .confirmation-row {
+        font-size: 18px;
+    }
+}
+
 @media only screen and (max-width: 568px) {
     .success-text {
         padding-top: 80px;
@@ -213,5 +249,15 @@
 
     .success-icon {
         width: 30%;
+    }
+
+    .confirmation-row {
+        font-size: 16px;
+    }
+}
+
+@media only screen and (max-width: 360px) {
+    .confirmation-row {
+        font-size: 14px;
     }
 }

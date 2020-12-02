@@ -24,7 +24,10 @@ urlpatterns = [
     path('cart/', include('cart.urls', namespace='cart')),
     path('coupon/', include('coupon.urls', namespace='coupon')),
     path('order/', include('order.urls', namespace='orders')),
+    path('payment/', include('payment.urls', namespace='payment')),
+    path('giftcard-payment/', include('giftcardpayment.urls', namespace='giftcardpayment')),
     path('admin/', admin.site.urls),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
