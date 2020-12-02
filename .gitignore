@@ -1,2 +1,6 @@
 *.pyc
 counter/settings.py
+**/migrations/**
+!**/migrations
+!**/migrations/__init__.py
+/counter/settings.py
