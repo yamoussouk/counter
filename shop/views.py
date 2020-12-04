@@ -174,9 +174,9 @@ class ProductsView(ListView):
 
     def get_queryset(self):
         products = Product.objects.prefetch_related('product_types').filter(available=True)
-        collection_name = self.kwargs['collection_name'] if 'collection_name' in self.kwargs else None
-        if collection_name:
-            collection = get_object_or_404(Collection, name=collection_name)
+        slug = self.kwargs['slug'] if 'slug' in self.kwargs else None
+        if slug:
+            collection = get_object_or_404(Collection, slug=slug)
             products = products.filter(collection=collection)
         return products
 

@@ -4,13 +4,13 @@
     </div>
     <div class="filter-element-wrapper">
         {% for col in collections %}
-        <div class="{% if collection_name == col.name %}current{% endif %} filter-element">
+        <div class="{% if slug == col.slug %}current{% endif %} filter-element">
             <a href="{% url 'shop:products_view' slug=col.slug %}" title="{{ col.name }}">
                 <p class="filter-element-text">{{ col.name }}</p>
             </a>
         </div>
         {% endfor %}
-        <div class="{% if not collection_name %}current{% endif %} filter-element">
+        <div class="{% if not slug %}current{% endif %} filter-element">
             <a href="{% url 'shop:products_view' %}" title="Összes termék">
                 <p class="filter-element-text">Mutasd mindet</p>
             </a>
