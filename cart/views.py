@@ -96,7 +96,6 @@ def cart_detail(request):
     current_amount = request.session['current_amount'] if 'current_amount' in request.session else 0
     notification = Notification.objects.all()
     api_key = settings.CSOMAGKULDO_API_KEY
-    print(cart.get_delivery_type())
     return render(request, 'cart/detail.html', {'cart': cart,
                                                 'coupon_apply_form': coupon_apply_form,
                                                 'delivery_form': delivery_form,

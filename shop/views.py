@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.db.utils import OperationalError
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, reverse
 from django.shortcuts import render, get_object_or_404
@@ -8,7 +9,6 @@ from cart.forms import CartAddProductForm, CartAddGiftCardProductForm
 from shop.MessageSender import MessageSender
 from .forms import ContactForm
 from .models import Collection, Product, Notification, ProductType, GiftCard, Message
-from django.db.utils import OperationalError
 
 
 def index_hid(request):
@@ -37,11 +37,6 @@ def product_list_by_collection(request, collection_name=None):
 def product_detail(request, id):
     product = get_object_or_404(Product, id=id, available=True)
     product_types = Product.objects.prefetch_related('product_types').filter(id=id, available=True)
-    # product_variations = Product.objects.prefetch_related('product_variations').filter(id=id, available=True)
-    # color_variations = [var for var in product_variations[0].product_variations.values()
-    #                     if var.get('attribute') == 'color' and var.get('available') is True]
-    # stud_variations = [var for var in product_variations[0].product_variations.values()
-    #                    if var.get('attribute') == 'stud' and var.get('available') is True]
     images = Product.objects.prefetch_related('images').filter(id=id, available=True)
     imgs = images[0].images.all()
     types = product_types[0].product_types.all()
@@ -67,8 +62,6 @@ def product_detail(request, id):
                    'cart_product_form': cart_product_form,
                    'is_stock': is_stock,
                    'images': imgs,
-                   # 'color_variations': color_variations,
-                   # 'stud_variations': stud_variations,
                    })
 
 
@@ -77,7 +70,8 @@ def faq(request):
     delivery = settings.DELIVERY_PRICE
     csomagkuldo = settings.CSOMAGKULDO_PRICE
     notification = Notification.objects.all()
-    return render(request, 'shop/faq.html', {'csomagkuldo': csomagkuldo, 'foxpost': foxpost, 'delivery': delivery, 'notification': notification})
+    return render(request, 'shop/faq.html',
+                  {'csomagkuldo': csomagkuldo, 'foxpost': foxpost, 'delivery': delivery, 'notification': notification})
 
 
 def contact(request):
@@ -103,7 +97,8 @@ def contact_message(request):
         subject = cd['subject']
         email = cd['email']
         message = cd['message']
-        result = MessageSender('Kapcsolat e-mail a minervastudio.hu oldalról', settings.EMAIL_HOST_USER, email, f'{subject}\n{message}').send_mail()
+        result = MessageSender('Kapcsolat e-mail a minervastudio.hu oldalról', settings.EMAIL_HOST_USER, email,
+                               f'{subject}\n{message}').send_mail()
         sent = True if result == 1 else False
         Message.objects.create(subject=subject, email=email, message=message,
                                sender='System message from Minerva Studio', sent=sent)
@@ -160,6 +155,23 @@ class ProductsView(ListView):
     except OperationalError:
         pass
 
+    def check_product_stock(self, products) -> dict:
+        stock_dict = dict()
+        for p in products:
+            pr = Product.objects.prefetch_related('product_types').filter(id=p.id, available=True)[0]
+            if len(pr.product_types.all()) > 0:
+                for h in pr.product_types.all().values():
+                    if h.get('product_id') not in stock_dict:
+                        stock_dict[h.get('product_id')] = int(h.get('stock'))
+                    else:
+                        stock_dict[h.get('product_id')] += int(h.get('stock'))
+            else:
+                if pr.id not in stock_dict:
+                    stock_dict[pr.id] = int(pr.stock)
+                else:
+                    stock_dict[pr.id] += int(pr.stock)
+        return stock_dict
+
     def get_queryset(self):
         products = Product.objects.prefetch_related('product_types').filter(available=True)
         collection_name = self.kwargs['collection_name'] if 'collection_name' in self.kwargs else None
@@ -170,7 +182,9 @@ class ProductsView(ListView):
 
     def get_context_data(self):
         context = super().get_context_data(**self.kwargs)
+        stock_dict = self.check_product_stock(context.get('products'))
         context['notification'] = Notification.objects.all()
+        context['product_stock'] = stock_dict
         if 'collection_name' in self.kwargs:
             context['collection'] = get_object_or_404(Collection, name=self.kwargs['collection_name'])
             context['collection_name'] = self.kwargs['collection_name']

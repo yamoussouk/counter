@@ -64,11 +64,17 @@ def order_create(request):
                                                    first_name=cd['first_name'], last_name=cd['last_name'],
                                                    csomagkuldo=cd['csomagkuldo'])
                 request.session['mandatory'] = dict(full_name=cd['full_name'], email=cd['email'], phone=cd['phone'])
+                request.session['billing'] = dict(billing_address=cd['billing_address'],
+                                                  billing_postal_code=cd['billing_postal_code'],
+                                                  billing_city=cd['billing_city'])
                 if cart.order:
                     order = cart.order
                     order.full_name = request.POST.get('full_name')
                     order.phone = request.POST.get('phone_number')
                     order.email = request.POST.get('email_address')
+                    order.billing_address = request.POST.get('billing_address')
+                    order.billing_postal_code = request.POST.get('billing_postal_code')
+                    order.billing_city = request.POST.get('billing_city')
                     order.first_name = request.POST.get('first_name')
                     order.last_name = request.POST.get('last_name')
                     order.delivery_name = request.POST.get('delivery_full_name')

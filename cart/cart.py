@@ -89,7 +89,7 @@ class Cart(object):
         if str(item_id) in self.cart:
             del self.cart[str(item_id)]
         if len(self.cart) == 0:
-            props = ['coupon_id', 'gift_card_ids', 'delivery', 'mandatory', 'order_id', 'delivery_type']
+            props = ['coupon_id', 'gift_card_ids', 'delivery', 'mandatory', 'order_id', 'delivery_type', 'billing']
             for p in props:
                 if p in self.session:
                     if p == 'order_id':
@@ -127,7 +127,7 @@ class Cart(object):
 
     def clear(self):
         self.session[settings.CART_SESSION_ID] = {}
-        props = ['coupon_id', 'gift_card_ids', 'delivery', 'mandatory', 'order_id', 'delivery_type']
+        props = ['coupon_id', 'gift_card_ids', 'delivery', 'mandatory', 'order_id', 'delivery_type', 'billing']
         for p in props:
             if p in self.session:
                 del self.session[p]

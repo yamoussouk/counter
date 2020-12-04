@@ -15,8 +15,14 @@ class CartAddGiftCardProductForm(forms.Form):
 
 
 class CartDeliveryInfoForm(forms.Form):
+    # mandatory fields
     fullname = forms.CharField(required=True, widget=forms.HiddenInput)
     email = forms.EmailField(required=True, widget=forms.HiddenInput)
+    phone = forms.CharField(required=True, widget=forms.HiddenInput, initial='')
+    billing_address = forms.CharField(required=False, widget=forms.HiddenInput, initial='')
+    billing_postal_code = forms.CharField(required=False, widget=forms.HiddenInput, initial='')
+    billing_city = forms.CharField(required=False, widget=forms.HiddenInput, initial='')
+    ##
     firstname = forms.CharField(required=False, widget=forms.HiddenInput, initial='')
     lastname = forms.CharField(required=False, widget=forms.HiddenInput, initial='')
     fox_post = forms.CharField(required=False, widget=forms.HiddenInput, initial='')
@@ -26,5 +32,4 @@ class CartDeliveryInfoForm(forms.Form):
     city = forms.CharField(required=False, widget=forms.HiddenInput, initial='')
     note = forms.CharField(required=False, widget=forms.HiddenInput, initial='')
     delivery_type = forms.CharField(required=False, widget=forms.HiddenInput, initial='')
-    phone = forms.CharField(required=True, widget=forms.HiddenInput, initial='')
     csomagkuldo = forms.CharField(required=False, widget=forms.HiddenInput, initial='')
