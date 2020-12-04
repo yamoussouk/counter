@@ -8,6 +8,8 @@ from multiselectfield import MultiSelectField
 
 class Collection(models.Model):
     name = models.CharField(max_length=200, db_index=True)
+    slug = models.SlugField(max_length=200, db_index=True, unique=True, default='')
+    slug_again = models.SlugField(max_length=200, db_index=True, unique=True)
     image = models.ImageField(upload_to='collections/', blank=True)
     available = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
@@ -22,7 +24,7 @@ class Collection(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('shop:products_view', args=[self.name])
+        return reverse('shop:products_view', args=[self.slug])
 
 
 class StudTypeEnum(Enum):
@@ -39,6 +41,7 @@ STUD_CHOICES = ((1, 'NORMAL'),
 class Product(models.Model):
     collection = models.ForeignKey(Collection, related_name='products', on_delete=models.CASCADE)
     name = models.CharField(max_length=200, db_index=True)
+    slug = models.SlugField(max_length=200, db_index=True)
     image = models.ImageField(blank=True)
     description = models.TextField(blank=True)
     size = models.TextField(blank=True)
@@ -54,12 +57,13 @@ class Product(models.Model):
         ordering = ('name',)
         verbose_name = 'Termék'
         verbose_name_plural = 'Termékek'
+        index_together = (('id', 'slug'),)
 
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('shop:product_detail', args=[self.id])
+        return reverse('shop:product_detail', args=[self.id, self.slug])
 
     def get_stud_value(self, value):
         values = ['normál fülbevaló alap - fém', 'nikkelmentes fülbevaló alap - fém',
@@ -97,23 +101,6 @@ class ProductType(models.Model):
         return self.color
 
 
-class VariationManager(models.Manager):
-    def all(self):
-        return super(VariationManager, self).filter(available=True)
-
-    def studs(self):
-        return self.all().filter(attribute='stud')
-
-    def colors(self):
-        return self.all().filter(attribute='color')
-
-
-VAR_CATEGORIES = (
-    ('color', 'color'),
-    ('stud', 'stud'),
-)
-
-
 class Notification(models.Model):
     name = models.CharField(max_length=200, db_index=True)
     text = models.CharField(max_length=200, db_index=True)
@@ -139,6 +126,7 @@ PRICE_CHOICES = ((1000, '1000'),
 
 class GiftCard(models.Model):
     name = models.CharField(max_length=200, db_index=True, default='Ajándékkártya')
+    slug = models.SlugField(max_length=200, db_index=True)
     price = models.IntegerField()
     available = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)

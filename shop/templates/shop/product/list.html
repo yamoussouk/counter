@@ -16,7 +16,7 @@
                     <div class="{% if not product_stock.items|is_stock:product.id %}out-of-stock{% endif %} product-element">
                         <div class="product-element-image-wrapper">
                             {% if product.image %}
-                            <a href="{% url 'shop:product_detail' id=product.id %}" title="Termék oldal">
+                            <a href="{% url 'shop:product_detail' id=product.id slug=product.slug %}" title="Termék oldal">
                                 <img src="{{ product.image.url }}" alt="{{ product.name }}"
                                      class="product-element-image"/>
                                 {% endif %}
@@ -25,7 +25,7 @@
                             </a>
                         </div>
                         <div class="product-element-description-wrapper">
-                            <a href="{% url 'shop:product_detail' id=product.id %}" title="Termék oldal">
+                            <a href="{% url 'shop:product_detail' id=product.id slug=product.slug %}" title="Termék oldal">
                                 <span class="product-element-name">{{ product.name }} | {{ product.price }} Ft.-</span>
                             </a>
                             <span class="product-element-collection">{{ product.collection.name }}</span>

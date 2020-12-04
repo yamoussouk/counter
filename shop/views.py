@@ -34,9 +34,9 @@ def product_list_by_collection(request, collection_name=None):
                    'notification': notification})
 
 
-def product_detail(request, id):
-    product = get_object_or_404(Product, id=id, available=True)
-    product_types = Product.objects.prefetch_related('product_types').filter(id=id, available=True)
+def product_detail(request, id: int, slug: str):
+    product = get_object_or_404(Product, id=id, slug=slug, available=True)
+    product_types = Product.objects.prefetch_related('product_types').filter(id=id, slug=slug, available=True)
     images = Product.objects.prefetch_related('images').filter(id=id, available=True)
     imgs = images[0].images.all()
     types = product_types[0].product_types.all()
@@ -52,12 +52,12 @@ def product_detail(request, id):
     cart_product_form = CartAddProductForm()
     collections = Collection.objects.all()
     notification = Notification.objects.all()
-    collection_name = product.collection.name
+    collection_slug = product.collection.slug
     return render(request, 'shop/product/detail.html',
                   {'product': product,
                    'notification': notification,
                    'collections': collections,
-                   'collection_name': collection_name,
+                   'collection_slug': collection_slug,
                    'types': types,
                    'cart_product_form': cart_product_form,
                    'is_stock': is_stock,

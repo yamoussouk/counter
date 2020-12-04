@@ -5,7 +5,7 @@
     <div class="filter-element-wrapper">
         {% for col in collections %}
         <div class="{% if collection_name == col.name %}current{% endif %} filter-element">
-            <a href="{% url 'shop:products_view' collection_name=col.name %}" title="{{ col.name }}">
+            <a href="{% url 'shop:products_view' slug=col.slug %}" title="{{ col.name }}">
                 <p class="filter-element-text">{{ col.name }}</p>
             </a>
         </div>

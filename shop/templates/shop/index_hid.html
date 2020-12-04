@@ -41,7 +41,7 @@
                         <img src="{{ collection.image.url }}" alt="{{ collection.name }}" />
                     </div>
                     <div class="text-on-image-wrapper">
-                        <a title="{{ collection.name }}" href="{% url 'shop:products_view' collection_name=collection.name %}">
+                        <a title="{{ collection.name }}" href="{% url 'shop:products_view' slug=collection.slug %}">
                             <span class="home-collection-title">{{ collection.name }}</span>
                         </a>
                     </div>
@@ -53,7 +53,7 @@
     <section class="home-image">
         <div class="row">
             <div class="fluid-image-wrapper">
-                <img src="{% static 'images/home2.png' %}" alt="Minerva home image" />
+                <img src="{% statpic 'images/home2.png' %}" alt="Minerva home image" />
             </div>
         </div>
     </section>

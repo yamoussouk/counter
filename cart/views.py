@@ -55,12 +55,12 @@ def cart_add(request, product_id):
         if status:
             cart.add(product=product, quantity=cd['quantity'],
                      update_quantity=cd['update'], color=cd['color'], stud=cd['stud'])
-            return redirect(reverse('shop:product_detail', args=[product_id]))
+            return redirect(reverse('shop:product_detail', args=[product_id, product.slug]))
         else:
             messages.error(request, f'A hozzáadni kívánt, illetve a kosaradban található termék összes mennyisége'
                                     f' meghaladja az elérhető mennyiséget, amely {stock}. A kosaradban az aktuális termék '
                                     f'mennyisége {item_in_cart}.')
-            return redirect(reverse('shop:product_detail', args=[product_id]))
+            return redirect(reverse('shop:product_detail', args=[product_id, product.slug]))
     messages.error(request, 'Hiba történt, kérlek, próbáld meg újra.')
     return redirect('shop:product_detail')
 
