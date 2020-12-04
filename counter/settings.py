@@ -41,6 +41,9 @@ INSTALLED_APPS = [
     'cart',
     'coupon',
     'order',
+    'multiselectfield',
+    'payment',
+    'giftcardpayment',
 ]
 
 MIDDLEWARE = [
@@ -67,6 +70,8 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'cart.context_processors.cart',
+                'shop.context_processors.ga_tracking_id',
+                'shop.context_processors.use_ga',
             ],
         },
     },
@@ -131,15 +136,24 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'shop', 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 CART_SESSION_ID = 'cart'
 
-FOXPOST_PRICE = 862
-DELIVERY_PRICE = 1735
+FOXPOST_PRICE = 870
+DELIVERY_PRICE = 1500
 CSOMAGKULDO_PRICE = 460
 
 CURRENCY = 'huf'
 
+##
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+# GA
+GA_TRACKING_ID = 'UA-YOUR-TRACKING-ID'
+USE_GA = os.environ.get('DJANGO_USE_GA', True)
+USE_GA = {'True': True, 'False': False}.get(USE_GA, True)

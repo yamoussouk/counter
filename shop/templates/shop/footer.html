@@ -93,5 +93,10 @@
     {% if cart_page %}
         <script src="{% static 'js/cart.js' %}"></script>
     {% endif %}
+    {% block ga %}
+        {% if use_ga %}
+            {% include "shop/snippets/ga.html" with ga_tracking_id=ga_tracking_id%}
+        {% endif %}
+    {% endblock ga %}
   </body>
 </html>
