@@ -22,7 +22,7 @@ class ProductSitemap(Sitemap):
         return Product.objects.filter(available=True)
 
     def location(self, obj):
-        return reverse('shop:product_detail', args=[obj.id, obj.slug])
+        return reverse('shop:product_detail', args=[obj.collection.slug, obj.slug])
 
     def lastmod(self, obj):
         return obj.updated

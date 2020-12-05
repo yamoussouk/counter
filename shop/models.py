@@ -63,7 +63,7 @@ class Product(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('shop:product_detail', args=[self.id, self.slug])
+        return reverse('shop:product_detail', args=[self.collection.slug, self.slug])
 
     def get_stud_value(self, value):
         values = ['normál fülbevaló alap - fém', 'nikkelmentes fülbevaló alap - fém',

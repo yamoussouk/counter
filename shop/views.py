@@ -34,10 +34,11 @@ def product_list_by_collection(request, collection_name=None):
                    'notification': notification})
 
 
-def product_detail(request, id: int, slug: str):
-    product = get_object_or_404(Product, id=id, slug=slug, available=True)
-    product_types = Product.objects.prefetch_related('product_types').filter(id=id, slug=slug, available=True)
-    images = Product.objects.prefetch_related('images').filter(id=id, available=True)
+def product_detail(request, id: str, slug: str):
+    collection = Collection.objects.filter(slug=id)[0]
+    product = get_object_or_404(Product, collection=collection, slug=slug, available=True)
+    product_types = Product.objects.prefetch_related('product_types').filter(collection=collection, slug=slug, available=True)
+    images = Product.objects.prefetch_related('images').filter(collection=collection, available=True)
     imgs = images[0].images.all()
     types = product_types[0].product_types.all()
     is_stock = False
