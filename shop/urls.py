@@ -3,6 +3,7 @@ from django.contrib.sitemaps.views import sitemap
 
 from . import views
 from .sitemaps import StaticViewsSitemap, CollectionSitemap, ProductSitemap
+from django.views.generic import TemplateView
 
 sitemaps = {
     'static': StaticViewsSitemap,
@@ -26,4 +27,5 @@ urlpatterns = [
     path('cookie-consent/', views.cookie_consent, name='cookie_consent'),
     path('impresszum/', views.impresszum, name='impresszum'),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
+    path('robots.txt', TemplateView.as_view(template_name="shop/robots.txt", content_type='text/plain')),
 ]
