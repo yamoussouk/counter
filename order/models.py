@@ -10,6 +10,9 @@ from shop.models import Product, GiftCard
 class Order(models.Model):
     full_name = models.CharField(max_length=200, default='')
     email = models.EmailField()
+    billing_address = models.CharField(max_length=250, default='', blank=True)
+    billing_postal_code = models.CharField(max_length=20, default='', blank=True)
+    billing_city = models.CharField(max_length=100, default='', blank=True)
     delivery_type = models.CharField(max_length=50, default='')
     first_name = models.CharField(max_length=50, default='', blank=True)
     last_name = models.CharField(max_length=50, default='', blank=True)
@@ -20,6 +23,8 @@ class Order(models.Model):
     note = models.CharField(max_length=250, default='', blank=True)
     fox_post = models.CharField(max_length=250, default='', blank=True)
     csomagkuldo = models.CharField(max_length=250, default='', blank=True)
+    products_price = models.IntegerField(default=0)
+    products_price_with_discount = models.IntegerField(default=0)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     paid = models.BooleanField(default=False)
@@ -65,6 +70,9 @@ class OrderItem(models.Model):
     color = models.CharField(max_length=50, default='', blank=True, null=True)
     stud = models.CharField(max_length=100, default='', blank=True, null=True)
     image = models.CharField(max_length=250, null=True, default='', blank=True)
+    first_initial = models.CharField(max_length=3, null=True, default='', blank=True)
+    second_initial = models.CharField(max_length=3, null=True, default='', blank=True)
+    custom_date = models.CharField(max_length=10, null=True, default='', blank=True)
 
     def __str__(self):
         return '{}'.format(self.id)

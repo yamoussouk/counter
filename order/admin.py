@@ -42,6 +42,7 @@ def order_detail(obj):
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
     raw_id_fields = ['product']
+    fields = ['product', 'price', 'quantity', 'color', 'stud', 'first_initial', 'second_initial', 'custom_date']
 
 
 class OrderAdmin(admin.ModelAdmin):

@@ -50,7 +50,10 @@ def order_create(request):
         if form.is_valid():
             cd = form.cleaned_data
             for item in cart:
-                status, item_in_cart, stock = __validate_stock(cart.cart, item['product'], item)
+                if item['product'].custom:
+                    status, item_in_cart, stock = True, 0, 0
+                else:
+                    status, item_in_cart, stock = __validate_stock(cart.cart, item['product'], item)
                 if not status:
                     out_of_stock = True
                     messages.error(request,
@@ -64,11 +67,17 @@ def order_create(request):
                                                    first_name=cd['first_name'], last_name=cd['last_name'],
                                                    csomagkuldo=cd['csomagkuldo'])
                 request.session['mandatory'] = dict(full_name=cd['full_name'], email=cd['email'], phone=cd['phone'])
+                request.session['billing'] = dict(billing_address=cd['billing_address'],
+                                                  billing_postal_code=cd['billing_postal_code'],
+                                                  billing_city=cd['billing_city'])
                 if cart.order:
                     order = cart.order
                     order.full_name = request.POST.get('full_name')
                     order.phone = request.POST.get('phone_number')
                     order.email = request.POST.get('email_address')
+                    order.billing_address = request.POST.get('billing_address')
+                    order.billing_postal_code = request.POST.get('billing_postal_code')
+                    order.billing_city = request.POST.get('billing_city')
                     order.first_name = request.POST.get('first_name')
                     order.last_name = request.POST.get('last_name')
                     order.delivery_name = request.POST.get('delivery_full_name')
@@ -97,17 +106,33 @@ def order_create(request):
                         color = item.color
                         stud = item.stud
                         product = item.product
-                        found = len([i for i in cart if int(i.get('product_id')) == int(product.id) and i.get('color') == color and i.get('stud') == stud]) > 0
+                        found = len([i for i in cart if
+                                     int(i.get('product_id')) == int(product.id) and i.get('color') == color and i.get(
+                                         'stud') == stud]) > 0
                         if not found:
                             item.delete()
+                product_price = 0
                 for item in cart:
                     OrderItem.objects.get_or_create(order=order, price=item['price'], quantity=item['quantity'],
                                                     color=item['color'] if 'color' in item else '',
                                                     stud=item['stud'] if 'stud' in item else '',
+                                                    first_initial=item[
+                                                        'first_initial'] if 'first_initial' in item and item[
+                                                        'first_initial'] != '--' else '',
+                                                    second_initial=item[
+                                                        'second_initial'] if 'second_initial' in item and item[
+                                                        'second_initial'] != '--' else '',
+                                                    custom_date=item['custom_date'] if 'custom_date' in item and item[
+                                                        'custom_date'] != '1899-01-01' else '',
                                                     image=item['image'],
                                                     **({"product": item['product']} if item['type']
                                                                                        in ['product', 'product_type']
                                                        else {"gift_card": item['product']}))
+                    product_price += int(item['price'])
+                order.products_price = product_price
+                if cart.coupon:
+                    order.products_price_with_discount = product_price - order.discount_amount
+                order.save()
         else:
             print('error', form.errors.as_data())
         if not out_of_stock:
@@ -129,7 +154,6 @@ def order_create(request):
                             if isinstance(request.session['cart'][key][key2][key3], Decimal):
                                 request.session['cart'][key][key2][str(key3)] = str(
                                     request.session['cart'][key][key2][key3])
-            # order_created.delay(order.id)
             request.session['order_id'] = order.id
             request.session['delivery_type'] = order.delivery_type
             return redirect(reverse('payment:process'))
