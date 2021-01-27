@@ -3,3 +3,4 @@
 *.png
 **/settings.py
 cart/**/*.pyc
+**/__pycache__/**
