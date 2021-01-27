@@ -1,9 +1,1 @@
-$('#menu-btn').click(function(e){
-    e.preventDefault();
-    $('.mobile-menu').toggleClass('opened')
-    $(this).toggleClass('opened')
-});
-
-$('#mobile-menu-close').click(function(e) {
-    $(this).parent().toggleClass('opened')
-});
+function timestamp_difference(e,t){return diffInHours=(t-e)/36e5}if($("#menu-btn").click(function(e){e.preventDefault(),$(".mobile-menu").toggleClass("opened"),$(this).toggleClass("opened")}),$("#mobile-menu-close").click(function(e){$(this).parent().toggleClass("opened")}),localStorage.getItem("cart")){var e=JSON.parse(localStorage.getItem("cart")),exp=parseInt(e.timestamp),now=(new Date).getTime(),diff=timestamp_difference(exp,now);isNaN(parseFloat(diff))&&localStorage.removeItem("cart"),diff>24&&localStorage.removeItem("cart")}

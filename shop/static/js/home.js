@@ -1,7 +1,1 @@
-$('.home-collection-item').on('mouseenter', function(e) {
-    $(this).find('img').css('opacity', '1');
-});
-
-$('.home-collection-item').on('mouseleave', function(e) {
-    $(this).find('img').css('opacity', '.3');
-});
+$(".home-collection-item").on("mouseenter",function(i){$(this).find("img").css("opacity","1")}),$(".home-collection-item").on("mouseleave",function(i){$(this).find("img").css("opacity",".3")});

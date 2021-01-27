@@ -50,20 +50,14 @@
                         <div class="product-price">
                             {{ product.price }} Ft.-
                         </div>
-                        <div class="product-interactions">
-                            {% if is_stock %}
+                        <div class="custom-product-interactions">
                             <form action="{% url 'cart:cart_add' product.id %}" method="post">
-                                <div class="minus"><span>-</span></div>
                               {{ cart_product_form }}
-                                <div class="plus"><span>+</span></div>
                               {% csrf_token %}
                                 <input id="add_to_cart_button" type="submit" value="Kosárba">
                             </form>
-                            {% else %}
-                                <div id="out_of_stock_button"><span>Elfogyott</span></div>
-                            {% endif %}
                         </div>
-                        <div class="product-attributes">
+                        <div class="custom-product-attributes">
                             {% if is_stock %}
                                 <div class="product-attributes-color">
                                     {% if types %}
@@ -80,13 +74,28 @@
                                     {% endif %}
                                 </div>
                             <div class="product-attributes-studs">
-                                {% for stud in product.studs %}
-                                <label class="studs-container"><span class="label-text">{{ product|get_stud:stud }}</span>
+                                {% for kr in product.key_ring %}
+                                <label class="studs-container"><span class="label-text">{{ product|get_key_ring:kr }}</span>
                                 <input type="radio" {% if forloop.counter == 1 %}checked="checked"{% endif %}
-                                       name="stud" value="{{ product|get_stud:stud }}" >
+                                       name="stud" value="{{ product|get_key_ring:kr }}" >
                                     <span class="checkmark"></span>
                                 </label>
                                 {% endfor %}
+                            </div>
+                            <div class="custom-product-fields">
+                                {% if product.initials %}
+                                <div id="initials-wrapper">
+                                    <label class="initials-label">Add meg a két karaktert:</label>
+                                    <input type="text" maxlength="2" minlength="1" name="first_initial" id="first_initial" required />
+                                    <input type="text" maxlength="2" minlength="1" name="second_initial" id="second_initial" required />
+                                </div>
+                                {% endif %}
+                                {% if product.custom_date %}
+                                <div id="date-wrapper">
+                                    <label class="initials-label">Add meg a dátumot:</label>
+                                    <input type="date" name="custom_date" id="custom_date" required>
+                                </div>
+                                {% endif %}
                             </div>
                             {% endif %}
                         </div>
@@ -106,7 +115,7 @@
         <div class="row">
             <div class="col-sm-12">
                 <div class="back-to-link">
-                    <a href="{% url 'shop:products_view' collection_slug %}" title="Vissza a kollekcióhoz" alt="Vissza a kollekcióhoz">
+                    <a href="{% url 'shop:custom_products_view' collection_slug %}" title="Vissza a kollekcióhoz" alt="Vissza a kollekcióhoz">
                         <img src="{% static 'images/arrow_left_150.png' %}" alt="Vissza a kollekcióhoz" title="Vissza a kollekcióhoz" />
                         <span>VISSZA A KOLLEKCIÓHOZ</span>
                     </a>

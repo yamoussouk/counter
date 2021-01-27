@@ -1,42 +1,36 @@
+import os
+
 from django.conf import settings
+from django.db.utils import OperationalError
+from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, reverse
 from django.shortcuts import render, get_object_or_404
 from django.views.generic.list import ListView
 
-from cart.forms import CartAddProductForm, CartAddGiftCardProductForm
+from cart.forms import CartAddProductForm, CartAddCustomProductForm, CartAddGiftCardProductForm
 from shop.MessageSender import MessageSender
 from .forms import ContactForm
 from .models import Collection, Product, Notification, ProductType, GiftCard, Message
-from django.db.utils import OperationalError
 
 
-def index(request):
+def index_hid(request):
     return render(request, 'shop/index.html')
 
 
-def product_list_by_collection(request, collection_name=None):
-    collection = None
-    collections = Collection.objects.all()
-    products = Product.objects.filter(available=True)
-    if collection_name:
-        collection = get_object_or_404(Collection, name=collection_name)
-        products = products.filter(collection=collection)
+def index(request):
+    collections = Collection.objects.filter(available=True, custom=False).order_by('-created')[:6]
     notification = Notification.objects.all()
-    return render(request, 'shop/product/list.html',
-                  {'collection': collection, 'collections': collections, 'products': products,
-                   'notification': notification})
+    return render(request, 'shop/index_hid.html', {'collections': collections, 'notification': notification})
 
 
-def product_detail(request, id):
-    product = get_object_or_404(Product, id=id, available=True)
-    product_types = Product.objects.prefetch_related('product_types').filter(id=id, available=True)
-    # product_variations = Product.objects.prefetch_related('product_variations').filter(id=id, available=True)
-    # color_variations = [var for var in product_variations[0].product_variations.values()
-    #                     if var.get('attribute') == 'color' and var.get('available') is True]
-    # stud_variations = [var for var in product_variations[0].product_variations.values()
-    #                    if var.get('attribute') == 'stud' and var.get('available') is True]
-    images = Product.objects.prefetch_related('images').filter(id=id, available=True)
+def __get_product_details(request, id: str, slug: str, custom: bool):
+    collection = Collection.objects.filter(slug=id)[0]
+    product = get_object_or_404(Product, collection=collection, slug=slug, available=True, custom=custom)
+    product_types = Product.objects.prefetch_related('product_types').filter(collection=collection, slug=slug,
+                                                                             available=True, custom=custom)
+    images = Product.objects.prefetch_related('images').filter(collection=collection, slug=slug, available=True,
+                                                               custom=custom)
     imgs = images[0].images.all()
     types = product_types[0].product_types.all()
     is_stock = False
@@ -48,29 +42,40 @@ def product_detail(request, id):
     else:
         if product.stock > 0:
             is_stock = True
-    cart_product_form = CartAddProductForm()
-    collections = Collection.objects.all()
+    cart_product_form = CartAddCustomProductForm() if custom else CartAddProductForm()
+    collections = Collection.objects.filter(available=True, custom=custom).order_by('-created')
     notification = Notification.objects.all()
-    collection_name = product.collection.name
-    return render(request, 'shop/product/detail.html',
+    collection_slug = product.collection.slug
+    view = 'shop:custom_products_view' if custom else 'shop:products_view'
+    template = 'shop/product/custom_detail.html' if custom else 'shop/product/detail.html'
+    return render(request, template,
                   {'product': product,
                    'notification': notification,
                    'collections': collections,
-                   'collection_name': collection_name,
+                   'collection_slug': collection_slug,
                    'types': types,
                    'cart_product_form': cart_product_form,
                    'is_stock': is_stock,
                    'images': imgs,
-                   # 'color_variations': color_variations,
-                   # 'stud_variations': stud_variations,
+                   'view': view
                    })
+
+
+def product_detail(request, id: str, slug: str):
+    return __get_product_details(request, id, slug, False)
+
+
+def custom_product_detail(request, id: str, slug: str):
+    return __get_product_details(request, id, slug, True)
 
 
 def faq(request):
     foxpost = settings.FOXPOST_PRICE
     delivery = settings.DELIVERY_PRICE
+    csomagkuldo = settings.CSOMAGKULDO_PRICE
     notification = Notification.objects.all()
-    return render(request, 'shop/faq.html', {'foxpost': foxpost, 'delivery': delivery, 'notification': notification})
+    return render(request, 'shop/faq.html',
+                  {'csomagkuldo': csomagkuldo, 'foxpost': foxpost, 'delivery': delivery, 'notification': notification})
 
 
 def contact(request):
@@ -96,8 +101,8 @@ def contact_message(request):
         subject = cd['subject']
         email = cd['email']
         message = cd['message']
-        result = MessageSender(subject, 'tamas.kakuszi@gmail.com', f'Email from {email} \n{message}',
-                               'System message from Minerva Studio').send_mail()
+        result = MessageSender('Kapcsolat e-mail a minervastudio.hu oldalról', settings.EMAIL_HOST_USER, email,
+                               f'{subject}\n{message}').send_mail()
         sent = True if result == 1 else False
         Message.objects.create(subject=subject, email=email, message=message,
                                sender='System message from Minerva Studio', sent=sent)
@@ -131,7 +136,7 @@ class ProductsView(ListView):
         template_name = 'shop/product/list.html'
         context_object_name = 'products'
         stock_dict = dict()
-        temp = Product.objects.prefetch_related('product_types').filter(available=True)
+        temp = Product.objects.prefetch_related('product_types').filter(available=True, custom=False)
         for i in temp:
             if len(i.product_types.all()) > 0:
                 for h in i.product_types.all().values():
@@ -149,16 +154,72 @@ class ProductsView(ListView):
         extra_context = {
             'product_stock': stock_dict,
             'gift_card': gift_card,
-            'card_gift_cart_product_form': card_gift_cart_product_form
+            'card_gift_cart_product_form': card_gift_cart_product_form,
+            'view': 'shop:products_view'
+        }
+    except OperationalError:
+        pass
+
+    def check_product_stock(self, products) -> dict:
+        stock_dict = dict()
+        for p in products:
+            pr = Product.objects.prefetch_related('product_types').filter(id=p.id, available=True, custom=False)[0]
+            if len(pr.product_types.all()) > 0:
+                for h in pr.product_types.all().values():
+                    if h.get('product_id') not in stock_dict:
+                        stock_dict[h.get('product_id')] = int(h.get('stock'))
+                    else:
+                        stock_dict[h.get('product_id')] += int(h.get('stock'))
+            else:
+                if pr.id not in stock_dict:
+                    stock_dict[pr.id] = int(pr.stock)
+                else:
+                    stock_dict[pr.id] += int(pr.stock)
+        return stock_dict
+
+    def get_queryset(self):
+        products = Product.objects.prefetch_related('product_types').filter(available=True, custom=False)
+        slug = self.kwargs['slug'] if 'slug' in self.kwargs else None
+        if slug:
+            collection = get_object_or_404(Collection, slug=slug)
+            products = products.filter(collection=collection)
+        return products
+
+    def get_context_data(self):
+        context = super().get_context_data(**self.kwargs)
+        stock_dict = self.check_product_stock(context.get('products'))
+        context['notification'] = Notification.objects.all()
+        context['product_stock'] = stock_dict
+        if 'collection_name' in self.kwargs:
+            context['collection'] = get_object_or_404(Collection, name=self.kwargs['collection_name'])
+            context['collection_name'] = self.kwargs['collection_name']
+        context['collections'] = Collection.objects.filter(available=True, custom=False).order_by('-created')
+        context['types'] = ProductType.objects.select_related('product')
+        context['custom'] = False
+        return context
+
+
+class CustomProductsView(ListView):
+    try:
+        collection = None
+        model = Product
+        paginate_by = 9
+        template_name = 'shop/product/custom_list.html'
+        context_object_name = 'custom_products'
+        temp = Product.objects.prefetch_related('product_types').filter(available=True, custom=True)
+        gift_card = GiftCard.objects.filter(available=True)
+        card_gift_cart_product_form = CartAddGiftCardProductForm()
+        extra_context = {
+            'view': 'shop:custom_products_view'
         }
     except OperationalError:
         pass
 
     def get_queryset(self):
-        products = Product.objects.prefetch_related('product_types').filter(available=True)
-        collection_name = self.kwargs['collection_name'] if 'collection_name' in self.kwargs else None
-        if collection_name:
-            collection = get_object_or_404(Collection, name=collection_name)
+        products = Product.objects.prefetch_related('product_types').filter(available=True, custom=True)
+        slug = self.kwargs['slug'] if 'slug' in self.kwargs else None
+        if slug:
+            collection = get_object_or_404(Collection, slug=slug)
             products = products.filter(collection=collection)
         return products
 
@@ -168,6 +229,12 @@ class ProductsView(ListView):
         if 'collection_name' in self.kwargs:
             context['collection'] = get_object_or_404(Collection, name=self.kwargs['collection_name'])
             context['collection_name'] = self.kwargs['collection_name']
-        context['collections'] = Collection.objects.all()
+        context['collections'] = Collection.objects.filter(available=True, custom=True).order_by('-created')
         context['types'] = ProductType.objects.select_related('product')
+        context['custom'] = True
         return context
+
+
+def get_icon(request):
+    image_data = open(os.path.join(settings.STATIC_ROOT, 'images', 'icon.png'), "rb").read()
+    return HttpResponse(image_data, content_type="image/png")

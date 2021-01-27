@@ -18,7 +18,7 @@ Kedvezmény: - {{ order.discount_amount|floatformat:"0" }} Ft
 {% endif %}
 
 Termékek {% if order.coupon %}(kedvezmény levonása után){% endif %}
-{% if order.coupon %}{{ order.subtotal|floatformat:"0" }}{% else %}{{ order.total|floatformat:"0" }}{% endif %} Ft
+{% if order.coupon %}{{ order.products_price_with_discount|floatformat:"0" }}{% else %}{{ order.products_price|floatformat:"0" }}{% endif %} Ft
 
 Szállítás {{ delivery_price|floatformat:"0" }} Ft
 Végösszeg: {{ order_total|floatformat:"0" }} Ft
