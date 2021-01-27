@@ -52,7 +52,7 @@ def create_checkout_session(request):
     metadata = dict(order_id=order_id)
     # if any gift card is applied an add hoc payment is created
     # this sucks since 175ft is the minimum limit for a purchase
-    if cart.gift_cards is not None:
+    if hasattr(cart, 'gift_cards') and cart.gift_cards is not None:
         total_price = cart.calculated_total_price()
         items.append(dict(name='valami', amount=int(total_price) * 100, quantity=1, currency=settings.CURRENCY))
     else:
@@ -68,11 +68,11 @@ def create_checkout_session(request):
                     items.append(dict(price=gift_card.price_api_id, quantity=int(i.get('quantity'))))
         delivery_type = order[0].delivery_type
         if delivery_type == 'Házhozszállítás':
-            items.append(dict(price='price_1Hmeu4EDD83OtAN44aAs4EUy', quantity=1))
+            items.append(dict(price=settings.DELIVERY_PRICE_API_KEY, quantity=1))
         elif delivery_type == 'FoxPost':
-            items.append(dict(price='price_1HmessEDD83OtAN4NAeiAbQ8', quantity=1))
+            items.append(dict(price=settings.FOXPOST_PRICE_API_KEY, quantity=1))
         elif delivery_type == 'Csomagkuldo':
-            items.append(dict(price='price_1HsDMmEDD83OtAN47Sr3RXUT', quantity=1))
+            items.append(dict(price=settings.CSOMAGKULDO_PRICE_API_KEY, quantity=1))
         if cart.gift_card_ids:
             if len(cart.gift_card_ids) > 0:
                 pass
@@ -121,7 +121,7 @@ def __post_payment_process(event):
     # decrease the stock number
     order_items = Order.objects.prefetch_related('items').filter(id=order_id)[0].items.all()
     for o in order_items:
-        if o.product is not None:
+        if o.product is not None and not o.product.custom:
             product = Product.objects.prefetch_related('product_types').filter(id=o.product.id)[0]
             if len(product.product_types.all()) > 0:
                 product_type = [pt for pt in product.product_types.all() if pt.color == o.color]
@@ -146,7 +146,7 @@ def __post_payment_process(event):
                          Személyesátvétel={'Vezetéknév': o.first_name, 'Keresztnév': o.last_name})
     delivery_price = prices[o.delivery_type.replace(' ', '')]
     delivery_data = delivery_info[o.delivery_type.replace(' ', '')]
-    order_total = o.subtotal + delivery_price
+    order_total = o.total
     result, msg = MessageSender(subject=f'Rendelés megerősítése #{str(o.id)}', to=o.email,
                                 sender='www.minervastudio.hu').send_order_confirmation_email(
         {'name': o.full_name, 'order': o,
@@ -155,6 +155,15 @@ def __post_payment_process(event):
          'order_total': order_total})
     sent = True if result == 1 else False
     Message.objects.create(subject=f'Rendelés megerősítése #{str(o.id)}', email=o.email, message=msg,
+                           sender='System message from Minerva Studio', sent=sent)
+    # SEND EMAIL ABOUT THE ORDER
+    product = ', '.join([i.product.name for i in order_items])
+    msg = f'Új rendelés:\nA rendelés száma: #{str(o.id)}\nA rendelés összege: {str(order_total)} Ft\nTermékek: {product}'
+    result = MessageSender(subject=f'Új rendelés #{str(o.id)}', to=settings.EMAIL_HOST_USER,
+                           sender='www.minervastudio.hu',
+                           message=msg).send_mail()
+    sent = True if result == 1 else False
+    Message.objects.create(subject=f'Új rendelés #{str(o.id)}', email=settings.EMAIL_HOST_USER, message=msg,
                            sender='System message from Minerva Studio', sent=sent)
 
 
