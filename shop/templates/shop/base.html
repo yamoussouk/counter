@@ -1,9 +1,15 @@
 {% load static %}
 <!DOCTYPE html>
-<html{% if cart_border %} id="cart"{% endif %}>
+<html{% if cart_border %} id="cart"{% endif %} lang="hu">
   <head>
-    <meta charset="utf-8" />
-    <title>Minerva Studio</title>
+    <meta name="description" content="A Minerva Studio ékszerei kis darabszámban kézzel készült, egyedi termékek.
+     A fülbevalók modernek, elegánsak, letisztultak.">
+    <meta name="keywords" content="kézműves fülbevaló, kézzel készített fülbevaló, egyedi fülbevaló, fülbarát fülbevaló" >
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="icon" sizes="192x192" href="{% url 'shop:get_icon' %}">
+    <link rel="apple-touch-icon" href="{% url 'shop:get_icon' %}" />
+    <title>Minerva Studio - modern, egyedi, könnyű fülbevalók</title>
     <link href="{% static "css/base.css" %}" rel="stylesheet" />
     <link href="{% static "css/footer.css" %}" rel="stylesheet" />
     {% if payment %}
@@ -35,8 +41,12 @@
     {% if faq %}
       <link href="{% static "css/faq.css" %}" rel="stylesheet" />
     {% endif %}
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {% block ga %}
+        {% if use_ga %}
+            {% include "shop/snippets/ga.html" with ga_tracking_id=ga_tracking_id%}
+        {% endif %}
+    {% endblock ga %}
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
     <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}"/>
 
     <!-- Bootstrap CSS -->
@@ -59,7 +69,7 @@
           <div class="col-md-12">
             <div id="main-logo">
               <a href="{% url 'shop:index' %}">
-                  <img class="c_logo" src="{% static 'images/logo_150.png' %}" alt="Minerva Studio Logo"/>
+                  <img class="c_logo" src="{% static 'images/logo_150.png' %}" alt="Minerva Studio Logo" title="Minerva Studio Logo" />
               </a>
             </div>
             <div class="tablet-menu">
@@ -77,6 +87,9 @@
                   <li class="{% if '/kapcsolat' in request.path %}current{% endif %} menu-item">
                     <a title="Kapcsolat" href="{% url 'shop:contact' %}" >Kapcsolat</a>
                   </li>
+                  <li class="{% if '/egyedi-rendelés' in request.path %}current{% endif %} menu-item">
+                    <a title="Kapcsolat" href="{% url 'shop:custom_products_view' %}" >Egyedi rendelés</a>
+                  </li>
                 </ul>
               </div>
             </div>
@@ -86,12 +99,12 @@
                 <a href="{% url 'cart:cart_detail' %}">
                     {% with total_items_plural=total_items|pluralize %}
                   <div class="item-in-cart-indicator"><span>{{ total_items }}</span></div>
-                      <img class="c_logo" src="{% static 'images/cart_150.png' %}" alt="Minerva Studio Cart Icon"/>
+                      <img class="c_logo" src="{% static 'images/cart_150.png' %}" alt="Minerva Studio Cart Icon" title="Minerva Studio Cart Icon"/>
                     {% endwith %}
                   </a>
                 {% else %}
                   <div class="cart-icon-inner">
-                    <img class="c_logo" src="{% static 'images/cart_150.png' %}" alt="Minerva Studio Cart Icon"/>
+                    <img class="c_logo" src="{% static 'images/cart_150.png' %}" alt="Minerva Studio Cart Icon" title="Minerva Studio Cart Icon"/>
                   </div>
                 {% endif %}
               {% endwith %}
@@ -116,6 +129,9 @@
                 <li class="{% if '/kapcsolat' in request.path %}current{% endif %} menu-item">
                   <a title="Kapcsolat" href="{% url 'shop:contact' %}" >Kapcsolat</a>
                 </li>
+                <li class="{% if '/egyedi-rendelés' in request.path %}current{% endif %} menu-item">
+                  <a title="Kapcsolat" href="{% url 'shop:custom_products_view' %}" >Egyedi rendelés</a>
+                </li>
               </ul>
             </div>
           </div>
@@ -134,6 +150,9 @@
               </li>
               <li class="{% if '/kapcsolat' in request.path %}current{% endif %} menu-item">
                 <a title="Kapcsolat" href="{% url 'shop:contact' %}" >Kapcsolat</a>
+              </li>
+              <li class="{% if '/egyedi-rendelés' in request.path %}current{% endif %} menu-item">
+                <a title="Kapcsolat" href="{% url 'shop:custom_products_view' %}" >Egyedi rendelés</a>
               </li>
             </ul>
           </div>

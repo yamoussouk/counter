@@ -1,17 +1,22 @@
-from enum import Enum
-
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
+from django.utils.text import slugify
 from multiselectfield import MultiSelectField
 
 
 class Collection(models.Model):
     name = models.CharField(max_length=200, db_index=True)
+    slug = models.SlugField(max_length=200, db_index=True, unique=True, default='')
     image = models.ImageField(upload_to='collections/', blank=True)
     available = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+    custom = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super(Collection, self).save(*args, **kwargs)
 
     class Meta:
         ordering = ('name',)
@@ -22,23 +27,22 @@ class Collection(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('shop:products_view', args=[self.name])
-
-
-class StudTypeEnum(Enum):
-    NORMAL = 0
-    NICKEL_FREE = 1
-    PLASTIC = 2
+        return reverse('shop:products_view', args=[self.slug])
 
 
 STUD_CHOICES = ((1, 'NORMAL'),
                 (2, 'NICKEL_FREE'),
                 (3, 'PLASTIC'))
 
+KEY_RING_CHOICES = ((1, 'KEREK'),
+                    (2, 'KARABINER'),
+                    (3, 'SZIV'))
+
 
 class Product(models.Model):
     collection = models.ForeignKey(Collection, related_name='products', on_delete=models.CASCADE)
     name = models.CharField(max_length=200, db_index=True)
+    slug = models.SlugField(max_length=200, db_index=True, unique=True, default='')
     image = models.ImageField(blank=True)
     description = models.TextField(blank=True)
     size = models.TextField(blank=True)
@@ -49,21 +53,34 @@ class Product(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     price_api_id = models.CharField(max_length=50, blank=True, default='')
+    key_ring = MultiSelectField(choices=KEY_RING_CHOICES, max_choices=3, default=KEY_RING_CHOICES[0], max_length=50)
+    custom = models.BooleanField(default=False)
+    custom_date = models.BooleanField(default=False)
+    initials = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super(Product, self).save(*args, **kwargs)
 
     class Meta:
         ordering = ('name',)
         verbose_name = 'Termék'
         verbose_name_plural = 'Termékek'
+        index_together = (('id', 'slug'),)
 
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('shop:product_detail', args=[self.id])
+        return reverse('shop:product_detail', args=[self.collection.slug, self.slug])
 
     def get_stud_value(self, value):
-        values = ['normál fülbevaló alap - fém', 'nikkelmentes fülbevaló alap - fém',
+        values = ['nemesacél alap', 'nikkelmentes fülbevaló alap - fém',
                   'műanyag fülbevaló alap - fém mentes']
+        return values[int(value) - 1]
+
+    def get_key_ring_value(self, value):
+        values = ['kerek kulcskarika - 25mm', 'karabíner - 32mm', 'szív alakú kulcskarika - 28mm']
         return values[int(value) - 1]
 
 
@@ -139,6 +156,7 @@ PRICE_CHOICES = ((1000, '1000'),
 
 class GiftCard(models.Model):
     name = models.CharField(max_length=200, db_index=True, default='Ajándékkártya')
+    slug = models.SlugField(max_length=200, db_index=True, unique=True, default='')
     price = models.IntegerField()
     available = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)

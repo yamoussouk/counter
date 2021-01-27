@@ -2,104 +2,126 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-          integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
     <meta charset="UTF-8">
-    <title>Email confirmation</title>
+    <title>Csomag feladva</title>
     <style>
-        #header {
-            text-align: center;
-            background: #D6AC23;
-            height: 150px;
-        }
-        #header-image-wrapper {
-            height: 150px;
-            line-height: 150px;
-        }
-        #header img {
-            width: 10rem;
-        }
-        #top-content-wrapper {
-            text-align: center;
-        }
-        h3 {
-            padding-bottom: .5rem;
-        }
-        #top-header-content-inner {
-            background: rgba(252, 237, 228, .7);
-            font-family: 'Raleway', sans-serif;
-            font-weight: 600;
-            color: #758689;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            letter-spacing: .055rem;
-        }
-        #top-header-content-inner p {
-            font-size: 1.2rem;
-            font-weight: 300;
-            margin-bottom: .5rem;
-        }
-        #creator {
-            background: #FCEDE4;
-            height: 80px;
-            text-align: center;
-            margin-top: 1rem;
-        }
-        #creator-inner {
-            height: 80px;
-            line-height: 80px;
-        }
-        #creator a {
-            font-family: 'Raleway', sans-serif;
-            font-weight: 700;
-            color: #D3927C;
-            font-size: 1.2rem;
-            letter-spacing: .08rem;
-        }
-        a, a:hover {
-            text-decoration: none;
-        }
-        #submark-logo-wrapper {
-            text-align: center;
-        }
-        #submark-logo-wrapper img {
-            width: 10rem;
-        }
-        #social {
-            margin-top: 1rem;
-        }
-        #social img {
-            width: 65px;
-        }
-        #social #facebook, #social #instagram {
-            width: 50%;
-            float: left;
-        }
-        #social #facebook img {
-            float: right;
-            margin-right: 10px;
-        }
-        #social #instagram img {
-            margin-left: 10px;
-        }
+        .container,.container-fluid,.container-lg,.container-md,.container-sm,.container-xl{width:100%;padding-right:15px;padding-left:15px;margin-right:auto;margin-left:auto}@media (min-width:576px){.container,.container-sm{max-width:540px}}@media (min-width:768px){.container,.container-md,.container-sm{max-width:720px}}@media (min-width:992px){.container,.container-lg,.container-md,.container-sm{max-width:960px}}@media (min-width:1200px){.container,.container-lg,.container-md,.container-sm,.container-xl{max-width:1140px}}
+        .row{display:-ms-flexbox;display:flex;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-15px;margin-left:-15px}
+        .col,.col-1,.col-10,.col-11,.col-12,.col-2,.col-3,.col-4,.col-5,.col-6,.col-7,.col-8,.col-9,.col-auto,.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-auto,.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-auto,.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-auto,.col-xl,.col-xl-1,.col-xl-10,.col-xl-11,.col-xl-12,.col-xl-2,.col-xl-3,.col-xl-4,.col-xl-5,.col-xl-6,.col-xl-7,.col-xl-8,.col-xl-9,.col-xl-auto{position:relative;width:100%;padding-right:15px;padding-left:15px}.col{-ms-flex-preferred-size:0;flex-basis:0;-ms-flex-positive:1;flex-grow:1;max-width:100%}
+        .col-12{-ms-flex:0 0 100%;flex:0 0 100%;max-width:100%}
+        .col-7{-ms-flex:0 0 58.333333%;flex:0 0 58.333333%;max-width:58.333333%}
+        .col-1{-ms-flex:0 0 8.333333%;flex:0 0 8.333333%;max-width:8.333333%}
+        .col-4{-ms-flex:0 0 33.333333%;flex:0 0 33.333333%;max-width:33.333333%}
+        .col-8{-ms-flex:0 0 66.666667%;flex:0 0 66.666667%;max-width:66.666667%}
+        .img-fluid{max-width:100%;height:auto}
+        .clearfix::after{display:block;clear:both;content:""}
+        .item-details-collection-divider, .item-details-collection {display:none;}
+        h1,h2,h3,h4,h5,h6{margin-top:0;margin-bottom:.5rem}
+        .h1,.h2,.h3,.h4,.h5,.h6,h1,h2,h3,h4,h5,h6{margin-bottom:.5rem;font-weight:500;line-height:1.2}
+        @media only screen and (max-width: 2560px) {
+            #header {
+                text-align: center;
+                background: #D6AC23;
+                height: 150px;
+                margin-bottom: 1rem;
+            }
+            #header-image-wrapper {
+                height: 150px;
+                line-height: 200px;
+            }
+            #header img {
+                width: 10rem;
+            }
+            #top-content-wrapper {
+                text-align: center;
+            }
+            h3 {
+                padding-bottom: .5rem;
+            }
+            #top-header-content-inner {
+                background: rgba(252, 237, 228, .7);
+                font-family: 'Raleway', sans-serif;
+                font-weight: 600;
+                color: #758689;
+                padding: 2rem;
+                margin-bottom: 2rem;
+                letter-spacing: .055rem;
+            }
+            #top-header-content-inner p {
+                font-size: 1.2rem;
+                font-weight: 300;
+                margin-bottom: .5rem;
+            }
+            #creator {
+                background: #FCEDE4;
+                height: 80px;
+                text-align: center;
+                margin-top: 1rem;
+            }
+            #creator-inner {
+                height: 80px;
+                line-height: 80px;
+            }
+            #creator a {
+                font-family: 'Raleway', sans-serif;
+                font-weight: 700;
+                color: #D3927C;
+                font-size: 1.2rem;
+                letter-spacing: .08rem;
+            }
+            a, a:hover {
+                text-decoration: none;
+            }
+            #submark-logo-wrapper {
+                text-align: center;
+            }
+            #submark-logo-wrapper img {
+                width: 10rem;
+            }
+            #social {
+                margin-top: 1rem;
+            }
+            #social img {
+                width: 65px;
+            }
+            #social #facebook, #social #instagram {
+                width: 50%;
+                float: left;
+            }
+            #social #facebook img {
+                float: right;
+                margin-right: 10px;
+            }
+            #social #instagram img {
+                margin-left: 10px;
+            }
 
-        footer .container-fluid {
-            padding: 0;
+            footer .container-fluid {
+                padding: 0;
+            }
+            .row {
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+            }
+            .col-md-12 {
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+            }
+            .container-fluid {
+                padding: 0 !important;
+                margin: 0 !important;
+            }
         }
-        .row {
-            margin-left: 0 !important;
-            margin-right: 0 !important;
-        }
-        .col-md-12 {
-            padding-left: 0 !important;
-            padding-right: 0 !important;
-        }
-        .container-fluid {
-            padding: 0 !important;
-            margin: 0 !important;
+        @media only screen and (max-width: 1024px) {
+            .h3,h3{font-size:.85rem}
+            .h4,h4{font-size:.8rem}
+            .h1,h1{font-size:.95rem}
+            #creator a{font-size:.9rem}
+            .col-12{padding:0 !important}
+            .container{width:100% !important;padding:0 !important;}
         }
 
     </style>
@@ -110,7 +132,8 @@
         <div class="col-12">
             <div id="header">
                 <div id="header-image-wrapper">
-                    <img src="{{ STATIC_URL }}{% static 'images/email_logo.png' %}" alt="minervastudio"/>
+                    <img src="{{ STATIC_URL }}{% static 'images/email_logo.png' %}" alt="Minerva Studio"
+                         title="Minerva Studio"/>
                 </div>
             </div>
         </div>
@@ -124,7 +147,7 @@
                     <div id="top-header-content-inner">
                         <h3>Kedves {{ name }}</h3>
                         <p>Az általad megrendelt termék feladásra került.</p>
-                        <p>Hamarosan megérkezik hozzád</p>
+                        <p>Hamarosan megérkezik hozzád.</p>
                     </div>
                 </div>
             </div>
@@ -137,7 +160,8 @@
             <div class="col-12">
                 <div id="submark-logo-wrapper">
                     <a href="https://www.minervastudio.hu">
-                        <img src="{{ STATIC_URL }}{% static 'images/submark_150.png' %}" alt="Minerva Logo">
+                        <img src="{{ STATIC_URL }}{% static 'images/submark_150.png' %}" alt="Minerva Studio Logo"
+                             title="Minerva Studio Logo">
                     </a>
                 </div>
             </div>
@@ -147,12 +171,14 @@
                 <div id="social">
                     <div id="facebook">
                         <a href="https://www.facebook.com/minervastudio.hu">
-                            <img src="{{ STATIC_URL }}{% static 'images/facebook_150.png' %}" alt="facebook icon"/>
+                            <img src="{{ STATIC_URL }}{% static 'images/facebook_150.png' %}" alt="facebook icon"
+                                 title="facebook icon"/>
                         </a>
                     </div>
                     <div id="instagram">
                         <a href="https://www.instagram.com/minervastudio.hu/">
-                            <img src="{{ STATIC_URL }}{% static 'images/instagram_150.png' %}" alt="instagram icon"/>
+                            <img src="{{ STATIC_URL }}{% static 'images/instagram_150.png' %}" alt="instagram icon"
+                                 title="instagram icon"/>
                         </a>
                     </div>
                 </div>
