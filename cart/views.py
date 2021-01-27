@@ -8,9 +8,7 @@ from coupon.forms import CouponApplyForm
 # from giftcardpayment.forms import GiftCardApplyForm
 from shop.models import Product, GiftCard, ProductType, Notification
 from .cart import Cart
-from .forms import CartAddProductForm, CartAddGiftCardProductForm, CartDeliveryInfoForm
-from shop.MessageSender import MessageSender
-from django.template import Context
+from .forms import CartAddProductForm, CartAddCustomProductForm, CartAddGiftCardProductForm, CartDeliveryInfoForm
 
 
 def __validate_stock(cart, product, cd):
@@ -48,21 +46,29 @@ def __validate_stock(cart, product, cd):
 def cart_add(request, product_id):
     cart = Cart(request)
     product = get_object_or_404(Product, id=product_id)
-    form = CartAddProductForm(request.POST)
+    redirect_url = 'shop:custom_product_detail' if product.custom else 'shop:product_detail'
+    form = CartAddCustomProductForm(request.POST) if product.custom else CartAddProductForm(request.POST)
     if form.is_valid():
         cd = form.cleaned_data
-        status, item_in_cart, stock = __validate_stock(cart.cart, product, cd)
+        if product.custom:
+            status, item_in_cart, stock = True, 0, 0
+        else:
+            status, item_in_cart, stock = __validate_stock(cart.cart, product, cd)
         if status:
             cart.add(product=product, quantity=cd['quantity'],
-                     update_quantity=cd['update'], color=cd['color'], stud=cd['stud'])
-            return redirect(reverse('shop:product_detail', args=[product_id]))
+                     update_quantity=cd['update'], color=cd['color'], stud=cd['stud'],
+                     first_initial=cd['first_initial'] if 'first_initial' in cd else '',
+                     second_initial=cd['second_initial'] if 'second_initial' in cd else '',
+                     custom_date=cd['custom_date'] if 'custom_date' in cd else '')
+            return redirect(reverse(redirect_url, args=[product.collection.slug, product.slug]))
         else:
             messages.error(request, f'A hozzáadni kívánt, illetve a kosaradban található termék összes mennyisége'
                                     f' meghaladja az elérhető mennyiséget, amely {stock}. A kosaradban az aktuális termék '
                                     f'mennyisége {item_in_cart}.')
-            return redirect(reverse('shop:product_detail', args=[product_id]))
-    messages.error(request, 'Hiba történt, kérlek, próbáld meg újra.')
-    return redirect('shop:product_detail')
+            return redirect(reverse(redirect_url, args=[product.collection.slug, product.slug]))
+    # messages.error(request, 'Hiba történt, kérlek, próbáld meg újra.')
+    messages.error(request, 'Kérem, töltse ki az összes mezőt!')
+    return redirect(reverse(redirect_url, args=[product.collection.slug, product.slug]))
 
 
 @require_http_methods(['POST'])

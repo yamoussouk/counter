@@ -1,0 +1,5 @@
+*.pyc
+*.jpg
+*.png
+**/settings.py
+cart/**/*.pyc
