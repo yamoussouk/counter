@@ -138,6 +138,26 @@
               </div>
           </div>
       </div>
+      <div class="row confirmation-row">
+          <div class="col-12">
+              <form onsubmit="event.preventDefault();" id="confirmation-form">
+                  <div class="data-alert">
+                      <p>A személyes adatokat a rendelés teljesítéséhez, a weboldalon történő vásárlási élmény
+                          fenntartásához és egyéb célokra használjuk, melyeket
+                          <a href="{% url 'shop:data_handling' %}" title="adatkezelési nyilatkozat">az adatkezelési nyilatkozat</a>
+                          tartalmaz.</p>
+                  </div>
+                  <div class="aszf-confirmation">
+                      <div class="form-check">
+                          <input type="checkbox" class="form-check-input" id="aszf-check" required>
+                          <label class="form-check-label" for="aszf-check">Elolvastam és elfogadom az
+                              <a href="{% url 'shop:aszf' %}" title="általános szerződési feltételek">
+                                  Általános Szerződési Feltételek</a>-ben foglaltakat.<span style="color:red;">*</span></label>
+                      </div>
+                  </div>
+              </form>
+          </div>
+      </div>
       <div class="row">
           <div class="col-12">
               <div id="purchase-button-wrapper">
