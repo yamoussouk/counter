@@ -7,3 +7,7 @@ def ga_tracking_id(request):
 
 def use_ga(request):
     return {'use_ga': settings.USE_GA}
+
+
+def custom_settings(request):
+    return {'CUSTOM': settings.CUSTOM_SERVICE}

@@ -40,9 +40,11 @@
                         <li class="menu-item">
                             <a title="Kapcsolat" href="{% url 'shop:contact' %}" >Kapcsolat</a>
                         </li>
+                        {% if CUSTOM %}
                         <li class="menu-item">
-                            <a title="Kapcsolat" href="{% url 'shop:custom_products_view' %}" >Egyedi rendelés</a>
+                            <a title="Egyedi rendelés" href="{% url 'shop:custom_products_view' %}" >Egyedi rendelés</a>
                           </li>
+                        {% endif %}
                         <li class="menu-item">
                             <a title="ÁSZF" href="{% url 'shop:aszf' %}" >ÁSZF</a>
                         </li>
