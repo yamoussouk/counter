@@ -19,6 +19,8 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 
+from . import views
+
 urlpatterns = [
     path('', include('shop.urls', namespace='shop')),
     path('cart/', include('cart.urls', namespace='cart')),
@@ -26,6 +28,7 @@ urlpatterns = [
     path('order/', include('order.urls', namespace='orders')),
     path('payment/', include('payment.urls', namespace='payment')),
     path('giftcard-payment/', include('giftcardpayment.urls', namespace='giftcardpayment')),
+    path('admin/settings/', views.settings, name='admin_settings'),
     path('admin/', admin.site.urls),
 ]
 
