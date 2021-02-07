@@ -10,8 +10,13 @@
     <link rel="icon" sizes="192x192" href="{% url 'shop:get_icon' %}">
     <link rel="apple-touch-icon" href="{% url 'shop:get_icon' %}" />
     <title>Minerva Studio - modern, egyedi, könnyű fülbevalók</title>
-    <link href="{% static "css/base.css" %}" rel="stylesheet" />
-    <link href="{% static "css/footer.css" %}" rel="stylesheet" />
+    {% if CUSTOM %}
+      <link href="{% static "css/base.css" %}" rel="stylesheet" />
+      <link href="{% static "css/footer.css" %}" rel="stylesheet" />
+    {% else %}
+      <link href="{% static "css/base_without_custom.css" %}" rel="stylesheet" />
+      <link href="{% static "css/footer_without_custom.css" %}" rel="stylesheet" />
+    {% endif %}
     {% if payment %}
       <link href="{% static "css/payment.css" %}" rel="stylesheet" />
     {% endif %}
@@ -87,9 +92,11 @@
                   <li class="{% if '/kapcsolat' in request.path %}current{% endif %} menu-item">
                     <a title="Kapcsolat" href="{% url 'shop:contact' %}" >Kapcsolat</a>
                   </li>
+                  {% if CUSTOM %}
                   <li class="{% if '/egyedi-rendelés' in request.path %}current{% endif %} menu-item">
                     <a title="Kapcsolat" href="{% url 'shop:custom_products_view' %}" >Egyedi rendelés</a>
                   </li>
+                  {% endif %}
                 </ul>
               </div>
             </div>
@@ -129,9 +136,11 @@
                 <li class="{% if '/kapcsolat' in request.path %}current{% endif %} menu-item">
                   <a title="Kapcsolat" href="{% url 'shop:contact' %}" >Kapcsolat</a>
                 </li>
+                {% if CUSTOM %}
                 <li class="{% if '/egyedi-rendelés' in request.path %}current{% endif %} menu-item">
                   <a title="Kapcsolat" href="{% url 'shop:custom_products_view' %}" >Egyedi rendelés</a>
                 </li>
+                {% endif %}
               </ul>
             </div>
           </div>
@@ -151,9 +160,11 @@
               <li class="{% if '/kapcsolat' in request.path %}current{% endif %} menu-item">
                 <a title="Kapcsolat" href="{% url 'shop:contact' %}" >Kapcsolat</a>
               </li>
+              {% if CUSTOM %}
               <li class="{% if '/egyedi-rendelés' in request.path %}current{% endif %} menu-item">
                 <a title="Kapcsolat" href="{% url 'shop:custom_products_view' %}" >Egyedi rendelés</a>
               </li>
+              {% endif %}
             </ul>
           </div>
         </div>

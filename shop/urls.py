@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.sitemaps.views import sitemap
 from django.urls import path
 from django.views.generic import TemplateView
@@ -22,9 +23,6 @@ urlpatterns = [
     path('kapcsolat/', views.contact, name='contact'),
     path('aszf/', views.aszf, name='aszf'),
     path('adatvedelem/', views.data_handling, name='data_handling'),
-    path('egyedi-rendelés/', views.CustomProductsView.as_view(), name='custom_products_view'),
-    path('egyedi-rendelés/<str:slug>', views.CustomProductsView.as_view(), name='custom_products_view'),
-    path('egyedi-termek/<str:id>/<str:slug>', views.custom_product_detail, name='custom_product_detail'),
     path('uzenet/', views.contact_message, name='contact_message'),
     path('sikeres-uzenet-kuldes/', views.thank_you, name='thank_you'),
     path('cookie-consent/', views.cookie_consent, name='cookie_consent'),
@@ -33,3 +31,10 @@ urlpatterns = [
     path('robots.txt', TemplateView.as_view(template_name="shop/robots.txt", content_type='text/plain')),
     path('icon/', views.get_icon, name='get_icon'),
 ]
+
+if settings.CUSTOM_SERVICE:
+    urlpatterns.extend([
+        path('egyedi-rendelés/', views.CustomProductsView.as_view(), name='custom_products_view'),
+        path('egyedi-rendelés/<str:slug>', views.CustomProductsView.as_view(), name='custom_products_view'),
+        path('egyedi-termek/<str:id>/<str:slug>', views.custom_product_detail, name='custom_product_detail')
+    ])
