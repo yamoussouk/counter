@@ -11,7 +11,7 @@
                 {% include 'shop/product/filter.html' %}
             </div>
             <div class="col-sm-9">
-                <div class="{% if types %}multi-product{% else %}singe-product{% endif %} product-wrapper"
+                <div class="{% if types %}multi-product{% else %}single-product{% endif %} product-wrapper"
                      {% if not types %}data-stock="{{ product.stock }}"{% endif %}>
                     <div class="product-image-wrapper">
                         <div class="product-image">
@@ -58,6 +58,14 @@
                                 <div class="plus"><span>+</span></div>
                               {% csrf_token %}
                                 <input id="add_to_cart_button" type="submit" value="Kosárba">
+                                {% if not product.studs %}
+                                <div class="form-check" id="product-detail-check">
+                                  <input type="checkbox" class="form-check-input" id="timeframe-check" required>
+                                  <label class="form-check-label" for="timeframe-check">
+                                      Megértettem, hogy hűtőmágnesek esetén az elkészülési idő 2-3 nap.
+                                  </label>
+                                </div>
+                                {% endif %}
                             </form>
                             {% else %}
                                 <div id="out_of_stock_button"><span>Elfogyott</span></div>
@@ -91,12 +99,9 @@
                             {% endif %}
                         </div>
                         <div class="product-description">
-                            {% for d in product.size|new_line %}
-                            <p>{{ d }}</p>
-                            {% endfor %}
-                            {% for d in product.description|new_line %}
-                            <p>{{ d }}</p>
-                            {% endfor %}
+                            <p>{{ product.description|linebreaksbr }}</p>
+                            <br />
+                            <p>{{ product.size|linebreaksbr }}</p>
                         </div>
                     </div>
                     <div class="clearfix"></div>

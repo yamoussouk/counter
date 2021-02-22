@@ -30,6 +30,7 @@ urlpatterns = [
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     path('robots.txt', TemplateView.as_view(template_name="shop/robots.txt", content_type='text/plain')),
     path('icon/', views.get_icon, name='get_icon'),
+    path('generate_stripe_product/<str:id>', views.generate_stripe_product, name='generate_stripe_product'),
 ]
 
 if settings.CUSTOM_SERVICE:
