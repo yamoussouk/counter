@@ -1,17 +1,22 @@
 import os
 
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.db.utils import OperationalError
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
+from django.http import JsonResponse
 from django.shortcuts import redirect, reverse
 from django.shortcuts import render, get_object_or_404
 from django.views.generic.list import ListView
 
 from cart.forms import CartAddProductForm, CartAddCustomProductForm, CartAddGiftCardProductForm
 from shop.MessageSender import MessageSender
+from .StripeProductGenerator import StripeProductGenerator
 from .forms import ContactForm
 from .models import Collection, Product, Notification, ProductType, GiftCard, Message
+
+stripe_product_generator = StripeProductGenerator()
 
 
 def index_hid(request):
@@ -238,3 +243,11 @@ class CustomProductsView(ListView):
 def get_icon(request):
     image_data = open(os.path.join(settings.STATIC_ROOT, 'images', 'icon.png'), "rb").read()
     return HttpResponse(image_data, content_type="image/png")
+
+
+@login_required()
+def generate_stripe_product(request, id: str):
+    pr = Product.objects.filter(id=id)[0]
+    success = stripe_product_generator.generate_product(pr)
+    status = 'success' if success else 'failure'
+    return JsonResponse(data={'status': status})

@@ -5,7 +5,7 @@ from django import forms
 class CartAddProductForm(forms.Form):
     quantity = forms.IntegerField(validators=[django.core.validators.MinValueValidator(0)], initial=1)
     color = forms.CharField(required=False, widget=forms.HiddenInput, initial='')
-    stud = forms.CharField(widget=forms.HiddenInput)
+    stud = forms.CharField(required=False, widget=forms.HiddenInput)
     update = forms.BooleanField(required=False, initial=False, widget=forms.HiddenInput)
 
 

@@ -4,3 +4,6 @@
 **/settings.py
 cart/**/*.pyc
 **/__pycache__/**
+**/migrations**
+*.sql
+.idea/**

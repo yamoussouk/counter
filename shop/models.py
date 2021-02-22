@@ -48,7 +48,7 @@ class Product(models.Model):
     size = models.TextField(blank=True)
     price = models.IntegerField()
     stock = models.IntegerField(blank=True, default=0)
-    studs = MultiSelectField(choices=STUD_CHOICES, max_choices=3, default=STUD_CHOICES[0])
+    studs = MultiSelectField(choices=STUD_CHOICES, max_choices=3, default=STUD_CHOICES[0], null=True, blank=True)
     available = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)

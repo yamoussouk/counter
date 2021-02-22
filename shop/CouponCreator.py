@@ -20,7 +20,7 @@ class CouponCreator:
             pass
 
         # get products
-        products = [p.get('id') for p in stripe.Product.list(active=True).get('data') if
+        products = [p.get('id') for p in stripe.Product.list(active=True, limit=100).get('data') if
                     p.get('id') not in self.delivery_products]
 
         # create new coupon with list of products
