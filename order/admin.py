@@ -50,6 +50,36 @@ class OrderAdmin(admin.ModelAdmin):
                     'updated',
                     'paid', 'paid_by', 'total', 'shipped', order_detail]
     list_filter = ['paid', 'paid_by', 'created', 'updated']
+    fieldsets = (
+        ('Kötelező mezők', {
+            'fields': ('full_name', 'phone', 'email', 'billing_address', 'billing_postal_code', 'billing_city',
+                       'product_note',)
+        }),
+        ('Szállítás módja', {
+            'fields': ('delivery_type',)
+        }),
+        ('Személyes átvétel', {
+            'fields': ('first_name', 'last_name',)
+        }),
+        ('Foxpost', {
+            'fields': ('fox_post',)
+        }),
+        ('Csomagküldő', {
+            'fields': ('csomagkuldo',)
+        }),
+        ('Házhozszállítás', {
+            'fields': ('delivery_name', 'address', 'postal_code', 'city', 'note',)
+        }),
+        ('Ár', {
+            'fields': ('products_price', 'products_price_with_discount', 'delivery_cost', 'subtotal', 'total',)
+        }),
+        ('Kupon', {
+            'fields': ('coupon', 'discount', 'discount_amount',)
+        }),
+        ('Fizetési részletek', {
+            'fields': ('paid', 'paid_time', 'shipped',)
+        })
+    )
     list_editable = ['shipped']
     inlines = [OrderItemInline]
     actions = [export_to_csv]
