@@ -69,7 +69,7 @@ def order_create(request):
                 request.session['mandatory'] = dict(full_name=cd['full_name'], email=cd['email'], phone=cd['phone'])
                 request.session['billing'] = dict(billing_address=cd['billing_address'],
                                                   billing_postal_code=cd['billing_postal_code'],
-                                                  billing_city=cd['billing_city'])
+                                                  billing_city=cd['billing_city'], product_note=cd['product_note'])
                 if cart.order:
                     order = cart.order
                     order.full_name = request.POST.get('full_name')
@@ -88,6 +88,7 @@ def order_create(request):
                     order.delivery_type = request.POST.get('delivery_type')
                     order.fox_post = request.POST.get('fox_post')
                     order.csomagkuldo = request.POST.get('csomagkuldo')
+                    order.product_note = request.POST.get('product_note')
                 else:
                     order = form.save(commit=False)
                 order.subtotal = cart.get_total_price()
