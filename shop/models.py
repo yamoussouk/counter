@@ -13,6 +13,7 @@ class Collection(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     custom = models.BooleanField(default=False)
+    show_on_home_page = models.BooleanField(default=True)
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)

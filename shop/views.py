@@ -24,7 +24,7 @@ def index_hid(request):
 
 
 def index(request):
-    collections = Collection.objects.filter(available=True, custom=False).order_by('-created')[:6]
+    collections = Collection.objects.filter(available=True, custom=False, show_on_home_page=True).order_by('-created')[:6]
     notification = Notification.objects.all()
     return render(request, 'shop/index_hid.html', {'collections': collections, 'notification': notification})
 

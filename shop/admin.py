@@ -6,7 +6,7 @@ from .models import Collection, Product, Image, Notification, ProductType, GiftC
 
 class CollectionAdmin(admin.ModelAdmin):
     list_display = ['name']
-    fields = ('name', 'image', 'available', 'custom')
+    fields = ('name', 'image', 'available', 'custom', 'show_on_home_page')
 
 
 admin.site.register(Collection, CollectionAdmin)
