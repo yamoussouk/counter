@@ -41,3 +41,4 @@ class CartDeliveryInfoForm(forms.Form):
     note = forms.CharField(required=False, widget=forms.HiddenInput, initial='')
     delivery_type = forms.CharField(required=False, widget=forms.HiddenInput, initial='')
     csomagkuldo = forms.CharField(required=False, widget=forms.HiddenInput, initial='')
+    product_note = forms.CharField(required=False, widget=forms.HiddenInput, initial='')

@@ -41,6 +41,7 @@ class Order(models.Model):
     paid_time = models.CharField(default='', max_length=50, blank=True)
     phone = models.CharField(max_length=25, default='', blank=True)
     shipped = models.BooleanField(default=False)
+    product_note = models.CharField(max_length=250, default='', blank=True)
 
     class Meta:
         ordering = ('-created',)
