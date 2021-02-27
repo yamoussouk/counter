@@ -42,13 +42,17 @@ def order_detail(obj):
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
     raw_id_fields = ['product']
-    fields = ['product', 'price', 'quantity', 'color', 'stud', 'first_initial', 'second_initial', 'custom_date']
+    readonly_fields = ['product', 'price', 'quantity', 'color', 'stud', 'first_initial', 'second_initial', 'custom_date']
+    exclude = ['gift_card', 'image']
+    can_delete = False
+
+    def has_add_permission(self, request, obj):
+        return False
 
 
 class OrderAdmin(admin.ModelAdmin):
     list_display = ['id', 'first_name', 'last_name', 'email', 'phone', 'address', 'postal_code', 'city', 'created',
-                    'updated',
-                    'paid', 'paid_by', 'total', 'shipped', order_detail]
+                    'updated', 'paid', 'paid_by', 'total', 'shipped']
     list_filter = ['paid', 'paid_by', 'created', 'updated']
     fieldsets = (
         ('Kötelező mezők', {
@@ -80,6 +84,11 @@ class OrderAdmin(admin.ModelAdmin):
             'fields': ('paid', 'paid_time', 'shipped',)
         })
     )
+    readonly_fields = ('full_name', 'phone', 'email', 'billing_address', 'billing_postal_code', 'billing_city',
+                       'product_note', 'delivery_type', 'first_name', 'last_name', 'fox_post', 'csomagkuldo',
+                       'delivery_name', 'address', 'postal_code', 'city', 'note', 'products_price',
+                       'products_price_with_discount', 'delivery_cost', 'subtotal', 'total', 'coupon', 'discount',
+                       'discount_amount', 'paid', 'paid_time', 'shipped',)
     list_editable = ['shipped']
     inlines = [OrderItemInline]
     actions = [export_to_csv]
@@ -97,6 +106,15 @@ class OrderAdmin(admin.ModelAdmin):
                 sent = True if result == 1 else False
                 Message.objects.create(subject=subject, email=order[0].email, message=msg,
                                        sender='System message from Minerva Studio', sent=sent)
+
+    def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
+        context.update({
+            'show_save_and_add_another': False,
+            'show_save': False,
+            'show_save_and_continue': False,
+            'show_delete': False
+        })
+        return super().render_change_form(request, context, add, change, form_url, obj)
 
 
 admin.site.register(Order, OrderAdmin)
