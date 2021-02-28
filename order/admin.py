@@ -2,13 +2,14 @@ import csv
 import datetime
 
 from django.contrib import admin
+from django.db.models import Count, Sum
 from django.http import HttpResponse
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
 from shop.MessageSender import MessageSender
 from shop.models import Message
-from .models import Order, OrderItem
+from .models import Order, OrderItem, OrderSummary, OrderItemSummary
 
 
 def export_to_csv(modeladmin, request, queryset):
@@ -47,7 +48,8 @@ def show_product(obj):
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
     raw_id_fields = ['product']
-    readonly_fields = ['id', 'product', 'price', 'quantity', 'color', 'stud', 'first_initial', 'second_initial', 'custom_date', show_product]
+    readonly_fields = ['id', 'product', 'price', 'quantity', 'color', 'stud', 'first_initial', 'second_initial',
+                       'custom_date', show_product]
     exclude = ['gift_card', 'image']
     can_delete = False
 
@@ -123,3 +125,75 @@ class OrderAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Order, OrderAdmin)
+
+
+@admin.register(OrderSummary)
+class OrderSummaryAdmin(admin.ModelAdmin):
+    change_list_template = 'admin/orders/order_summary_change_list.html'
+    date_hierarchy = 'created'
+
+    # list_filter = (
+    #     '',
+    # )
+
+    def changelist_view(self, request, extra_context=None):
+        response = super().changelist_view(
+            request,
+            extra_context=extra_context,
+        )
+        try:
+            qs = response.context_data['cl'].queryset
+        except (AttributeError, KeyError):
+            return response
+
+        metrics = {
+            'total': Count('id'),
+            'total_product_price': Sum('products_price'),
+            'total_delivery_price': Sum('delivery_cost'),
+            'total_discount_amount': Sum('discount_amount'),
+        }
+        response.context_data['summary'] = list(
+            qs
+                .values('full_name')
+                .annotate(**metrics)
+                .order_by('-total_product_price')
+        )
+
+        response.context_data['summary_total'] = dict(
+            qs.aggregate(**metrics)
+        )
+
+        return response
+
+
+@admin.register(OrderItemSummary)
+class OrderItemSummaryAdmin(admin.ModelAdmin):
+    change_list_template = 'admin/orders/order_item_summary_change_list.html'
+    date_hierarchy = 'order__created'
+
+    def changelist_view(self, request, extra_context=None):
+        response = super().changelist_view(
+            request,
+            extra_context=extra_context,
+        )
+        try:
+            qs = response.context_data['cl'].queryset
+        except (AttributeError, KeyError):
+            return response
+
+        metrics = {
+            'total': Count('id'),
+        }
+
+        response.context_data['summary'] = list(
+            qs
+                .values('product__name')
+                .annotate(**metrics)
+                .order_by('-total')
+        )
+
+        response.context_data['summary_total'] = dict(
+            qs.aggregate(**metrics)
+        )
+
+        return response

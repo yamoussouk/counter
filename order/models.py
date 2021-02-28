@@ -61,6 +61,13 @@ class Order(models.Model):
         return total_cost * (self.discount / Decimal('100'))
 
 
+class OrderSummary(Order):
+    class Meta:
+        proxy = True
+        verbose_name = 'Order summary'
+        verbose_name_plural = 'Orders summary'
+
+
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, related_name='order_items', on_delete=models.CASCADE, blank=True, null=True)
@@ -80,3 +87,10 @@ class OrderItem(models.Model):
 
     def get_cost(self):
         return self.price * self.quantity
+
+
+class OrderItemSummary(OrderItem):
+    class Meta:
+        proxy = True
+        verbose_name = 'Order item summary'
+        verbose_name_plural = 'Order items summary'
