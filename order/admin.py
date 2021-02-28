@@ -37,13 +37,18 @@ def order_detail(obj):
     return mark_safe('<a href="{}">View</a>'.format(reverse('orders:admin_order_detail', args=[obj.id])))
 
 
+def show_product(obj):
+    return mark_safe('<a target="_blank" href="/termek/{}/{}">Product</a>'
+                     .format(obj.product.collection.slug, obj.product.slug))
+
+
 # order_detail.allow_tags=True
 
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
     raw_id_fields = ['product']
-    readonly_fields = ['product', 'price', 'quantity', 'color', 'stud', 'first_initial', 'second_initial', 'custom_date']
-    exclude = ['gift_card', 'image']
+    readonly_fields = ['id', 'product', 'price', 'quantity', 'color', 'stud', 'first_initial', 'second_initial', 'custom_date', show_product]
+    # exclude = ['gift_card']
     can_delete = False
 
     def has_add_permission(self, request, obj):
