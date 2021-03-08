@@ -2,6 +2,7 @@ from django.conf import settings
 from django.shortcuts import redirect
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
+from django.core.exceptions import ObjectDoesNotExist
 
 from .forms import CouponApplyForm
 # from giftcardpayment.models import BoughtGiftCard
@@ -16,7 +17,10 @@ def __get_amount(request):
     for key, value in cart.items():
         amount += int(value.get('price')) * value.get('quantity')
     if 'coupon_id' in request.session:
-        discount = (Coupon.objects.get(id=request.session['coupon_id']).discount / 100) * amount
+        try:
+            discount = (Coupon.objects.get(id=request.session['coupon_id']).discount / 100) * amount
+        except ObjectDoesNotExist:
+            discount = 0
     # if 'gift_card_ids' in request.session:
     #     temp = request.session['gift_card_ids']
     #     for t in temp:
@@ -37,7 +41,7 @@ def coupon_apply(request):
                                         valid_to__gte=now,
                                         active=True)
             request.session['coupon_id'] = coupon.id
-        except Coupon.DoesNotExist:
+        except ObjectDoesNotExist:
             request.session['coupon_id'] = None
     request.session['current_amount'] = __get_amount(request)
     return redirect('cart:cart_detail')
