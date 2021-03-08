@@ -142,7 +142,7 @@ class OrderSummaryAdmin(admin.ModelAdmin):
             extra_context=extra_context,
         )
         try:
-            qs = response.context_data['cl'].queryset
+            qs = response.context_data['cl'].queryset.filter(paid=True)
         except (AttributeError, KeyError):
             return response
 
@@ -177,7 +177,7 @@ class OrderItemSummaryAdmin(admin.ModelAdmin):
             extra_context=extra_context,
         )
         try:
-            qs = response.context_data['cl'].queryset
+            qs = response.context_data['cl'].queryset.filter(order__paid=True)
         except (AttributeError, KeyError):
             return response
 
