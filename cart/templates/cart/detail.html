@@ -1,5 +1,6 @@
 {% include "shop/base.html" with notification=notification cart_border=True cart_page=True api_key=api_key %}
 {% load static %}
+{% load humanize %}
 
 {% block content %}
   <div class="container-md">
@@ -14,19 +15,31 @@
               <div class="col-7 item-details">
                   <div class="item-details-image-wrapper">
                       {% if value.type == 'product' or value.type == 'product_type' %}
-                        <img src="{% if value.image == '' %}{{ value.image.url }}{% else %}{{ value.image }}{% endif %}" alt="{{ value.product_name }}" title="{{ value.product_name }}" />
+                      <picture>
+                          <source srcset="{% if value.image == '' %}{{ value.image.url|wp }}{% else %}
+                          {{ value.image|wp }}{% endif %}" type="image/webp">
+                          <source srcset="{% if value.image == '' %}{{ value.image.url }}{% else %}
+                          {{ value.image }}{% endif %}" type="image/png">
+                          <img src="{% if value.image == '' %}{{ value.image.url }}{% else %}
+                          {{ value.image }}{% endif %}" alt="{{ value.product_name }}"
+                               title="{{ value.product_name }} photo" />
+                        </picture>
                       {% else %}
-                        <img src="{% static 'images/giftcard_thumbnail.png' %}" alt="Ajándékkártya" title="Ajándékkártya"/>
+                      <picture>
+                          <source srcset="{% static 'images/giftcard_thumbnail.webp' %}" type="image/webp">
+                          <source srcset="{% static 'images/giftcard_thumbnail.png' %}" type="image/png">
+                          <img src="{% static 'images/giftcard_thumbnail.png' %}" alt="Ajándékkártya" title="Ajándékkártya photo"/>
+                        </picture>
                       {% endif %}
                   </div>
                   <div class="item-details-wrapper">
-                    <span class="item-details-name">{{ value.product_name }}</span>{% if value.collection %} <span class="item-details-collection-divider">- </span><span class="item-details-collection">{{ value.collection }}</span>{% endif %}
+                    <span class="item-details-name">{{ value.quantity }}db {{ value.product_name }}</span>{% if value.collection %} <span class="item-details-collection-divider">- </span><span class="item-details-collection">{{ value.collection }}</span>{% endif %}
                     <span class="item-details-color">{% if value.color != '' %}{{ value.color|lower }}{% else %}&nbsp;{% endif %}</span>
                     <span class="item-details-stud">{{ value.stud }}</span>
                   </div>
                   <div class="clearfix"></div>
               </div>
-              <div class="col-3 item-price"><span>{{ value.price|calculate_item_price:value.quantity }} Ft.-</span></div>
+              <div class="col-3 item-price"><span>{{ cart|calculate_item_price_with_discount:value }} Ft.-</span></div>
                 <div class="col-1 item-remove">
                   <a href="{% url 'cart:cart_remove' item_id=key %}">
                     <span>
@@ -40,17 +53,17 @@
     {% if cart.coupon %}
       <div class="row total-row coupon-in-cart-row">
           <div class="col-8 total"><span>"{{ cart.coupon.code }}" kupon ({{ cart.coupon.discount }}% kedvezmény)</span></div>
-          <div class="col-3 total-price"><span>- {{ cart.get_discount|floatformat:"0" }} Ft.-</span></div>
+          <div class="col-3 total-price"><span>- {{ cart.get_discount|floatformat }} Ft.-</span></div>
       </div>
       <div class="row total-row">
           <div class="col-8 total"><span>Összesen:</span></div>
-          <div class="col-3 total-price"><span>{{ cart.get_total_price_after_discount|floatformat:"0" }} Ft.-</span></div>
+          <div class="col-3 total-price"><span>{{ cart.get_total_price_after_discount|floatformat }} Ft.-</span></div>
           <div class="col-1"></div>
       </div>
     {% else %}
     <div class="row total-row">
         <div class="col-8 total"><span>Összesen:</span></div>
-        <div class="col-3 total-price"><span>{{ cart.get_total_price|floatformat:"0" }} Ft.-</span></div>
+        <div class="col-3 total-price"><span>{{ cart.get_total_price|floatformat }} Ft.-</span></div>
         <div class="col-1"></div>
     </div>
     {% endif %}
@@ -147,21 +160,21 @@
             </div>
           </div>
         </div>
-        <div class="card">
-          <div class="card-header" id="csomagkuldo">
-            <h5 class="mb-0">
-              <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseFour"
-                      aria-expanded="false" aria-controls="collapseFour" onClick="inlineFullHU()">
-                <img src="{% static 'images/foxpost.png' %}" alt="csomagkuldo" title="csomagkuldo" />
-                <span>Csomagküldő átvevőhely + <span id="csomagkuldo_price">{{ csomagkuldo_price }}</span> Ft</span>
-              </button>
-            </h5>
-          </div>
+<!--        <div class="card">-->
+<!--          <div class="card-header" id="csomagkuldo">-->
+<!--            <h5 class="mb-0">-->
+<!--              <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseFour"-->
+<!--                      aria-expanded="false" aria-controls="collapseFour" onClick="inlineFullHU()">-->
+<!--                <img src="{% static 'images/foxpost.png' %}" alt="csomagkuldo" title="csomagkuldo" />-->
+<!--                <span>Csomagküldő átvevőhely + <span id="csomagkuldo_price">{{ csomagkuldo_price }}</span> Ft</span>-->
+<!--              </button>-->
+<!--            </h5>-->
+<!--          </div>-->
 
-          <div id="collapseFour" class="collapse" aria-labelledby="personal" data-parent="#accordion">
-            <div id="csomagkuldo-body" class="card-body"></div>
-         </div>
-        </div>
+<!--          <div id="collapseFour" class="collapse" aria-labelledby="personal" data-parent="#accordion">-->
+<!--            <div id="csomagkuldo-body" class="card-body"></div>-->
+<!--         </div>-->
+<!--        </div>-->
         <div class="card">
           <div class="card-header" id="foxt-post">
             <h5 class="mb-0">

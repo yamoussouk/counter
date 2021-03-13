@@ -23,9 +23,56 @@ class Cart(object):
         self.delivery_type = self.session.get('delivery_type')
         self.prices = dict(FoxPost=settings.FOXPOST_PRICE, Csomagkuldo=settings.CSOMAGKULDO_PRICE,
                            Házhozszállítás=settings.DELIVERY_PRICE, Személyesátvétel=0)
+        self.discount_products = []
+
+    def __get_the_lowest_price(self, cart: dict, times: int):
+        t = times
+        temp = times
+        result = dict()
+        order_dict = dict(sorted(cart.items(), key=lambda item: int(item[1]['price'])))
+        for k, v in order_dict.items():
+            while t > 0:
+                t -= int(v.get('quantity'))
+                if t >= 0:
+                    result[k] = int(v.get('quantity'))
+                else:
+                    result[k] = int(v.get('quantity')) - temp
+                temp -= int(v.get('quantity'))
+                break
+        return result
+
+    def __evaluate_discount_price(self, cart_length):
+        times = int(cart_length / 3)
+        lowest_price_cart_key = self.__get_the_lowest_price(self.cart, times)
+        for k, v in self.cart.items():
+            if k in list(lowest_price_cart_key.keys()):
+                self.cart[k]['zero_discount'] = True
+                if lowest_price_cart_key[k] == v.get('quantity'):
+                    self.cart[k]['discount_show_price'] = 0
+                else:
+                    self.cart[k]['discount_show_price'] = int(lowest_price_cart_key[k]) * int(self.cart[k].get('price'))
+                self.cart[k]['discount_quantity'] = lowest_price_cart_key[k]
+                if k not in self.discount_products:
+                    self.discount_products.append(k)
+            else:
+                self.cart[k]['zero_discount'] = False
+                self.cart[k]['discount_show_price'] = None
+                self.cart[k]['discount_quantity'] = 0
+                if k in self.discount_products:
+                    del self.discount_products[k]
 
     def get_cart(self):
         temp = self.cart
+        return temp
+
+    def get_length(self):
+        cart_length = 0
+        for k, v in self.cart.items():
+            cart_length += int(v.get('quantity'))
+        return cart_length
+
+    def get_discount_products(self):
+        temp = self.discount_products
         return temp
 
     def add(self, product, color, stud, first_initial='', second_initial='', custom_date='',
@@ -75,6 +122,13 @@ class Cart(object):
         self.cart[new_cart_id]['first_initial'] = first_initial
         self.cart[new_cart_id]['second_initial'] = second_initial
         self.cart[new_cart_id]['custom_date'] = custom_date
+        self.cart[new_cart_id]['zero_discount'] = False
+        self.cart[new_cart_id]['discount_show_price'] = None
+        self.cart[new_cart_id]['discount_quantity'] = 0
+
+        if settings.DISCOUNT:
+            cart_length = self.get_length()
+            self.__evaluate_discount_price(cart_length)
         self.save()
 
     def add_gift_card(self, giftcard, amount, quantity=1, update_quantity=False):
@@ -96,6 +150,11 @@ class Cart(object):
     def remove(self, item_id):
         if str(item_id) in self.cart:
             del self.cart[str(item_id)]
+            if settings.DISCOUNT:
+                cart_length = 0
+                for k, v in self.cart.items():
+                    cart_length += int(v.get('quantity'))
+                self.__evaluate_discount_price(cart_length)
         if len(self.cart) == 0:
             props = ['coupon_id', 'gift_card_ids', 'delivery', 'mandatory', 'order_id', 'delivery_type', 'billing']
             for p in props:
@@ -131,7 +190,16 @@ class Cart(object):
         return sum(item['quantity'] for item in self.cart.values())
 
     def get_total_price(self):
-        return sum(Decimal(item['price']) * item['quantity'] for item in self.cart.values())
+        p = float(0)
+        if settings.DISCOUNT:
+            for item in self.cart.values():
+                if item['zero_discount']:
+                    p += float(item['discount_show_price'])
+                else:
+                    p += float(item['price']) * item['quantity']
+            return p
+        else:
+            return sum(float(item['price']) * item['quantity'] for item in self.cart.values())
 
     def clear(self):
         self.session[settings.CART_SESSION_ID] = {}
@@ -171,11 +239,11 @@ class Cart(object):
 
     def get_discount(self):
         if self.coupon:
-            return (self.coupon.discount / Decimal('100')) * self.get_total_price()
-        return Decimal('0')
+            return round((self.coupon.discount / float('100')) * float(self.get_total_price()))
+        return float('0')
 
     def get_total_price_after_discount(self):
-        return self.get_total_price() - self.get_discount()
+        return float(self.get_total_price()) - float(self.get_discount())
 
     # @property
     # def gift_cards(self):
