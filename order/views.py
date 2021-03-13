@@ -1,5 +1,6 @@
 from decimal import Decimal
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.forms.models import model_to_dict
@@ -10,6 +11,9 @@ from cart.cart import Cart
 from shop.models import ProductType
 from .forms import OrderCreateForm
 from .models import Order, OrderItem
+
+prices = dict(FoxPost=settings.FOXPOST_PRICE, Csomagkuldo=settings.CSOMAGKULDO_PRICE,
+              Házhozszállítás=settings.DELIVERY_PRICE, Személyesátvétel=0)
 
 
 def __validate_stock(cart, product, cd):
@@ -91,14 +95,11 @@ def order_create(request):
                     order.product_note = request.POST.get('product_note')
                 else:
                     order = form.save(commit=False)
-                order.subtotal = cart.get_total_price()
-                order.total = cart.get_total_price()
+                order.subtotal = cart.get_total_price_after_discount()  # delivery excluded
                 if cart.coupon:
                     order.coupon = cart.coupon
                     order.discount = cart.coupon.discount
-                    order.discount_amount = cart.get_total_price() - cart.get_total_price_after_discount()
-                    order.subtotal = cart.get_total_price_after_discount()
-                    order.total = cart.get_total_price()
+                    order.discount_amount = float(cart.get_total_price()) - float(cart.get_total_price_after_discount())
                 order.save()
                 order_items = Order.objects.prefetch_related('items').filter(id=order.id)[0].items.all()
                 # some item was removed from the cart
@@ -112,7 +113,6 @@ def order_create(request):
                                          'stud') == stud]) > 0
                         if not found:
                             item.delete()
-                product_price = 0
                 for item in cart:
                     OrderItem.objects.get_or_create(order=order, price=item['price'], quantity=item['quantity'],
                                                     color=item['color'] if 'color' in item else '',
@@ -129,10 +129,11 @@ def order_create(request):
                                                     **({"product": item['product']} if item['type']
                                                                                        in ['product', 'product_type']
                                                        else {"gift_card": item['product']}))
-                    product_price += int(item['price'])
-                order.products_price = product_price
-                if cart.coupon:
-                    order.products_price_with_discount = product_price - order.discount_amount
+                order.products_price = cart.get_total_price()
+                order.products_price_with_discount = cart.get_total_price() - order.discount_amount \
+                    if cart.coupon else cart.get_total_price()
+                order.delivery_cost = prices[order.delivery_type.replace(' ', '')]
+                order.total = cart.get_total_price_after_discount() + order.delivery_cost
                 order.save()
         else:
             print('error', form.errors.as_data())
