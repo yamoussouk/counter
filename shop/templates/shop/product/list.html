@@ -17,11 +17,20 @@
                         <div class="product-element-image-wrapper">
                             {% if product.image %}
                             <a href="{% url 'shop:product_detail' id=product.collection.slug slug=product.slug %}" title="Termék oldal">
-                                <img src="{{ product.image.url }}" alt="{{ product.name }}" title="{{ product.name }}"
+                                <picture>
+                                  <source class="product-element-image" srcset="{{ product.image.url|wp }}" type="image/webp">
+                                  <source class="product-element-image" srcset="{{ product.image.url }}" type="image/png">
+                                  <img src="{{ product.image.url }}" alt="{{ product.name }}" title="{{ product.name }} photo"
                                      class="product-element-image"/>
+                                </picture>
                                 {% endif %}
-                                <img src="{% static 'images/sold_out_150.png' %}" alt="Elfogyott" title="Elfogyott"
+                                <picture>
+                                  <source class="sold-out-icon" srcset="{% static 'images/sold_out_150.webp' %}" type="image/webp">
+                                  <source class="sold-out-icon" srcset="{% static 'images/sold_out_150.png' %}" type="image/png">
+                                  <img src="{% static 'images/sold_out_150.png' %}" alt="Elfogyott" title="Elfogyott"
                                      class="sold-out-icon"/>
+                                </picture>
+
                             </a>
                         </div>
                         <div class="product-element-description-wrapper">
