@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="icon" sizes="192x192" href="{% url 'shop:get_icon' %}">
     <link rel="apple-touch-icon" href="{% url 'shop:get_icon' %}" />
-    <title>Minerva Studio - modern, egyedi, könnyű fülbevalók</title>
+    <title>Minerva Studio - modern, egyedi, könnyű fülbevalók | Kézműves fülbevalók</title>
     {% if CUSTOM %}
       <link href="{% static "css/base.css" %}" rel="stylesheet" />
       <link href="{% static "css/footer.css" %}" rel="stylesheet" />
@@ -57,6 +57,12 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
           integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <script src="https://unpkg.com/webp-hero@0.0.0-dev.21/dist-cjs/polyfills.js"></script>
+    <script src="https://unpkg.com/webp-hero@0.0.0-dev.21/dist-cjs/webp-hero.bundle.js"></script>
+    <script>
+     var webpMachine = new webpHero.WebpMachine();
+     webpMachine.polyfillDocument();
+    </script>
   </head>
   <body>
     <header id="header">
@@ -74,7 +80,11 @@
           <div class="col-md-12">
             <div id="main-logo">
               <a href="{% url 'shop:index' %}">
-                  <img class="c_logo" src="{% static 'images/logo_150.png' %}" alt="Minerva Studio Logo" title="Minerva Studio Logo" />
+                <picture id="desktop-image">
+                  <source class="c_logo" srcset="{% static 'images/logo_150.webp' %}" type="image/webp">
+                  <img class="c_logo" src="{% static 'images/logo_150.png' %}" alt="Minerva Studio Logo"
+                       title="Minerva Studio Logo image" />
+                </picture>
               </a>
             </div>
             <div class="tablet-menu">

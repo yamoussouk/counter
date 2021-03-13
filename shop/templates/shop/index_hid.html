@@ -1,4 +1,5 @@
 {% include "shop/base.html" with notification=notification index=True %}
+{% load webp %}
 {% load static %}
 
 {% block content %}
@@ -6,8 +7,16 @@
     <section class="home-image">
         <div class="row">
             <div class="fluid-image-wrapper">
-                <img id="desktop-image" src="{% static 'images/home.png' %}" alt="Minerva home image" title="Minerva home image" />
-                <img id="mobile-image" src="{% static 'images/home_mobile.png' %}" alt="Minerva home image" title="Minerva home image" />
+                <picture id="desktop-image">
+                  <source srcset="{% static 'images/home.webp' %}" type="image/webp">
+                  <source srcset="{% static 'images/home_mobile.webp' %}" type="image/webp">
+                  <img src="{% static 'images/home.png' %}" alt="Minervastudio home image" title="Minervastudio home image photo">
+                </picture>
+                <picture id="mobile-image">
+                  <source srcset="{% static 'images/home_mobile.webp' %}" type="image/webp">
+                  <source srcset="{% static 'images/home_mobile.png' %}" type="image/png">
+                  <img src="{% static 'images/home_mobile.png' %}" alt="Minervastudio home image" title="Minervastudio home image photo">
+                </picture>
             </div>
         </div>
     </section>
@@ -38,7 +47,12 @@
                 {% for collection in collections %}
                 <div class="home-collection-item">
                     <div class="text-on-image-image-wrapper">
-                        <img src="{{ collection.image.url }}" alt="{{ collection.name }}" title="{{ collection.name }}" />
+                        <picture>
+                          <source srcset="{{ collection.image.url|wp }}" type="image/webp">
+                          <source srcset="{{ collection.image.url }}" type="image/png">
+                          <img src="{{ collection.image.url }}" alt="{{ collection.name }}"
+                               title="{{ collection.name }} photo" />
+                        </picture>
                     </div>
                     <div class="text-on-image-wrapper">
                         <a title="{{ collection.name }}" href="{% url 'shop:products_view' slug=collection.slug %}">
@@ -53,7 +67,10 @@
     <section class="home-image">
         <div class="row">
             <div class="fluid-image-wrapper">
-                <img src="{% static 'images/home2.png' %}" alt="Minerva Studio home image" title="Minerva Studio home image" />
+                <picture>
+                  <source srcset="{% static 'images/home2.webp' %}" type="image/webp">
+                  <img src="{% static 'images/home2.png' %}" alt="Minerva Studio home" title="Minerva Studio home image" />
+                </picture>
             </div>
         </div>
     </section>
@@ -70,7 +87,10 @@
         <div class="row">
             <div class="home-image-with-text-wrapper">
                 <div class="home-image-wrapper">
-                    <img src="{% static 'images/home3.png' %}" alt="Környezetbarát csomagolás" title="Környezetbarát csomagolás">
+                    <picture>
+                      <source srcset="{% static 'images/home3.webp' %}" type="image/webp">
+                      <img src="{% static 'images/home3.png' %}" alt="Környezetbarát csomagolás" title="Környezetbarát csomagolás">
+                    </picture>
                 </div>
                 <div class="home-text-wrapper">
                     <div class="home-text-header">

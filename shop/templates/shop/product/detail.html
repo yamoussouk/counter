@@ -15,25 +15,44 @@
                      {% if not types %}data-stock="{{ product.stock }}"{% endif %}>
                     <div class="product-image-wrapper">
                         <div class="product-image">
-                            <img src="{{ product.image.url }}" alt="{{ product.name }}" title="{{ product.name }}" class="product_image" />
+                            <picture>
+                              <source class="product_image" srcset="{{ product.image.url|wp }}" type="image/webp">
+                              <source class="product_image" srcset="{{ product.image.url }}" type="image/png">
+                              <img src="{{ product.image.url }}" alt="{{ product.name }}"
+                                   title="{{ product.name }} photo" class="product_image"/>
+                            </picture>
                         </div>
                         <div class="product-thumbnails-wrapper">
                             <div class="product-thumbnail selected">
-                                <img src="{{ product.image.url }}" alt="{{ product.name }}" title="{{ product.name }}" />
+                                <picture>
+                                  <source class="product_image" srcset="{{ product.image.url|wp }}" type="image/webp">
+                                  <source class="product_image" srcset="{{ product.image.url }}" type="image/png">
+                                  <img src="{{ product.image.url }}" alt="{{ product.name }}"
+                                       title="{{ product.name }} thumbnail photo" class="product_image"/>
+                                </picture>
                             </div>
                             {% if types %}
                                 {% for type in types %}
                                     {% if type.image %}
                                     <div class="product-thumbnail">
-                                        <img src="{{ type.image.url }}" alt="{{ product.name }}" title="{{ product.name }}"
-                                             data-name="{{ type.color }}" />
+                                        <picture>
+                                          <source data-name="{{ type.color }}" srcset="{{ type.image.url|wp }}" type="image/webp">
+                                          <source data-name="{{ type.color }}" srcset="{{ type.image.url }}" type="image/png">
+                                          <img src="{{ type.image.url }}" alt="{{ product.name }}"
+                                               title="{{ product.name }} thumbnail photo" data-name="{{ type.color }}"/>
+                                        </picture>
                                     </div>
                                     {% endif %}
                                 {% endfor %}
                             {% else %}
                                 {% for img in images %}
                                     <div class="product-thumbnail">
-                                        <img src="{{ img.image.url }}" alt="{{ product.name }}" title="{{ product.name }}" />
+                                        <picture>
+                                          <source data-name="{{ type.color }}" srcset="{{ img.image.url|wp }}" type="image/webp">
+                                          <source data-name="{{ type.color }}" srcset="{{ img.image.url }}" type="image/png">
+                                          <img src="{{ img.image.url }}" alt="{{ product.name }}"
+                                               title="{{ product.name }} thumbnail photo" />
+                                        </picture>
                                     </div>
                                 {% endfor %}
                             {% endif %}

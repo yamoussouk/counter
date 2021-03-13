@@ -6,7 +6,10 @@
             <div class="col-sm-12">
                 <div id="submark-logo-wrapper">
                     <a href="{% url 'shop:index' %}">
-                        <img src="{% static 'images/submark_150.png' %}" alt="Minerva Logo" title="Minerva Logo">
+                        <picture>
+                          <source srcset="{% static 'images/submark_150.webp' %}" type="image/webp">
+                          <img src="{% static 'images/submark_150.png' %}" alt="Minerva Logo" title="Minerva Logo image">
+                        </picture>
                     </a>
                 </div>
             </div>
@@ -16,12 +19,18 @@
                 <div id="social">
                     <div id="facebook">
                         <a href="https://www.facebook.com/minervastudio.hu">
-                            <img src="{% static 'images/facebook_150.png' %}" alt="facebook icon" title="facebook icon" />
+                            <picture>
+                              <source srcset="{% static 'images/facebook_150.webp' %}" type="image/webp">
+                              <img src="{% static 'images/facebook_150.png' %}" alt="facebook icon" title="facebook icon image" />
+                            </picture>
                         </a>
                     </div>
                     <div id="instagram">
                         <a href="https://www.instagram.com/minervastudio.hu/">
-                            <img src="{% static 'images/instagram_150.png' %}" alt="instagram icon" title="instagram icon" />
+                            <picture>
+                              <source srcset="{% static 'images/instagram_150.webp' %}" type="image/webp">
+                              <img src="{% static 'images/instagram_150.png' %}" alt="instagram icon" title="instagram icon" />
+                            </picture>
                         </a>
                     </div>
                 </div>
