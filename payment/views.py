@@ -57,15 +57,22 @@ def create_checkout_session(request):
         items.append(dict(name='valami', amount=int(total_price) * 100, quantity=1, currency=settings.CURRENCY))
     else:
         discount = order[0].coupon if order[0].coupon is not None else ''
-        for o in order:
-            item = o.items.all().values()
-            for i in item:
-                if i.get('product_id') is not None:
-                    product = Product.objects.filter(id=i.get('product_id'))[0]
-                    items.append(dict(price=product.price_api_id, quantity=int(i.get('quantity'))))
+        for k, v in cart.cart.items():
+            if v.get('product_id') is not None:
+                product = Product.objects.filter(id=v.get('product_id'))[0]
+                if settings.DISCOUNT:
+                    if v['zero_discount']:
+                        if int(v['discount_show_price']) != 0:
+                            q = v['discount_quantity']
+                            if q > 0:
+                                items.append(dict(price=product.price_api_id, quantity=int(q)))
+                    else:
+                        items.append(dict(price=product.price_api_id, quantity=int(v.get('quantity'))))
                 else:
-                    gift_card = GiftCard.objects.filter(id=i.get('gift_card_id'))[0]
-                    items.append(dict(price=gift_card.price_api_id, quantity=int(i.get('quantity'))))
+                    items.append(dict(price=product.price_api_id, quantity=int(v.get('quantity'))))
+            else:
+                gift_card = GiftCard.objects.filter(id=v.get('gift_card_id'))[0]
+                items.append(dict(price=gift_card.price_api_id, quantity=int(v.get('quantity'))))
         delivery_type = order[0].delivery_type
         if delivery_type == 'Házhozszállítás':
             items.append(dict(price=settings.DELIVERY_PRICE_API_KEY, quantity=1))
@@ -109,9 +116,6 @@ def __post_payment_process(event):
     order = get_object_or_404(Order, id=order_id)
     order.paid = True
     order.paid_by = 'Stripe'
-    order.subtotal = event['data']['object']['amount_subtotal'] / 100
-    order.total = event['data']['object']['amount_total'] / 100
-    order.discount_amount = order.total - order.subtotal
     order.paid_time = (datetime.utcfromtimestamp(event['created'])
                        + timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S')
     prices = dict(FoxPost=settings.FOXPOST_PRICE, Csomagkuldo=settings.CSOMAGKULDO_PRICE,
