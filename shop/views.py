@@ -62,7 +62,8 @@ def __get_product_details(request, id: str, slug: str, custom: bool):
                    'cart_product_form': cart_product_form,
                    'is_stock': is_stock,
                    'images': imgs,
-                   'view': view
+                   'view': view,
+                   'slug': collection_slug
                    })
 
 
