@@ -96,6 +96,7 @@
                                     {% if types %}
                                     <p>Szín:</p>
                                     <select required>
+                                        <option value="" selected disabled>Válassz színt</option>
                                         {% for type in types %}
                                         {% if type.image %}
                                         <option value="{{ type.color }}" data-stock="{{ type.stock }}"
