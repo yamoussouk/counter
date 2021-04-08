@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 
 import stripe
 from django.conf import settings
+import json
 from django.http.response import JsonResponse, HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
@@ -13,6 +14,7 @@ from giftcardpayment.models import BoughtGiftCard
 from order.models import Order
 from shop.MessageSender import MessageSender
 from shop.models import Notification, Product, GiftCard, Message
+from logs.models import LogFile
 
 
 @csrf_exempt
@@ -129,11 +131,23 @@ def __post_payment_process(event):
             product = Product.objects.prefetch_related('product_types').filter(id=o.product.id)[0]
             if len(product.product_types.all()) > 0:
                 product_type = [pt for pt in product.product_types.all() if pt.color == o.color]
+                log = LogFile(type='INFO', message=f'Stock of product with the ID of "{product.id}" '
+                                                   f'and the color of "{product_type[0].color}" was decreased'
+                                                   f' with {o.quantity}. Previous stock was "{product_type[0].stock}",'
+                                                   f' current stock is ')
                 product_type[0].stock = product_type[0].stock - o.quantity
                 product_type[0].save()
+                log.message += f'"{product_type[0].stock}".'
+                log.save()
             else:
+                log = LogFile(type='INFO', message=f'Stock of product with the ID of "{product.id}" was decreased'
+                                                   f' with {o.quantity}. Previous stock was "{product.stock}",'
+                                                   f' current stock is ')
                 product.stock = product.stock - o.quantity
             product.save()
+            if len(product.product_types.all()) == 0:
+                log.message += f'"{product.stock}".'
+                log.save()
         if o.gift_card is not None:
             gift_card = GiftCard.objects.get(id=o.gift_card.id)
             bought_card = BoughtGiftCard(price=gift_card.price, bought=datetime.now, email=order.email, active=True)
@@ -167,6 +181,7 @@ def __post_payment_process(event):
                            sender='www.minervastudio.hu',
                            message=msg).send_mail()
     sent = True if result == 1 else False
+    LogFile.objects.create(type='INFO', message=f'Message is sent to "{o.email}", status: "{result}"')
     Message.objects.create(subject=f'Új rendelés #{str(o.id)}', email=settings.EMAIL_HOST_USER, message=msg,
                            sender='System message from Minerva Studio', sent=sent)
 
@@ -210,5 +225,7 @@ def stripe_webhook(request):
 
     if event['type'] == 'checkout.session.completed':
         __post_payment_process(event)
+    else:
+        LogFile(type='INFO', message=f'Checkout failure, {json.dumps(payload)}')
 
     return HttpResponse(status=200)
