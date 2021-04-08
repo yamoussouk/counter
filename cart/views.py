@@ -50,6 +50,9 @@ def cart_add(request, product_id):
     form = CartAddCustomProductForm(request.POST) if product.custom else CartAddProductForm(request.POST)
     if form.is_valid():
         cd = form.cleaned_data
+        if cd.get('color') == '' and product.product_types.all().exists():
+            messages.error(request, f'Kérem válasszon színt!')
+            return redirect(reverse(redirect_url, args=[product.collection.slug, product.slug]))
         if product.custom:
             status, item_in_cart, stock = True, 0, 0
         else:
