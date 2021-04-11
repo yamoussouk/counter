@@ -1,12 +1,11 @@
 from django.contrib import admin
-from django.utils.safestring import mark_safe
 
 from .models import Collection, Product, Image, Notification, ProductType, GiftCard, Message
 
 
 class CollectionAdmin(admin.ModelAdmin):
     list_display = ['name']
-    fields = ('name', 'image', 'available', 'custom', 'show_on_home_page')
+    fields = ('name', 'image', 'available', 'custom', 'show_on_home_page', 'basic_collection', 'regular_collection')
 
 
 admin.site.register(Collection, CollectionAdmin)
