@@ -12,8 +12,12 @@ class Collection(models.Model):
     available = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    custom = models.BooleanField(default=False)
-    show_on_home_page = models.BooleanField(default=True)
+    custom = models.BooleanField(default=False, help_text="Nem aktivált funkció, azt jelöli, hogy a kollekció azok "
+                                                          "közé tartozik-e, amelyeket a vásárlók módosíthatnak. "
+                                                          "Pl. névkezdőbetűs nyaklánc, stb.")
+    show_on_home_page = models.BooleanField(default=True, help_text="Látható legyen-e a kollekció a főoldalon")
+    basic_collection = models.BooleanField(default=False, help_text="Alap kollekció jelölő")
+    regular_collection = models.BooleanField(default=False, help_text="Állandó kollekció jelölő")
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
