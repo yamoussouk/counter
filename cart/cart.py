@@ -6,6 +6,7 @@ from django.conf import settings
 from coupon.models import Coupon
 # from giftcardpayment.models import BoughtGiftCard
 from order.models import Order
+from parameters.models import Parameter
 from shop.models import Product, GiftCard, ProductType
 
 
@@ -21,9 +22,13 @@ class Cart(object):
         self.gift_card_ids = self.session.get('gift_card_ids')
         self.order_id = self.session.get('order_id')
         self.delivery_type = self.session.get('delivery_type')
-        self.prices = dict(FoxPost=settings.FOXPOST_PRICE, Csomagkuldo=settings.CSOMAGKULDO_PRICE,
-                           Házhozszállítás=settings.DELIVERY_PRICE, Személyesátvétel=0)
+        self.prices = dict(FoxPost=int(Parameter.objects.filter(name="foxpost_price")[0].value),
+                           Csomagkuldo=int(Parameter.objects.filter(name="csomagkuldo_price")[0].value),
+                           Házhozszállítás=int(Parameter.objects.filter(name="delivery_price")[0].value),
+                           Személyesátvétel=0,
+                           Ajanlott=int(Parameter.objects.filter(name="ajanlott_price")[0].value))
         self.discount_products = []
+        self.discount_service = Parameter.objects.filter(name="discount_service")[0].value == 'True'
 
     def __get_the_lowest_price(self, cart: dict, times: int):
         t = times
@@ -126,7 +131,7 @@ class Cart(object):
         self.cart[new_cart_id]['discount_show_price'] = None
         self.cart[new_cart_id]['discount_quantity'] = 0
 
-        if settings.DISCOUNT:
+        if self.discount_service:
             cart_length = self.get_length()
             self.__evaluate_discount_price(cart_length)
         self.save()
@@ -150,7 +155,7 @@ class Cart(object):
     def remove(self, item_id):
         if str(item_id) in self.cart:
             del self.cart[str(item_id)]
-            if settings.DISCOUNT:
+            if self.discount_service:
                 cart_length = 0
                 for k, v in self.cart.items():
                     cart_length += int(v.get('quantity'))
@@ -191,7 +196,7 @@ class Cart(object):
 
     def get_total_price(self):
         p = float(0)
-        if settings.DISCOUNT:
+        if self.discount_service:
             for item in self.cart.values():
                 if item['zero_discount']:
                     p += float(item['discount_show_price'])

@@ -11,6 +11,7 @@ from django.shortcuts import render, get_object_or_404
 from django.views.generic.list import ListView
 
 from cart.forms import CartAddProductForm, CartAddCustomProductForm, CartAddGiftCardProductForm
+from parameters.models import Parameter
 from shop.MessageSender import MessageSender
 from .StripeProductGenerator import StripeProductGenerator
 from .forms import ContactForm
@@ -24,7 +25,8 @@ def index_hid(request):
 
 
 def index(request):
-    collections = Collection.objects.filter(available=True, custom=False, show_on_home_page=True).order_by('-created')[:9]
+    collections = (Collection.objects.filter(available=True, custom=False, show_on_home_page=True)
+                       .order_by('-created')[:9])
     notification = Notification.objects.all()
     return render(request, 'shop/index_hid.html', {'collections': collections, 'notification': notification})
 
@@ -76,12 +78,14 @@ def custom_product_detail(request, id: str, slug: str):
 
 
 def faq(request):
-    foxpost = settings.FOXPOST_PRICE
-    delivery = settings.DELIVERY_PRICE
-    csomagkuldo = settings.CSOMAGKULDO_PRICE
+    foxpost = Parameter.objects.filter(name="foxpost_price")[0].value
+    delivery = Parameter.objects.filter(name="delivery_price")[0].value
+    csomagkuldo = Parameter.objects.filter(name="csomagkuldo_price")[0].value
+    ajanlott = Parameter.objects.filter(name="ajanlott_price")[0].value
     notification = Notification.objects.all()
     return render(request, 'shop/faq.html',
-                  {'csomagkuldo': csomagkuldo, 'foxpost': foxpost, 'delivery': delivery, 'notification': notification})
+                  {'csomagkuldo': csomagkuldo, 'foxpost': foxpost, 'delivery': delivery,
+                   'ajanlott': ajanlott, 'notification': notification})
 
 
 def contact(request):

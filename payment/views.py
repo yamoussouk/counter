@@ -1,8 +1,8 @@
+import json
 from datetime import datetime, timedelta
 
 import stripe
 from django.conf import settings
-import json
 from django.http.response import JsonResponse, HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
@@ -11,10 +11,11 @@ from django.views.generic import TemplateView
 
 from cart.cart import Cart
 from giftcardpayment.models import BoughtGiftCard
+from logs.models import LogFile
 from order.models import Order
+from parameters.models import Parameter
 from shop.MessageSender import MessageSender
 from shop.models import Notification, Product, GiftCard, Message
-from logs.models import LogFile
 
 
 @csrf_exempt
@@ -56,13 +57,14 @@ def create_checkout_session(request):
     # this sucks since 175ft is the minimum limit for a purchase
     if hasattr(cart, 'gift_cards') and cart.gift_cards is not None:
         total_price = cart.calculated_total_price()
-        items.append(dict(name='valami', amount=int(total_price) * 100, quantity=1, currency=settings.CURRENCY))
+        items.append(dict(name='valami', amount=int(total_price) * 100, quantity=1,
+                          currency=Parameter.objects.filter(name="currency")[0].value))
     else:
         discount = order[0].coupon if order[0].coupon is not None else ''
         for k, v in cart.cart.items():
             if v.get('product_id') is not None:
                 product = Product.objects.filter(id=v.get('product_id'))[0]
-                if settings.DISCOUNT:
+                if Parameter.objects.filter(name="discount_service")[0].value == 'True':
                     if v['zero_discount']:
                         if int(v['discount_show_price']) != 0:
                             q = v['discount_quantity']
@@ -77,11 +79,13 @@ def create_checkout_session(request):
                 items.append(dict(price=gift_card.price_api_id, quantity=int(v.get('quantity'))))
         delivery_type = order[0].delivery_type
         if delivery_type == 'Házhozszállítás':
-            items.append(dict(price=settings.DELIVERY_PRICE_API_KEY, quantity=1))
+            items.append(dict(price=Parameter.objects.filter(name="delivery_price_api_key")[0].value, quantity=1))
         elif delivery_type == 'FoxPost':
-            items.append(dict(price=settings.FOXPOST_PRICE_API_KEY, quantity=1))
+            items.append(dict(price=Parameter.objects.filter(name="foxpost_price_api_key")[0].value, quantity=1))
         elif delivery_type == 'Csomagkuldo':
-            items.append(dict(price=settings.CSOMAGKULDO_PRICE_API_KEY, quantity=1))
+            items.append(dict(price=Parameter.objects.filter(name="csomagkuldo_price_api_key")[0].value, quantity=1))
+        elif delivery_type == 'Ajanlott':
+            items.append(dict(price=Parameter.objects.filter(name="ajanlott_price_api_key")[0].value, quantity=1))
         if cart.gift_card_ids:
             if len(cart.gift_card_ids) > 0:
                 pass
@@ -120,8 +124,11 @@ def __post_payment_process(event):
     order.paid_by = 'Stripe'
     order.paid_time = (datetime.utcfromtimestamp(event['created'])
                        + timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S')
-    prices = dict(FoxPost=settings.FOXPOST_PRICE, Csomagkuldo=settings.CSOMAGKULDO_PRICE,
-                  Házhozszállítás=settings.DELIVERY_PRICE, Személyesátvétel=0)
+    prices = dict(FoxPost=int(Parameter.objects.filter(name="foxpost_price")[0].value),
+                  Csomagkuldo=int(Parameter.objects.filter(name="csomagkuldo_price")[0].value),
+                  Házhozszállítás=int(Parameter.objects.filter(name="delivery_price")[0].value),
+                  Személyesátvétel=0,
+                  Ajanlott=int(Parameter.objects.filter(name="ajanlott_price")[0].value))
     order.delivery_cost = prices[order.delivery_type.replace(' ', '')]
     order.save()
     # decrease the stock number
@@ -132,21 +139,23 @@ def __post_payment_process(event):
             if len(product.product_types.all()) > 0:
                 product_type = [pt for pt in product.product_types.all() if pt.color == o.color]
                 log = LogFile(type='INFO', message=f'Stock of product with the ID of "{product.id}" '
+                                                   f'and the name of "{product.name}" '
                                                    f'and the color of "{product_type[0].color}" was decreased'
                                                    f' with {o.quantity}. Previous stock was "{product_type[0].stock}",'
                                                    f' current stock is ')
                 product_type[0].stock = product_type[0].stock - o.quantity
                 product_type[0].save()
-                log.message += f'"{product_type[0].stock}".'
+                log.message += f'"{product_type[0].stock}". Order ID: {order.id}'
                 log.save()
             else:
-                log = LogFile(type='INFO', message=f'Stock of product with the ID of "{product.id}" was decreased'
+                log = LogFile(type='INFO', message=f'Stock of product with the ID of "{product.id}"'
+                                                   f' and the name of "{product.name}" was decreased'
                                                    f' with {o.quantity}. Previous stock was "{product.stock}",'
                                                    f' current stock is ')
                 product.stock = product.stock - o.quantity
             product.save()
             if len(product.product_types.all()) == 0:
-                log.message += f'"{product.stock}".'
+                log.message += f'"{product.stock}". Order ID: {order.id}'
                 log.save()
         if o.gift_card is not None:
             gift_card = GiftCard.objects.get(id=o.gift_card.id)
@@ -155,8 +164,6 @@ def __post_payment_process(event):
 
     # SEND AN ORDER CONFIRMATION MAIL
     o = Order.objects.prefetch_related('items').filter(id=order_id)[0]
-    prices = dict(FoxPost=settings.FOXPOST_PRICE, Csomagkuldo=settings.CSOMAGKULDO_PRICE,
-                  Házhozszállítás=settings.DELIVERY_PRICE, Személyesátvétel=0)
     delivery_info = dict(FoxPost={'Átvételi pont': o.fox_post},
                          Csomagkuldo={'Átvételi pont': o.csomagkuldo},
                          Házhozszállítás={'Szállítási név': o.delivery_name, 'Szállítási cím': o.address,

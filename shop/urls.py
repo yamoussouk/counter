@@ -1,8 +1,8 @@
-from django.conf import settings
 from django.contrib.sitemaps.views import sitemap
 from django.urls import path
 from django.views.generic import TemplateView
 
+from parameters.models import Parameter
 from . import views
 from .sitemaps import StaticViewsSitemap, CollectionSitemap, ProductSitemap
 
@@ -33,7 +33,7 @@ urlpatterns = [
     path('generate_stripe_product/<str:id>', views.generate_stripe_product, name='generate_stripe_product'),
 ]
 
-if settings.CUSTOM_SERVICE:
+if Parameter.objects.filter(name="custom_service")[0].value == 'True':
     urlpatterns.extend([
         path('egyedi-rendelés/', views.CustomProductsView.as_view(), name='custom_products_view'),
         path('egyedi-rendelés/<str:slug>', views.CustomProductsView.as_view(), name='custom_products_view'),
