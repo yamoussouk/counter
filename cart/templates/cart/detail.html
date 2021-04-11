@@ -123,6 +123,7 @@
       {% if is_product_in_cart %}
       <h1>szállítási információk</h1>
       <div id="accordion">
+          {% if is_szemelyes_atvetel_enabled %}
         <div class="card">
           <div class="card-header" id="personal">
             <h5 class="mb-0">
@@ -133,7 +134,6 @@
               </button>
             </h5>
           </div>
-
           <div id="collapseOne" class="collapse show" aria-labelledby="personal" data-parent="#accordion">
             <div class="card-body">
               <div class="personal-left-wrapper">
@@ -160,21 +160,25 @@
             </div>
           </div>
         </div>
-<!--        <div class="card">-->
-<!--          <div class="card-header" id="csomagkuldo">-->
-<!--            <h5 class="mb-0">-->
-<!--              <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseFour"-->
-<!--                      aria-expanded="false" aria-controls="collapseFour" onClick="inlineFullHU()">-->
-<!--                <img src="{% static 'images/foxpost.png' %}" alt="csomagkuldo" title="csomagkuldo" />-->
-<!--                <span>Csomagküldő átvevőhely + <span id="csomagkuldo_price">{{ csomagkuldo_price }}</span> Ft</span>-->
-<!--              </button>-->
-<!--            </h5>-->
-<!--          </div>-->
+          {% endif %}
+          {% if is_csomagkuldo_enabled %}
+        <div class="card">
+          <div class="card-header" id="csomagkuldo">
+            <h5 class="mb-0">
+              <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseFour"
+                      aria-expanded="false" aria-controls="collapseFour" onClick="inlineFullHU()">
+                <img src="{% static 'images/foxpost.png' %}" alt="csomagkuldo" title="csomagkuldo" />
+                <span>Csomagküldő átvevőhely + <span id="csomagkuldo_price">{{ csomagkuldo_price }}</span> Ft</span>
+              </button>
+            </h5>
+          </div>
 
-<!--          <div id="collapseFour" class="collapse" aria-labelledby="personal" data-parent="#accordion">-->
-<!--            <div id="csomagkuldo-body" class="card-body"></div>-->
-<!--         </div>-->
-<!--        </div>-->
+          <div id="collapseFour" class="collapse" aria-labelledby="personal" data-parent="#accordion">
+            <div id="csomagkuldo-body" class="card-body"></div>
+         </div>
+        </div>
+          {% endif %}
+          {% if is_foxpost_enabled %}
         <div class="card">
           <div class="card-header" id="foxt-post">
             <h5 class="mb-0">
@@ -191,6 +195,8 @@
             </div>
           </div>
         </div>
+          {% endif %}
+          {% if is_delivery_enabled %}
         <div class="card">
           <div class="card-header" id="delivery">
             <h5 class="mb-0">
@@ -227,6 +233,45 @@
             </div>
           </div>
         </div>
+          {% endif %}
+          {% if is_ajanlott_enabled and cart.cart|length <= ajanlott_cart_limit %}
+          <div class="card">
+          <div class="card-header" id="envelope">
+            <h5 class="mb-0">
+              <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseFive"
+                      aria-expanded="false" aria-controls="collapseFive">
+                <img src="{% static 'images/delivery.png' %}" alt="Ajánlott" title="Ajánlott" />
+                  <span>DOBOZ NÉLKÜL! Ajánlott levélként + <span id="envelope_price">{{ ajanlott_price }}</span> Ft</span>
+              </button>
+            </h5>
+          </div>
+          <div id="collapseFive" class="collapse" aria-labelledby="envelope" data-parent="#accordion">
+            <div class="card-body">
+              <div class="form-group">
+                <label for="envelope_full_name">Név*</label>
+                <input type="text" class="form-control" id="envelope_full_name" name="envelope_full_name">
+              </div>
+              <div class="form-group">
+                <label for="envelope_address">Utca, házszám*</label>
+                <input type="text" class="form-control" id="envelope_address" name="envelope_address">
+              </div>
+              <div class="form-group">
+                <label for="envelope_zip">Irányítószám*</label>
+                <input type="text" class="form-control" id="envelope_zip" name="envelope_zip">
+              </div>
+              <div class="form-group">
+                <label for="envelope_city">Település*</label>
+                <input type="text" class="form-control" id="envelope_city" name="envelope_city">
+              </div>
+              <div class="clearfix"></div>
+              <div class="form-group">
+                <label for="envelope_note">Egyéb Információk</label>
+                <input type="text" class="form-control" id="envelope_note" name="envelope_note">
+              </div>
+            </div>
+          </div>
+        </div>
+          {% endif %}
       </div>
       <input type="hidden" id="delivery_safe" {% if 'delivery' in session and session.delivery.delivery_type == 'FoxPost' %}value="fp;{{ session.delivery.fox_post }}" {% elif 'delivery' in session and session.delivery.delivery_type == 'Csomagkuldo' %}value="cs;{{ session.delivery.csomagkuldo }}" {% endif %} />
       <div id="payment-form">

@@ -1,6 +1,5 @@
 from decimal import Decimal
 
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.forms.models import model_to_dict
@@ -8,12 +7,16 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 
 from cart.cart import Cart
+from parameters.models import Parameter
 from shop.models import ProductType
 from .forms import OrderCreateForm
 from .models import Order, OrderItem
 
-prices = dict(FoxPost=settings.FOXPOST_PRICE, Csomagkuldo=settings.CSOMAGKULDO_PRICE,
-              Házhozszállítás=settings.DELIVERY_PRICE, Személyesátvétel=0)
+prices = dict(FoxPost=int(Parameter.objects.filter(name="foxpost_price")[0].value),
+              Csomagkuldo=int(Parameter.objects.filter(name="csomagkuldo_price")[0].value),
+              Házhozszállítás=int(Parameter.objects.filter(name="delivery_price")[0].value),
+              Személyesátvétel=0,
+              Ajanlott=int(Parameter.objects.filter(name="ajanlott_price")[0].value))
 
 
 def __validate_stock(cart, product, cd):
@@ -84,11 +87,21 @@ def order_create(request):
                     order.billing_city = request.POST.get('billing_city')
                     order.first_name = request.POST.get('first_name')
                     order.last_name = request.POST.get('last_name')
-                    order.delivery_name = request.POST.get('delivery_full_name')
-                    order.address = request.POST.get('d_address')
-                    order.postal_code = request.POST.get('d_zip')
-                    order.city = request.POST.get('d_city')
-                    order.note = request.POST.get('note')
+                    v = 'delivery_full_name' if request.POST.get(
+                        'delivery_type') == 'Házhozszállítás' else 'delivery_name'
+                    order.delivery_name = request.POST.get(v)
+                    v = 'd_address' if request.POST.get(
+                        'delivery_type') == 'Házhozszállítás' else 'address'
+                    order.address = request.POST.get(v)
+                    v = 'd_zip' if request.POST.get(
+                        'delivery_type') == 'Házhozszállítás' else 'postal_code'
+                    order.postal_code = request.POST.get(v)
+                    v = 'd_city' if request.POST.get(
+                        'delivery_type') == 'Házhozszállítás' else 'city'
+                    order.city = request.POST.get(v)
+                    v = 'd_note' if request.POST.get(
+                        'delivery_type') == 'Házhozszállítás' else 'note'
+                    order.note = request.POST.get(v)
                     order.delivery_type = request.POST.get('delivery_type')
                     order.fox_post = request.POST.get('fox_post')
                     order.csomagkuldo = request.POST.get('csomagkuldo')

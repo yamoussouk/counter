@@ -1,10 +1,10 @@
-from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
 from coupon.forms import CouponApplyForm
+from parameters.models import Parameter
 # from giftcardpayment.forms import GiftCardApplyForm
 from shop.models import Product, GiftCard, ProductType, Notification
 from .cart import Cart
@@ -87,7 +87,7 @@ def cart_add_gift_card(request, card_id):
 
 def cart_remove(request, item_id):
     cart = Cart(request)
-    cart = cart.remove(item_id)
+    _ = cart.remove(item_id)
     return redirect(reverse('cart:cart_detail'))
 
 
@@ -104,16 +104,22 @@ def cart_detail(request):
     delivery_form = CartDeliveryInfoForm()
     current_amount = request.session['current_amount'] if 'current_amount' in request.session else 0
     notification = Notification.objects.all()
-    api_key = settings.CSOMAGKULDO_API_KEY
-    return render(request, 'cart/detail.html', {'cart': cart,
-                                                'coupon_apply_form': coupon_apply_form,
-                                                'delivery_form': delivery_form,
-                                                'fox_price': settings.FOXPOST_PRICE,
-                                                'delivery_price': settings.DELIVERY_PRICE,
-                                                'is_product_in_cart': is_product_in_cart,
-                                                # 'gift_card_apply_form': gift_card_apply_form,
-                                                'current_amount': current_amount,
-                                                'session': request.session,
-                                                'notification': notification,
-                                                'api_key': api_key,
-                                                'csomagkuldo_price': settings.CSOMAGKULDO_PRICE})
+    api_key = Parameter.objects.filter(name="csomagkuldo_price_api_key")[0].value
+    is_szemelyes_atvetel_enabled = Parameter.objects.filter(name="szemelyes_atvetel_enabled")[0].value == 'True'
+    is_foxpost_enabled = Parameter.objects.filter(name="foxpost_enabled")[0].value == 'True'
+    is_delivery_enabled = Parameter.objects.filter(name="delivery_enabled")[0].value == 'True'
+    is_csomagkuldo_enabled = Parameter.objects.filter(name="csomagkuldo_enabled")[0].value == 'True'
+    is_ajanlott_enabled = Parameter.objects.filter(name="ajanlott_enabled")[0].value == 'True'
+    ajanlott_cart_limit = int(Parameter.objects.filter(name="ajanlott_cart_limit")[0].value)
+    context = dict(cart=cart, coupon_apply_form=coupon_apply_form, delivery_form=delivery_form,
+                   fox_price=Parameter.objects.filter(name="foxpost_price")[0].value,
+                   delivery_price=Parameter.objects.filter(name="delivery_price")[0].value,
+                   csomagkuldo_price=Parameter.objects.filter(name="csomagkuldo_price")[0].value,
+                   ajanlott_price=Parameter.objects.filter(name="ajanlott_price")[0].value,
+                   is_product_in_cart=is_product_in_cart,
+                   current_amount=current_amount, session=request.session, notification=notification, api_key=api_key,
+                   is_szemelyes_atvetel_enabled=is_szemelyes_atvetel_enabled,
+                   is_foxpost_enabled=is_foxpost_enabled, is_delivery_enabled=is_delivery_enabled,
+                   is_csomagkuldo_enabled=is_csomagkuldo_enabled, is_ajanlott_enabled=is_ajanlott_enabled,
+                   ajanlott_cart_limit=ajanlott_cart_limit)  # 'gift_card_apply_form': gift_card_apply_form
+    return render(request, 'cart/detail.html', context)
