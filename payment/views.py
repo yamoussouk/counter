@@ -168,6 +168,8 @@ def __post_payment_process(event):
                          Csomagkuldo={'Átvételi pont': o.csomagkuldo},
                          Házhozszállítás={'Szállítási név': o.delivery_name, 'Szállítási cím': o.address,
                                           'Postakód': o.postal_code, 'Település': o.city, 'Megjegyzés': o.note},
+                         Ajanlott={'Szállítási név': o.delivery_name, 'Szállítási cím': o.address,
+                                          'Postakód': o.postal_code, 'Település': o.city, 'Megjegyzés': o.note},
                          Személyesátvétel={'Vezetéknév': o.first_name, 'Keresztnév': o.last_name})
     delivery_price = prices[o.delivery_type.replace(' ', '')]
     delivery_data = delivery_info[o.delivery_type.replace(' ', '')]
