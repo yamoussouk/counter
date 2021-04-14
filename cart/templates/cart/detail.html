@@ -178,6 +178,44 @@
          </div>
         </div>
           {% endif %}
+          {% if is_ajanlott_enabled and cart.cart|length <= ajanlott_cart_limit %}
+          <div class="card">
+          <div class="card-header" id="envelope">
+            <h5 class="mb-0">
+              <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseFive"
+                      aria-expanded="false" aria-controls="collapseFive">
+                <img src="{% static 'images/delivery.png' %}" alt="Ajánlott" title="Ajánlott" />
+                  <span>DOBOZ NÉLKÜL! Ajánlott levélként + <span id="envelope_price">{{ ajanlott_price }}</span> Ft</span>
+              </button>
+            </h5>
+          </div>
+          <div id="collapseFive" class="collapse" aria-labelledby="envelope" data-parent="#accordion">
+            <div class="card-body">
+              <div class="form-group">
+                <label for="envelope_full_name">Név*</label>
+                <input type="text" class="form-control" id="envelope_full_name" name="envelope_full_name">
+              </div>
+              <div class="form-group">
+                <label for="envelope_address">Utca, házszám*</label>
+                <input type="text" class="form-control" id="envelope_address" name="envelope_address">
+              </div>
+              <div class="form-group">
+                <label for="envelope_zip">Irányítószám*</label>
+                <input type="text" class="form-control" id="envelope_zip" name="envelope_zip">
+              </div>
+              <div class="form-group">
+                <label for="envelope_city">Település*</label>
+                <input type="text" class="form-control" id="envelope_city" name="envelope_city">
+              </div>
+              <div class="clearfix"></div>
+              <div class="form-group">
+                <label for="envelope_note">Egyéb Információk</label>
+                <input type="text" class="form-control" id="envelope_note" name="envelope_note">
+              </div>
+            </div>
+          </div>
+        </div>
+          {% endif %}
           {% if is_foxpost_enabled %}
         <div class="card">
           <div class="card-header" id="foxt-post">
@@ -229,44 +267,6 @@
               <div class="form-group">
                 <label for="d_note">Egyéb Információk</label>
                 <input type="text" class="form-control" id="d_note" name="d_note">
-              </div>
-            </div>
-          </div>
-        </div>
-          {% endif %}
-          {% if is_ajanlott_enabled and cart.cart|length <= ajanlott_cart_limit %}
-          <div class="card">
-          <div class="card-header" id="envelope">
-            <h5 class="mb-0">
-              <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseFive"
-                      aria-expanded="false" aria-controls="collapseFive">
-                <img src="{% static 'images/delivery.png' %}" alt="Ajánlott" title="Ajánlott" />
-                  <span>DOBOZ NÉLKÜL! Ajánlott levélként + <span id="envelope_price">{{ ajanlott_price }}</span> Ft</span>
-              </button>
-            </h5>
-          </div>
-          <div id="collapseFive" class="collapse" aria-labelledby="envelope" data-parent="#accordion">
-            <div class="card-body">
-              <div class="form-group">
-                <label for="envelope_full_name">Név*</label>
-                <input type="text" class="form-control" id="envelope_full_name" name="envelope_full_name">
-              </div>
-              <div class="form-group">
-                <label for="envelope_address">Utca, házszám*</label>
-                <input type="text" class="form-control" id="envelope_address" name="envelope_address">
-              </div>
-              <div class="form-group">
-                <label for="envelope_zip">Irányítószám*</label>
-                <input type="text" class="form-control" id="envelope_zip" name="envelope_zip">
-              </div>
-              <div class="form-group">
-                <label for="envelope_city">Település*</label>
-                <input type="text" class="form-control" id="envelope_city" name="envelope_city">
-              </div>
-              <div class="clearfix"></div>
-              <div class="form-group">
-                <label for="envelope_note">Egyéb Információk</label>
-                <input type="text" class="form-control" id="envelope_note" name="envelope_note">
               </div>
             </div>
           </div>
