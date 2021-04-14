@@ -36,14 +36,41 @@
         </div>
     </section>
     <section id="home-collections">
+        <!-- Top content -->
+        <!-- basic collection -->
+        {% if basic_collection|length > 0 %}
         <div class="row">
             <div class="header-text-wrapper">
-                <h2>KOLLEKCIÓK</h2>
+                <h2>ALAP KOLLEKCIÓ</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="owl-carousel owl-theme">
+                {% for product in basic_products %}
+                    <a href="{% url 'shop:product_detail' id=product.collection.slug slug=product.slug %}" title="{{ product.name }}">
+                        <picture>
+                          <source srcset="{{ product.image.url|wp }}" type="image/webp">
+                          <source srcset="{{ product.image.url }}" type="image/png">
+                          <img class="img-fluid" src="{{ product.image.url }}"
+                               alt="{{ product.name }}"
+                               title="{{ product.name }} photo" />
+                        </picture>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        <!-- end of basic collection -->
+        <!-- regular collections -->
+        {% if regular_collections|length > 0 %}
+        <div class="row">
+            <div class="header-text-wrapper">
+                <h2>ÁLLANDÓ KOLLEKCIÓK</h2>
             </div>
         </div>
         <div class="row">
             <div class="home-collection-wrapper">
-                {% for collection in collections %}
+                {% for collection in regular_collections %}
                 <div class="home-collection-item">
                     <div class="text-on-image-image-wrapper">
                         <picture>
@@ -62,6 +89,38 @@
                 {% endfor %}
             </div>
         </div>
+        {% endif %}
+        <!-- end of regular collections -->
+        <!-- temporary collections -->
+        {% if temporary_collections|length > 0 %}
+        <div class="row">
+            <div class="header-text-wrapper">
+                <h2>IDŐSZAKOS KOLLEKCIÓK</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="home-collection-wrapper">
+                {% for collection in temporary_collections %}
+                <div class="home-collection-item">
+                    <div class="text-on-image-image-wrapper">
+                        <picture>
+                          <source srcset="{{ collection.image.url|wp }}" type="image/webp">
+                          <source srcset="{{ collection.image.url }}" type="image/png">
+                          <img src="{{ collection.image.url }}" alt="{{ collection.name }}"
+                               title="{{ collection.name }} photo" />
+                        </picture>
+                    </div>
+                    <div class="text-on-image-wrapper">
+                        <a title="{{ collection.name }}" href="{% url 'shop:products_view' slug=collection.slug %}">
+                            <span class="home-collection-title">{{ collection.name }}</span>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        <!-- end of temporary collections -->
     </section>
     <section class="home-image">
         <div class="row">

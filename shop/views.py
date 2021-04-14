@@ -25,10 +25,20 @@ def index_hid(request):
 
 
 def index(request):
-    collections = (Collection.objects.filter(available=True, custom=False, show_on_home_page=True)
-                       .order_by('-created')[:9])
+    basic_collection = Collection.objects.filter(available=True, custom=False, show_on_home_page=True,
+                                                 basic_collection=True)
+    basic_products = Product.objects.filter(collection=basic_collection[0])
+    regular_collections = Collection.objects.filter(available=True, custom=False, show_on_home_page=True,
+                                                    regular_collection=True).order_by('-created')[:3]
+    temporary_collections = (
+        Collection.objects.filter(available=True, custom=False, show_on_home_page=True, basic_collection=False,
+                                  regular_collection=False)
+            .order_by('-created')[:6])
     notification = Notification.objects.all()
-    return render(request, 'shop/index_hid.html', {'collections': collections, 'notification': notification})
+    context = dict(basic_collection=basic_collection, basic_products=basic_products,
+                   regular_collections=regular_collections, temporary_collections=temporary_collections,
+                   notification=notification)
+    return render(request, 'shop/index_hid.html', context)
 
 
 def __get_product_details(request, id: str, slug: str, custom: bool):
@@ -50,7 +60,13 @@ def __get_product_details(request, id: str, slug: str, custom: bool):
         if product.stock > 0:
             is_stock = True
     cart_product_form = CartAddCustomProductForm() if custom else CartAddProductForm()
-    collections = Collection.objects.filter(available=True, custom=custom).order_by('-created')
+    basic_collections = Collection.objects.filter(
+        available=True, basic_collection=True, custom=custom).order_by('-created')
+    regular_collections = Collection.objects.filter(available=True, custom=custom,
+                                                    regular_collection=True).order_by('-created')
+    temporary_collections = Collection.objects.filter(available=True, custom=custom,
+                                                      basic_collection=False,
+                                                      regular_collection=False).order_by('-created')
     notification = Notification.objects.all()
     collection_slug = product.collection.slug
     view = 'shop:custom_products_view' if custom else 'shop:products_view'
@@ -58,7 +74,9 @@ def __get_product_details(request, id: str, slug: str, custom: bool):
     return render(request, template,
                   {'product': product,
                    'notification': notification,
-                   'collections': collections,
+                   'basic_collections': basic_collections,
+                   'regular_collections': regular_collections,
+                   'temporary_collections': temporary_collections,
                    'collection_slug': collection_slug,
                    'types': types,
                    'cart_product_form': cart_product_form,
@@ -203,7 +221,13 @@ class ProductsView(ListView):
         if 'collection_name' in self.kwargs:
             context['collection'] = get_object_or_404(Collection, name=self.kwargs['collection_name'])
             context['collection_name'] = self.kwargs['collection_name']
-        context['collections'] = Collection.objects.filter(available=True, custom=False).order_by('-created')
+        context['basic_collections'] = Collection.objects.filter(
+            available=True, basic_collection=True, custom=False).order_by('-created')
+        context['regular_collections'] = Collection.objects.filter(available=True, custom=False,
+                                                                   regular_collection=True).order_by('-created')
+        context['temporary_collections'] = Collection.objects.filter(available=True, custom=False,
+                                                                     basic_collection=False,
+                                                                     regular_collection=False).order_by('-created')
         context['types'] = ProductType.objects.select_related('product')
         context['custom'] = False
         return context
@@ -239,7 +263,13 @@ class CustomProductsView(ListView):
         if 'collection_name' in self.kwargs:
             context['collection'] = get_object_or_404(Collection, name=self.kwargs['collection_name'])
             context['collection_name'] = self.kwargs['collection_name']
-        context['collections'] = Collection.objects.filter(available=True, custom=True).order_by('-created')
+        context['basic_collections'] = Collection.objects.filter(
+            available=True, basic_collection=True, custom=True).order_by('-created')
+        context['regular_collections'] = Collection.objects.filter(available=True, custom=True,
+                                                                   regular_collection=True).order_by('-created')
+        context['temporary_collections'] = Collection.objects.filter(available=True, custom=False,
+                                                                     basic_collection=False,
+                                                                     regular_collection=True).order_by('-created')
         context['types'] = ProductType.objects.select_related('product')
         context['custom'] = True
         return context
