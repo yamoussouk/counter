@@ -17,18 +17,18 @@ media_path = os.path.join(current_path, 'media')
 collections_path = os.path.join(media_path, 'collections')
 images_path = os.path.join(media_path, 'images')
 
-# for filename in os.listdir(media_path):
-#     if filename.endswith(".png") and not os.path.isfile(os.path.join(media_path, filename.split('.')[0] + '.webp')):
-#         convert_file(os.path.join(media_path, filename))
-#         print(filename)
-#
-# for filename in os.listdir(collections_path):
-#     if filename.endswith(".png") and not os.path.isfile(
-#             os.path.join(collections_path, filename.split('.')[0] + '.webp')):
-#         convert_file(os.path.join(collections_path, filename))
-#         print(filename)
-#
-# for filename in os.listdir(images_path):
-#     if filename.endswith(".png") and not os.path.isfile(os.path.join(images_path, filename.split('.')[0] + '.webp')):
-#         convert_file(os.path.join(images_path, filename))
-#         print(filename)
+for filename in os.listdir(media_path):
+    if filename.endswith(".png") and not os.path.isfile(os.path.join(media_path, filename.split('.')[0] + '.webp')):
+        convert_file(os.path.join(media_path, filename))
+        print(filename)
+
+for filename in os.listdir(collections_path):
+    if filename.endswith(".png") and not os.path.isfile(
+            os.path.join(collections_path, filename.split('.')[0] + '.webp')):
+        convert_file(os.path.join(collections_path, filename))
+        print(filename)
+
+for filename in os.listdir(images_path):
+    if filename.endswith(".png") and not os.path.isfile(os.path.join(images_path, filename.split('.')[0] + '.webp')):
+        convert_file(os.path.join(images_path, filename))
+        print(filename)
