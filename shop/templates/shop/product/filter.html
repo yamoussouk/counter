@@ -16,6 +16,18 @@
         <h2>ÁLLANDÓ<br/>KOLLEKCIÓK</h2>
     </div>
     <div class="filter-element-wrapper">
+        {% for col in regular_collections %}
+        <div class="{% if slug == col.slug %}current{% endif %} filter-element">
+            <a href="{% url view slug=col.slug %}" title="{{ col.name }}">
+                <p class="filter-element-text">{{ col.name }}</p>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="filter-header-wrapper">
+        <h2>IDŐSZAKOS<br />KOLLEKCIÓK</h2>
+    </div>
+    <div class="filter-element-wrapper">
         {% for col in temporary_collections %}
         <div class="{% if slug == col.slug %}current{% endif %} filter-element">
             <a href="{% url view slug=col.slug %}" title="{{ col.name }}">
@@ -28,17 +40,5 @@
                 <p class="filter-element-text">Mutasd mindet</p>
             </a>
         </div>
-    </div>
-    <div class="filter-header-wrapper">
-        <h2>IDŐSZAKOS<br />KOLLEKCIÓK</h2>
-    </div>
-    <div class="filter-element-wrapper">
-        {% for col in regular_collections %}
-        <div class="{% if slug == col.slug %}current{% endif %} filter-element">
-            <a href="{% url view slug=col.slug %}" title="{{ col.name }}">
-                <p class="filter-element-text">{{ col.name }}</p>
-            </a>
-        </div>
-        {% endfor %}
     </div>
 </div>
