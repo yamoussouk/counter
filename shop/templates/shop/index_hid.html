@@ -59,6 +59,11 @@
                 {% endfor %}
             </div>
         </div>
+        <div class="fluid-text-anchor container-fluid" id="home-page-carousel-buy-button">
+            {% with basic_collection.all|first as collection %}
+                <a title="Teljes kollekció" href="{% url 'shop:products_view' slug=collection.slug %}">Teljes kollekció</a>
+            {% endwith %}
+        </div>
         {% endif %}
         <!-- end of basic collection -->
         <!-- regular collections -->
