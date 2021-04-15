@@ -20,11 +20,6 @@
     {% if payment %}
       <link href="{% static "css/payment.css" %}" rel="stylesheet" />
     {% endif %}
-    {% if index %}
-      <link href="{% static "css/home.css" %}" rel="stylesheet" />
-      <link href="{% static "css/home_page_carousel.css" %}" rel="stylesheet" />
-      <link rel="stylesheet" href="{% static "css/owl.carousel.min.css" %}" />
-    {% endif %}
     {% if product_list %}
       <link href="{% static "css/product_list.css" %}" rel="stylesheet" />
     {% endif %}
@@ -61,6 +56,11 @@
           integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
     <script src="https://unpkg.com/webp-hero@0.0.0-dev.21/dist-cjs/polyfills.js"></script>
     <script src="https://unpkg.com/webp-hero@0.0.0-dev.21/dist-cjs/webp-hero.bundle.js"></script>
+    {% if index %}
+      <link href="{% static "css/home.css" %}" rel="stylesheet" />
+      <link href="{% static "css/home_page_carousel.css" %}" rel="stylesheet" />
+      <link rel="stylesheet" href="{% static "css/owl.carousel.min.css" %}" />
+    {% endif %}
     <script>
      var webpMachine = new webpHero.WebpMachine();
      webpMachine.polyfillDocument();

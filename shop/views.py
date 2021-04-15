@@ -27,7 +27,10 @@ def index_hid(request):
 def index(request):
     basic_collection = Collection.objects.filter(available=True, custom=False, show_on_home_page=True,
                                                  basic_collection=True)
-    basic_products = Product.objects.filter(collection=basic_collection[0])
+    if len(basic_collection):
+        basic_products = Product.objects.filter(collection=basic_collection[0])
+    else:
+        basic_products = []
     regular_collections = Collection.objects.filter(available=True, custom=False, show_on_home_page=True,
                                                     regular_collection=True).order_by('-created')[:3]
     temporary_collections = (
