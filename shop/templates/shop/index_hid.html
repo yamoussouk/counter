@@ -76,21 +76,23 @@
         <div class="row">
             <div class="home-collection-wrapper d-flex justify-content-center">
                 {% for collection in regular_collections %}
-                <div class="home-collection-item">
-                    <div class="text-on-image-image-wrapper">
-                        <picture>
-                          <source srcset="{{ collection.image.url|wp }}" type="image/webp">
-                          <source srcset="{{ collection.image.url }}" type="image/png">
-                          <img src="{{ collection.image.url }}" alt="{{ collection.name }}"
-                               title="{{ collection.name }} photo" />
-                        </picture>
-                    </div>
-                    <div class="text-on-image-wrapper">
-                        <a title="{{ collection.name }}" href="{% url 'shop:products_view' slug=collection.slug %}">
-                            <span class="home-collection-title">{{ collection.name }}</span>
-                        </a>
-                    </div>
-                </div>
+                    {% if collection.image %}
+                        <div class="home-collection-item">
+                            <div class="text-on-image-image-wrapper">
+                                <picture>
+                                  <source srcset="{{ collection.image.url|wp }}" type="image/webp">
+                                  <source srcset="{{ collection.image.url }}" type="image/png">
+                                  <img src="{{ collection.image.url }}" alt="{{ collection.name }}"
+                                       title="{{ collection.name }} photo" />
+                                </picture>
+                            </div>
+                            <div class="text-on-image-wrapper">
+                                <a title="{{ collection.name }}" href="{% url 'shop:products_view' slug=collection.slug %}">
+                                    <span class="home-collection-title">{{ collection.name }}</span>
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
                 {% endfor %}
             </div>
         </div>
@@ -106,21 +108,23 @@
         <div class="row">
             <div class="home-collection-wrapper">
                 {% for collection in temporary_collections %}
-                <div class="home-collection-item">
-                    <div class="text-on-image-image-wrapper">
-                        <picture>
-                          <source srcset="{{ collection.image.url|wp }}" type="image/webp">
-                          <source srcset="{{ collection.image.url }}" type="image/png">
-                          <img src="{{ collection.image.url }}" alt="{{ collection.name }}"
-                               title="{{ collection.name }} photo" />
-                        </picture>
-                    </div>
-                    <div class="text-on-image-wrapper">
-                        <a title="{{ collection.name }}" href="{% url 'shop:products_view' slug=collection.slug %}">
-                            <span class="home-collection-title">{{ collection.name }}</span>
-                        </a>
-                    </div>
-                </div>
+                    {% if collection.image %}
+                        <div class="home-collection-item">
+                            <div class="text-on-image-image-wrapper">
+                                <picture>
+                                  <source srcset="{{ collection.image.url|wp }}" type="image/webp">
+                                  <source srcset="{{ collection.image.url }}" type="image/png">
+                                  <img src="{{ collection.image.url }}" alt="{{ collection.name }}"
+                                       title="{{ collection.name }} photo" />
+                                </picture>
+                            </div>
+                            <div class="text-on-image-wrapper">
+                                <a title="{{ collection.name }}" href="{% url 'shop:products_view' slug=collection.slug %}">
+                                    <span class="home-collection-title">{{ collection.name }}</span>
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
                 {% endfor %}
             </div>
         </div>
