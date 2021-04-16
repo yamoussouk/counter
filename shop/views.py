@@ -70,6 +70,12 @@ def __get_product_details(request, id: str, slug: str, custom: bool):
     temporary_collections = Collection.objects.filter(available=True, custom=custom,
                                                       basic_collection=False,
                                                       regular_collection=False).order_by('-created')
+    # find if there is utolsó darabok
+    temp = list(temporary_collections)
+    upper = [e.name for e in temp if e.name.isupper()]
+    if len(upper):
+        idx_of_upper = [idx for idx, u in enumerate(temp) if u.name == upper[0]][0]
+        temp.append(temp.pop(idx_of_upper))
     notification = Notification.objects.all()
     collection_slug = product.collection.slug
     view = 'shop:custom_products_view' if custom else 'shop:products_view'
@@ -79,7 +85,7 @@ def __get_product_details(request, id: str, slug: str, custom: bool):
                    'notification': notification,
                    'basic_collections': basic_collections,
                    'regular_collections': regular_collections,
-                   'temporary_collections': temporary_collections,
+                   'temporary_collections': temp,
                    'collection_slug': collection_slug,
                    'types': types,
                    'cart_product_form': cart_product_form,
@@ -228,9 +234,16 @@ class ProductsView(ListView):
             available=True, basic_collection=True, custom=False).order_by('-created')
         context['regular_collections'] = Collection.objects.filter(available=True, custom=False,
                                                                    regular_collection=True).order_by('-created')
-        context['temporary_collections'] = Collection.objects.filter(available=True, custom=False,
-                                                                     basic_collection=False,
-                                                                     regular_collection=False).order_by('-created')
+        temporary_collections = Collection.objects.filter(available=True, custom=False,
+                                                          basic_collection=False,
+                                                          regular_collection=False).order_by('-created')
+        # find if there is utolsó darabok
+        temp = list(temporary_collections)
+        upper = [e.name for e in temp if e.name.isupper()]
+        if len(upper):
+            idx_of_upper = [idx for idx, u in enumerate(temp) if u.name == upper[0]][0]
+            temp.append(temp.pop(idx_of_upper))
+        context['temporary_collections'] = temp
         context['types'] = ProductType.objects.select_related('product')
         context['custom'] = False
         return context
@@ -270,9 +283,16 @@ class CustomProductsView(ListView):
             available=True, basic_collection=True, custom=True).order_by('-created')
         context['regular_collections'] = Collection.objects.filter(available=True, custom=True,
                                                                    regular_collection=True).order_by('-created')
-        context['temporary_collections'] = Collection.objects.filter(available=True, custom=False,
-                                                                     basic_collection=False,
-                                                                     regular_collection=True).order_by('-created')
+        temporary_collections = Collection.objects.filter(available=True, custom=True,
+                                                          basic_collection=False,
+                                                          regular_collection=False).order_by('-created')
+        # find if there is utolsó darabok
+        temp = list(temporary_collections)
+        upper = [e.name for e in temp if e.name.isupper()]
+        if len(upper):
+            idx_of_upper = [idx for idx, u in enumerate(temp) if u.name == upper[0]][0]
+            temp.append(temp.pop(idx_of_upper))
+        context['temporary_collections'] = temp
         context['types'] = ProductType.objects.select_related('product')
         context['custom'] = True
         return context
