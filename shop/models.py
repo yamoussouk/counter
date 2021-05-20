@@ -3,6 +3,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
 from multiselectfield import MultiSelectField
+from helper import convert
 
 
 class Collection(models.Model):
@@ -22,6 +23,7 @@ class Collection(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
         super(Collection, self).save(*args, **kwargs)
+        convert()
 
     class Meta:
         ordering = ('name',)
@@ -66,6 +68,7 @@ class Product(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
         super(Product, self).save(*args, **kwargs)
+        convert()
 
     class Meta:
         ordering = ('name',)
@@ -114,6 +117,10 @@ class ProductType(models.Model):
         ordering = ('color',)
         verbose_name = 'Terméktípus'
         verbose_name_plural = 'Terméktípusok'
+
+    def save(self, *args, **kwargs):
+        super(ProductType, self).save(*args, **kwargs)
+        convert()
 
     def __str__(self):
         return self.color
