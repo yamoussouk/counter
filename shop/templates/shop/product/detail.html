@@ -17,7 +17,6 @@
                         <div class="product-image">
                             <picture>
                               <source class="product_image" srcset="{{ product.image.url|wp }}" type="image/webp">
-                              <source class="product_image" srcset="{{ product.image.url }}" type="image/png">
                               <img src="{{ product.image.url }}" alt="{{ product.name }}"
                                    title="{{ product.name }} photo" class="product_image"/>
                             </picture>
@@ -26,7 +25,6 @@
                             <div class="product-thumbnail selected">
                                 <picture>
                                   <source class="product_image" srcset="{{ product.image.url|wp }}" type="image/webp">
-                                  <source class="product_image" srcset="{{ product.image.url }}" type="image/png">
                                   <img src="{{ product.image.url }}" alt="{{ product.name }}"
                                        title="{{ product.name }} thumbnail photo" class="product_image"/>
                                 </picture>
@@ -37,7 +35,6 @@
                                     <div class="product-thumbnail">
                                         <picture>
                                           <source data-name="{{ type.color }}" srcset="{{ type.image.url|wp }}" type="image/webp">
-                                          <source data-name="{{ type.color }}" srcset="{{ type.image.url }}" type="image/png">
                                           <img src="{{ type.image.url }}" alt="{{ product.name }}"
                                                title="{{ product.name }} thumbnail photo" data-name="{{ type.color }}"/>
                                         </picture>
@@ -49,7 +46,6 @@
                                     <div class="product-thumbnail">
                                         <picture>
                                           <source data-name="{{ type.color }}" srcset="{{ img.image.url|wp }}" type="image/webp">
-                                          <source data-name="{{ type.color }}" srcset="{{ img.image.url }}" type="image/png">
                                           <img src="{{ img.image.url }}" alt="{{ product.name }}"
                                                title="{{ product.name }} thumbnail photo" />
                                         </picture>
