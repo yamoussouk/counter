@@ -12,14 +12,17 @@ class CollectionAdmin(admin.ModelAdmin):
     fields = ('name', 'image', 'available', 'custom', 'show_on_home_page', 'basic_collection', 'regular_collection')
 
     def save_model(self, request, obj, form, change):
-        slug = slugify(obj.name)
-        collection = Collection.objects.get(slug=slug)
-        if collection is not None:
-            self.error_while_saving = True
-            msg = f"Collection with the given name \"{obj.name}\" already exists."
-            self.message_user(request, msg, messages.WARNING)
-        else:
+        if change:
             super().save_model(request, obj, form, change)
+        else:
+            slug = slugify(obj.name)
+            collection = Collection.objects.filter(slug=slug)
+            if len(collection):
+                self.error_while_saving = True
+                msg = f"Collection with the given name \"{obj.name}\" already exists."
+                self.message_user(request, msg, messages.WARNING)
+            else:
+                super().save_model(request, obj, form, change)
 
     def response_add(self, request, obj, post_url_continue=None):
         if self.error_while_saving:
@@ -57,14 +60,17 @@ class ProductAdmin(admin.ModelAdmin):
         )
 
     def save_model(self, request, obj, form, change):
-        slug = slugify(obj.name)
-        product = Product.objects.get(slug=slug)
-        if product is not None:
-            self.error_while_saving = True
-            msg = f"Product with the given name \"{obj.name}\" already exists."
-            self.message_user(request, msg, messages.WARNING)
-        else:
+        if change:
             super().save_model(request, obj, form, change)
+        else:
+            slug = slugify(obj.name)
+            product = Product.objects.filter(slug=slug)
+            if len(product):
+                self.error_while_saving = True
+                msg = f"Product with the given name \"{obj.name}\" already exists."
+                self.message_user(request, msg, messages.WARNING)
+            else:
+                super().save_model(request, obj, form, change)
 
     def response_add(self, request, obj, post_url_continue=None):
         if self.error_while_saving:
