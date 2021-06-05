@@ -1,4 +1,5 @@
 import os
+import re
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -20,6 +21,14 @@ from .models import Collection, Product, Notification, ProductType, GiftCard, Me
 stripe_product_generator = StripeProductGenerator()
 
 
+def mobile(request):
+    MOBILE_AGENT_RE = re.compile(r".*(iphone|mobile|androidtouch)", re.IGNORECASE)
+    if MOBILE_AGENT_RE.match(request.META['HTTP_USER_AGENT']):
+        return True
+    else:
+        return False
+
+
 def index_hid(request):
     return render(request, 'shop/index.html')
 
@@ -38,9 +47,12 @@ def index(request):
                                   regular_collection=False)
             .order_by('-created')[:6])
     notification = Notification.objects.all()
+    is_mobile = mobile(request)
+    # is_mobile = True
+    ratio = 0.93 if is_mobile else 2.44
     context = dict(basic_collection=basic_collection, basic_products=basic_products,
                    regular_collections=regular_collections, temporary_collections=temporary_collections,
-                   notification=notification)
+                   notification=notification, ratio=ratio)
     return render(request, 'shop/index_hid.html', context)
 
 
@@ -215,7 +227,9 @@ class ProductsView(ListView):
         return stock_dict
 
     def get_queryset(self):
-        products = Product.objects.prefetch_related('product_types').filter(available=True, custom=False)
+        products = Product.objects.prefetch_related('product_types').filter(available=True, custom=False,
+                                                                            collection__available=True,
+                                                                            collection__studio_collection=False)
         slug = self.kwargs['slug'] if 'slug' in self.kwargs else None
         if slug:
             collection = get_object_or_404(Collection, slug=slug)
