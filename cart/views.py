@@ -46,7 +46,8 @@ def __validate_stock(cart, product, cd):
 def cart_add(request, product_id):
     cart = Cart(request)
     product = get_object_or_404(Product, id=product_id)
-    redirect_url = 'shop:custom_product_detail' if product.custom else 'shop:product_detail'
+    redirect_url = 'shop:studio_product_detail' if product.collection.studio_collection \
+        else ('shop:custom_product_detail' if product.custom else 'shop:product_detail')
     form = CartAddCustomProductForm(request.POST) if product.custom else CartAddProductForm(request.POST)
     if form.is_valid():
         cd = form.cleaned_data

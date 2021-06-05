@@ -1,29 +1,33 @@
 <div id="filter-wrapper">
-    <div class="filter-header-wrapper">
-        <h2>ALAP<br />KOLLEKCIÓ</h2>
-    </div>
-    <div class="filter-element-wrapper">
-        {% for col in basic_collections %}
-        <div class="{% if slug == col.slug %}current{% endif %} filter-element">
-            <a href="{% url view slug=col.slug %}" title="{{ col.name }}">
-                <p class="filter-element-text">{{ col.name }}</p>
-            </a>
+    {% if basic_collections %}
+        <div class="filter-header-wrapper">
+            <h2>ALAP<br />KOLLEKCIÓ</h2>
         </div>
-        {% endfor %}
-    </div>
+        <div class="filter-element-wrapper">
+            {% for col in basic_collections %}
+            <div class="{% if slug == col.slug %}current{% endif %} filter-element">
+                <a href="{% url view slug=col.slug %}" title="{{ col.name }}">
+                    <p class="filter-element-text">{{ col.name }}</p>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
 
-    <div class="filter-header-wrapper">
-        <h2>ÁLLANDÓ<br/>KOLLEKCIÓK</h2>
-    </div>
-    <div class="filter-element-wrapper">
-        {% for col in regular_collections %}
-        <div class="{% if slug == col.slug %}current{% endif %} filter-element">
-            <a href="{% url view slug=col.slug %}" title="{{ col.name }}">
-                <p class="filter-element-text">{{ col.name }}</p>
-            </a>
+    {% if regular_collections %}
+        <div class="filter-header-wrapper">
+            <h2>ÁLLANDÓ<br/>KOLLEKCIÓK</h2>
         </div>
-        {% endfor %}
-    </div>
+        <div class="filter-element-wrapper">
+            {% for col in regular_collections %}
+            <div class="{% if slug == col.slug %}current{% endif %} filter-element">
+                <a href="{% url view slug=col.slug %}" title="{{ col.name }}">
+                    <p class="filter-element-text">{{ col.name }}</p>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
     <div class="filter-header-wrapper">
         <h2>IDŐSZAKOS<br />KOLLEKCIÓK</h2>
     </div>

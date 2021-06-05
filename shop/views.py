@@ -56,7 +56,7 @@ def index(request):
     return render(request, 'shop/index_hid.html', context)
 
 
-def __get_product_details(request, id: str, slug: str, custom: bool):
+def __get_product_details(request, id: str, slug: str, custom: bool, studio: bool):
     collection = Collection.objects.filter(slug=id)[0]
     product = get_object_or_404(Product, collection=collection, slug=slug, available=True, custom=custom)
     product_types = Product.objects.prefetch_related('product_types').filter(collection=collection, slug=slug,
@@ -75,13 +75,15 @@ def __get_product_details(request, id: str, slug: str, custom: bool):
         if product.stock > 0:
             is_stock = True
     cart_product_form = CartAddCustomProductForm() if custom else CartAddProductForm()
-    basic_collections = Collection.objects.filter(
-        available=True, basic_collection=True, custom=custom).order_by('-created')
-    regular_collections = Collection.objects.filter(available=True, custom=custom,
-                                                    regular_collection=True).order_by('-created')
-    temporary_collections = Collection.objects.filter(available=True, custom=custom,
-                                                      basic_collection=False,
-                                                      regular_collection=False).order_by('-created')
+    basic_collections = [] if studio else Collection.objects.filter(
+        available=True, basic_collection=True, custom=custom, studio_collection=False).order_by('-created')
+    regular_collections = [] if studio else Collection.objects.filter(available=True, custom=custom,
+                                                                      regular_collection=True,
+                                                                      studio_collection=False).order_by('-created')
+    temporary_collections = [] if studio else Collection.objects.filter(available=True, custom=custom,
+                                                                        basic_collection=False,
+                                                                        regular_collection=False,
+                                                                        studio_collection=False).order_by('-created')
     # find if there is utolsó darabok
     temp = list(temporary_collections)
     upper = [e.name for e in temp if e.name.isupper()]
@@ -89,8 +91,8 @@ def __get_product_details(request, id: str, slug: str, custom: bool):
         idx_of_upper = [idx for idx, u in enumerate(temp) if u.name == upper[0]][0]
         temp.append(temp.pop(idx_of_upper))
     notification = Notification.objects.all()
-    collection_slug = product.collection.slug
-    view = 'shop:custom_products_view' if custom else 'shop:products_view'
+    collection_slug = '' if studio else product.collection.slug
+    view = 'shop:studio_products_view' if studio else ('shop:custom_products_view' if custom else 'shop:products_view')
     template = 'shop/product/custom_detail.html' if custom else 'shop/product/detail.html'
     return render(request, template,
                   {'product': product,
@@ -109,11 +111,15 @@ def __get_product_details(request, id: str, slug: str, custom: bool):
 
 
 def product_detail(request, id: str, slug: str):
-    return __get_product_details(request, id, slug, False)
+    return __get_product_details(request, id, slug, False, False)
+
+
+def studio_product_detail(request, id: str, slug: str):
+    return __get_product_details(request, id, slug, False, True)
 
 
 def custom_product_detail(request, id: str, slug: str):
-    return __get_product_details(request, id, slug, True)
+    return __get_product_details(request, id, slug, True, False)
 
 
 def faq(request):
@@ -185,7 +191,9 @@ class ProductsView(ListView):
         template_name = 'shop/product/list.html'
         context_object_name = 'products'
         stock_dict = dict()
-        temp = Product.objects.prefetch_related('product_types').filter(available=True, custom=False)
+        temp = Product.objects.prefetch_related('product_types').filter(available=True, custom=False,
+                                                                        collection__available=True,
+                                                                        collection__studio_collection=False)
         for i in temp:
             if len(i.product_types.all()) > 0:
                 for h in i.product_types.all().values():
@@ -204,7 +212,8 @@ class ProductsView(ListView):
             'product_stock': stock_dict,
             'gift_card': gift_card,
             'card_gift_cart_product_form': card_gift_cart_product_form,
-            'view': 'shop:products_view'
+            'view': 'shop:products_view',
+            'product_view': 'shop:product_detail'
         }
     except OperationalError:
         pass
@@ -212,7 +221,9 @@ class ProductsView(ListView):
     def check_product_stock(self, products) -> dict:
         stock_dict = dict()
         for p in products:
-            pr = Product.objects.prefetch_related('product_types').filter(id=p.id, available=True, custom=False)[0]
+            pr = Product.objects.prefetch_related('product_types').filter(id=p.id, available=True, custom=False,
+                                                                          collection__available=True,
+                                                                          collection__studio_collection=False)[0]
             if len(pr.product_types.all()) > 0:
                 for h in pr.product_types.all().values():
                     if h.get('product_id') not in stock_dict:
@@ -245,12 +256,102 @@ class ProductsView(ListView):
             context['collection'] = get_object_or_404(Collection, name=self.kwargs['collection_name'])
             context['collection_name'] = self.kwargs['collection_name']
         context['basic_collections'] = Collection.objects.filter(
-            available=True, basic_collection=True, custom=False).order_by('-created')
+            available=True, basic_collection=True, custom=False, studio_collection=False).order_by('-created')
         context['regular_collections'] = Collection.objects.filter(available=True, custom=False,
-                                                                   regular_collection=True).order_by('-created')
+                                                                   regular_collection=True,
+                                                                   studio_collection=False).order_by('-created')
         temporary_collections = Collection.objects.filter(available=True, custom=False,
                                                           basic_collection=False,
-                                                          regular_collection=False).order_by('-created')
+                                                          regular_collection=False,
+                                                          studio_collection=False).order_by('-created')
+        # find if there is utolsó darabok
+        temp = list(temporary_collections)
+        upper = [e.name for e in temp if e.name.isupper()]
+        if len(upper):
+            idx_of_upper = [idx for idx, u in enumerate(temp) if u.name == upper[0]][0]
+            temp.append(temp.pop(idx_of_upper))
+        context['temporary_collections'] = temp
+        context['types'] = ProductType.objects.select_related('product')
+        context['custom'] = False
+        return context
+
+
+class StudioProductsView(ListView):
+    try:
+        collection = None
+        model = Product
+        paginate_by = 9
+        template_name = 'shop/product/list.html'
+        context_object_name = 'products'
+        stock_dict = dict()
+        temp = Product.objects.prefetch_related('product_types').filter(available=True, custom=False,
+                                                                        collection__available=True,
+                                                                        collection__studio_collection=True)
+        for i in temp:
+            if len(i.product_types.all()) > 0:
+                for h in i.product_types.all().values():
+                    if h.get('product_id') not in stock_dict:
+                        stock_dict[h.get('product_id')] = int(h.get('stock'))
+                    else:
+                        stock_dict[h.get('product_id')] += int(h.get('stock'))
+            else:
+                if i.id not in stock_dict:
+                    stock_dict[i.id] = int(i.stock)
+                else:
+                    stock_dict[i.id] += int(i.stock)
+        gift_card = GiftCard.objects.filter(available=True)
+        card_gift_cart_product_form = CartAddGiftCardProductForm()
+        extra_context = {
+            'product_stock': stock_dict,
+            'gift_card': gift_card,
+            'card_gift_cart_product_form': card_gift_cart_product_form,
+            'view': 'shop:studio_products_view',
+            'product_view': 'shop:studio_product_detail'
+        }
+    except OperationalError:
+        pass
+
+    def check_product_stock(self, products) -> dict:
+        stock_dict = dict()
+        for p in products:
+            pr = Product.objects.prefetch_related('product_types').filter(id=p.id, available=True, custom=False,
+                                                                          collection__available=True,
+                                                                          collection__studio_collection=True
+                                                                          )[0]
+            if len(pr.product_types.all()) > 0:
+                for h in pr.product_types.all().values():
+                    if h.get('product_id') not in stock_dict:
+                        stock_dict[h.get('product_id')] = int(h.get('stock'))
+                    else:
+                        stock_dict[h.get('product_id')] += int(h.get('stock'))
+            else:
+                if pr.id not in stock_dict:
+                    stock_dict[pr.id] = int(pr.stock)
+                else:
+                    stock_dict[pr.id] += int(pr.stock)
+        return stock_dict
+
+    def get_queryset(self):
+        products = Product.objects.prefetch_related('product_types').filter(available=True, custom=False,
+                                                                            collection__available=True,
+                                                                            collection__studio_collection=True)
+        slug = self.kwargs['slug'] if 'slug' in self.kwargs else None
+        if slug:
+            collection = get_object_or_404(Collection, slug=slug)
+            products = products.filter(collection=collection)
+        return products
+
+    def get_context_data(self):
+        context = super().get_context_data(**self.kwargs)
+        stock_dict = self.check_product_stock(context.get('products'))
+        context['notification'] = Notification.objects.all()
+        context['product_stock'] = stock_dict
+        if 'collection_name' in self.kwargs:
+            context['collection'] = get_object_or_404(Collection, name=self.kwargs['collection_name'])
+            context['collection_name'] = self.kwargs['collection_name']
+        context['basic_collections'] = []
+        context['regular_collections'] = []
+        temporary_collections = []
         # find if there is utolsó darabok
         temp = list(temporary_collections)
         upper = [e.name for e in temp if e.name.isupper()]
