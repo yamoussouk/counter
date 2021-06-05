@@ -3,6 +3,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
 from multiselectfield import MultiSelectField
+
 from helper import convert
 
 
@@ -19,6 +20,9 @@ class Collection(models.Model):
     show_on_home_page = models.BooleanField(default=True, help_text="Látható legyen-e a kollekció a főoldalon")
     basic_collection = models.BooleanField(default=False, help_text="Alap kollekció jelölő")
     regular_collection = models.BooleanField(default=False, help_text="Állandó kollekció jelölő")
+    studio_collection = models.BooleanField(default=False, help_text="Kollekció, amely összefogja az "
+                                                                     "összes olyan terméket, amelyik csak a "
+                                                                     "studióban elérhető")
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)

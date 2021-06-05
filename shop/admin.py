@@ -9,7 +9,8 @@ from .models import Collection, Product, Image, Notification, ProductType, GiftC
 class CollectionAdmin(admin.ModelAdmin):
     error_while_saving = False
     list_display = ['name']
-    fields = ('name', 'image', 'available', 'custom', 'show_on_home_page', 'basic_collection', 'regular_collection')
+    fields = ('name', 'image', 'available', 'custom', 'show_on_home_page', 'basic_collection',
+              'regular_collection', 'studio_collection')
 
     def save_model(self, request, obj, form, change):
         if change:
