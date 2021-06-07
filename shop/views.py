@@ -280,7 +280,7 @@ class StudioProductsView(ListView):
     try:
         collection = None
         model = Product
-        paginate_by = 9
+        paginate_by = 12
         template_name = 'shop/product/list.html'
         context_object_name = 'products'
         stock_dict = dict()
