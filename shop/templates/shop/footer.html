@@ -69,6 +69,20 @@
         </div>
     </div>
 </footer>
+{% if shipping_information != None %}
+<section id="information-consent" class="information-consent">
+    <div class="information-consent-inner">
+        <div class="information">
+            <div class="information-inner">
+                <div class="information-msg">Kedves látogató! <br />{{ shipping_information }}</div>
+                <div class="information-accept">
+                    <button id="information" class="information-button" onclick='SetInfoAndHideDiv();'>Értem</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
 <section id="cookie-consent" class="cookie-consent">
 	<div class="cookie-consent-inner">
 		<div class="cookie">

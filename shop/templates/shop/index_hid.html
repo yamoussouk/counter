@@ -47,6 +47,7 @@
         <div class="row">
             <div class="owl-carousel owl-theme">
                 {% for product in basic_products %}
+                    {% if product.image %}
                     <a href="{% url 'shop:product_detail' id=product.collection.slug slug=product.slug %}" title="{{ product.name }}">
                         <picture>
                           <source srcset="{{ product.image.url|wp }}" type="image/webp">
@@ -56,6 +57,7 @@
                                title="{{ product.name }} photo" />
                         </picture>
                     </a>
+                    {% endif %}
                 {% endfor %}
             </div>
         </div>
@@ -179,4 +181,4 @@
 
 {% endblock %}
 
-{% include 'shop/footer.html' with home=True %}
+{% include 'shop/footer.html' with home=True shipping_information=shipping_information %}
