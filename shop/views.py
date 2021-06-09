@@ -48,11 +48,12 @@ def index(request):
             .order_by('-created')[:6])
     notification = Notification.objects.all()
     is_mobile = mobile(request)
-    # is_mobile = True
+    param = Parameter.objects.filter(name="shipping_information")
+    shipping_information = param[0].value if len(param) and param[0].active else None
     ratio = 0.93 if is_mobile else 2.44
     context = dict(basic_collection=basic_collection, basic_products=basic_products,
                    regular_collections=regular_collections, temporary_collections=temporary_collections,
-                   notification=notification, ratio=ratio)
+                   notification=notification, ratio=ratio, shipping_information=shipping_information)
     return render(request, 'shop/index_hid.html', context)
 
 
@@ -170,12 +171,6 @@ def contact_message(request):
 
 def thank_you(request):
     return render(request, 'shop/thank_you.html')
-
-
-def cookie_consent(request):
-    response = HttpResponseRedirect('')
-    response.set_cookie('cookie_consent', 'True')
-    return response
 
 
 def impresszum(request):

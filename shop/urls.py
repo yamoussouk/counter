@@ -27,7 +27,6 @@ urlpatterns = [
     path('adatvedelem/', views.data_handling, name='data_handling'),
     path('uzenet/', views.contact_message, name='contact_message'),
     path('sikeres-uzenet-kuldes/', views.thank_you, name='thank_you'),
-    path('cookie-consent/', views.cookie_consent, name='cookie_consent'),
     path('impresszum/', views.impresszum, name='impresszum'),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     path('robots.txt', TemplateView.as_view(template_name="shop/robots.txt", content_type='text/plain')),
