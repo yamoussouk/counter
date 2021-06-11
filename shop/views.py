@@ -95,6 +95,8 @@ def __get_product_details(request, id: str, slug: str, custom: bool, studio: boo
     collection_slug = '' if studio else product.collection.slug
     view = 'shop:studio_products_view' if studio else ('shop:custom_products_view' if custom else 'shop:products_view')
     template = 'shop/product/custom_detail.html' if custom else 'shop/product/detail.html'
+    param = Parameter.objects.filter(name="shipping_information")
+    shipping_information = param[0].value if len(param) and param[0].active else None
     return render(request, template,
                   {'product': product,
                    'notification': notification,
@@ -107,7 +109,8 @@ def __get_product_details(request, id: str, slug: str, custom: bool, studio: boo
                    'is_stock': is_stock,
                    'images': imgs,
                    'view': view,
-                   'slug': collection_slug
+                   'slug': collection_slug,
+                   'shipping_information': shipping_information
                    })
 
 
@@ -129,25 +132,36 @@ def faq(request):
     csomagkuldo = Parameter.objects.filter(name="csomagkuldo_price")[0].value
     ajanlott = Parameter.objects.filter(name="ajanlott_price")[0].value
     notification = Notification.objects.all()
+    param = Parameter.objects.filter(name="shipping_information")
+    shipping_information = param[0].value if len(param) and param[0].active else None
     return render(request, 'shop/faq.html',
                   {'csomagkuldo': csomagkuldo, 'foxpost': foxpost, 'delivery': delivery,
-                   'ajanlott': ajanlott, 'notification': notification})
+                   'ajanlott': ajanlott, 'notification': notification, 'shipping_information': shipping_information})
 
 
 def contact(request):
     contact_form = ContactForm()
     notification = Notification.objects.all()
-    return render(request, 'shop/contact.html', {'contact_form': contact_form, 'notification': notification})
+    param = Parameter.objects.filter(name="shipping_information")
+    shipping_information = param[0].value if len(param) and param[0].active else None
+    return render(request, 'shop/contact.html', {'contact_form': contact_form, 'notification': notification,
+                                                 'shipping_information': shipping_information})
 
 
 def data_handling(request):
     notification = Notification.objects.all()
-    return render(request, 'shop/data_handling.html', {'notification': notification})
+    param = Parameter.objects.filter(name="shipping_information")
+    shipping_information = param[0].value if len(param) and param[0].active else None
+    return render(request, 'shop/data_handling.html', {'notification': notification,
+                                                       'shipping_information': shipping_information})
 
 
 def aszf(request):
     notification = Notification.objects.all()
-    return render(request, 'shop/aszf.html', {'notification': notification})
+    param = Parameter.objects.filter(name="shipping_information")
+    shipping_information = param[0].value if len(param) and param[0].active else None
+    return render(request, 'shop/aszf.html', {'notification': notification,
+                                              'shipping_information': shipping_information})
 
 
 def contact_message(request):
@@ -175,7 +189,10 @@ def thank_you(request):
 
 def impresszum(request):
     notification = Notification.objects.all()
-    return render(request, 'shop/impresszum.html', {'notification': notification})
+    param = Parameter.objects.filter(name="shipping_information")
+    shipping_information = param[0].value if len(param) and param[0].active else None
+    return render(request, 'shop/impresszum.html', {'notification': notification,
+                                                    'shipping_information': shipping_information})
 
 
 class ProductsView(ListView):
@@ -203,12 +220,15 @@ class ProductsView(ListView):
                     stock_dict[i.id] += int(i.stock)
         gift_card = GiftCard.objects.filter(available=True)
         card_gift_cart_product_form = CartAddGiftCardProductForm()
+        param = Parameter.objects.filter(name="shipping_information")
+        shipping_information = param[0].value if len(param) and param[0].active else None
         extra_context = {
             'product_stock': stock_dict,
             'gift_card': gift_card,
             'card_gift_cart_product_form': card_gift_cart_product_form,
             'view': 'shop:products_view',
-            'product_view': 'shop:product_detail'
+            'product_view': 'shop:product_detail',
+            'shipping_information': shipping_information
         }
     except OperationalError:
         pass
