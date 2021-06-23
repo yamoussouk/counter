@@ -1,12 +1,15 @@
 import csv
 import datetime
 
+from django.conf import settings
 from django.contrib import admin
 from django.db.models import Count, Sum
 from django.http import HttpResponse
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
+from logs.models import LogFile
+from parameters.models import Parameter
 from shop.MessageSender import MessageSender
 from shop.models import Message
 from .models import Order, OrderItem, OrderSummary, OrderItemSummary
@@ -32,6 +35,60 @@ def export_to_csv(modeladmin, request, queryset):
 
 
 export_to_csv.short_description = 'Export to CSV'
+
+
+def re_send_order_email(modeladmin, request, queryset):
+    opts = modeladmin.model._meta
+    fields = [field for field in opts.get_fields() if not field.many_to_many and not field.one_to_many]
+    f = fields
+    for obj in queryset:
+        data_row = dict()
+        for field in fields:
+            value = getattr(obj, field.name)
+            if isinstance(value, datetime.datetime):
+                value = value.strftime('%d/%m/%Y')
+            data_row[field.name] = value
+
+        # SEND AN ORDER CONFIRMATION MAIL
+        prices = dict(FoxPost=int(Parameter.objects.filter(name="foxpost_price")[0].value),
+                      Csomagkuldo=int(Parameter.objects.filter(name="csomagkuldo_price")[0].value),
+                      Házhozszállítás=int(Parameter.objects.filter(name="delivery_price")[0].value),
+                      Személyesátvétel=0,
+                      Ajanlott=int(Parameter.objects.filter(name="ajanlott_price")[0].value))
+        o = Order.objects.prefetch_related('items').filter(id=data_row.get("id"))[0]
+        order_items = Order.objects.prefetch_related('items').filter(id=data_row.get("id"))[0].items.all()
+        delivery_info = dict(FoxPost={'Átvételi pont': o.fox_post},
+                             Csomagkuldo={'Átvételi pont': o.csomagkuldo},
+                             Házhozszállítás={'Szállítási név': o.delivery_name, 'Szállítási cím': o.address,
+                                              'Postakód': o.postal_code, 'Település': o.city, 'Megjegyzés': o.note},
+                             Ajanlott={'Szállítási név': o.delivery_name, 'Szállítási cím': o.address,
+                                       'Postakód': o.postal_code, 'Település': o.city, 'Megjegyzés': o.note},
+                             Személyesátvétel={'Vezetéknév': o.first_name, 'Keresztnév': o.last_name})
+        delivery_price = prices[o.delivery_type.replace(' ', '')]
+        delivery_data = delivery_info[o.delivery_type.replace(' ', '')]
+        order_total = o.total
+        result, msg = MessageSender(subject=f'Rendelés megerősítése #{str(o.id)}', to=o.email,
+                                    sender='www.minervastudio.hu').send_order_confirmation_email(
+            {'name': o.full_name, 'order': o,
+             'delivery_price': delivery_price,
+             'delivery_info': delivery_data,
+             'order_total': order_total})
+        sent = True if result == 1 else False
+        Message.objects.create(subject=f'Rendelés megerősítése #{str(o.id)}', email=o.email, message=msg,
+                               sender='System message from Minerva Studio', sent=sent)
+        # SEND EMAIL ABOUT THE ORDER
+        product = ', '.join([i.product.name for i in order_items])
+        msg = f'Új rendelés:\nA rendelés száma: #{str(o.id)}\nA rendelés összege: {str(order_total)} Ft\nTermékek: {product}'
+        result = MessageSender(subject=f'Új rendelés #{str(o.id)}', to=settings.EMAIL_HOST_USER,
+                               sender='www.minervastudio.hu',
+                               message=msg).send_mail()
+        sent = True if result == 1 else False
+        LogFile.objects.create(type='INFO', message=f'Message is sent to "{o.email}", status: "{result}"')
+        Message.objects.create(subject=f'Új rendelés #{str(o.id)}', email=settings.EMAIL_HOST_USER, message=msg,
+                               sender='System message from Minerva Studio', sent=sent)
+
+
+re_send_order_email.short_description = 'Resend Order Email'
 
 
 def order_detail(obj):
@@ -98,7 +155,7 @@ class OrderAdmin(admin.ModelAdmin):
                        'discount_amount', 'paid', 'paid_time', 'shipped',)
     list_editable = ['shipped']
     inlines = [OrderItemInline]
-    actions = [export_to_csv]
+    actions = [export_to_csv, re_send_order_email]
 
     def save_model(self, request, obj, form, change):
         field = 'shipped'
