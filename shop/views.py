@@ -45,7 +45,7 @@ def index(request):
     temporary_collections = (
         Collection.objects.filter(available=True, custom=False, show_on_home_page=True, basic_collection=False,
                                   regular_collection=False)
-            .order_by('-created')[:6])
+            .order_by('-created')[:9])
     notification = Notification.objects.all()
     is_mobile = mobile(request)
     param = Parameter.objects.filter(name="shipping_information")
