@@ -1,10 +1,23 @@
+import os
+
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.dispatch import receiver
 from django.urls import reverse
 from django.utils.text import slugify
 from multiselectfield import MultiSelectField
 
 from helper import convert
+
+
+def _delete_image(instance):
+    if instance.image:
+        if os.path.isfile(instance.image.path):
+            os.remove(instance.image.path)
+            temp = instance.image.path.split('.')
+            temp = temp[0] + '.webp'
+            if os.path.isfile(temp):
+                os.remove(temp)
 
 
 class Collection(models.Model):
@@ -39,6 +52,11 @@ class Collection(models.Model):
 
     def get_absolute_url(self):
         return reverse('shop:products_view', args=[self.slug])
+
+
+@receiver(models.signals.post_delete, sender=Collection)
+def auto_delete_collection_image_on_delete(sender, instance, **kwargs):
+    _delete_image(instance)
 
 
 STUD_CHOICES = ((1, 'NORMAL'),
@@ -96,6 +114,11 @@ class Product(models.Model):
         return values[int(value) - 1]
 
 
+@receiver(models.signals.post_delete, sender=Product)
+def auto_delete_image_on_delete(sender, instance, **kwargs):
+    _delete_image(instance)
+
+
 class Image(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images', default=None)
     image = models.ImageField(upload_to='images/')
@@ -108,6 +131,11 @@ class Image(models.Model):
 
     def __str__(self):
         return self.product.name + " Img"
+
+
+@receiver(models.signals.post_delete, sender=Image)
+def auto_delete_image_image_on_delete(sender, instance, **kwargs):
+    _delete_image(instance)
 
 
 class ProductType(models.Model):
@@ -128,6 +156,11 @@ class ProductType(models.Model):
 
     def __str__(self):
         return self.color
+
+
+@receiver(models.signals.post_delete, sender=ProductType)
+def auto_delete_type_image_on_delete(sender, instance, **kwargs):
+    _delete_image(instance)
 
 
 class VariationManager(models.Manager):
