@@ -43,6 +43,9 @@
     {% if faq %}
       <link href="{% static "css/faq.css" %}" rel="stylesheet" />
     {% endif %}
+    {% if 404 %}
+      <link href="{% static "css/404.css" %}" rel="stylesheet" />
+    {% endif %}
     {% block ga %}
         {% if use_ga %}
             {% include "shop/snippets/ga.html" with ga_tracking_id=ga_tracking_id%}
