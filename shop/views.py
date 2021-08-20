@@ -58,8 +58,15 @@ def index(request):
 
 
 def __get_product_details(request, id: str, slug: str, custom: bool, studio: bool):
-    collection = Collection.objects.filter(slug=id)[0]
-    product = get_object_or_404(Product, collection=collection, slug=slug, available=True, custom=custom)
+    try:
+        collection = Collection.objects.filter(slug=id)[0]
+    except (Collection.DoesNotExist, IndexError):
+        return render(request, 'shop/404_termek.html', {})
+    # collection = get_object_or_404(Collection, slug=id)
+    try:
+        product = Product.objects.filter(collection=collection, slug=slug, available=True, custom=custom)[0]
+    except (Product.DoesNotExist, IndexError):
+        return render(request, 'shop/404_termek.html', {})
     product_types = Product.objects.prefetch_related('product_types').filter(collection=collection, slug=slug,
                                                                              available=True, custom=custom)
     images = Product.objects.prefetch_related('images').filter(collection=collection, slug=slug, available=True,
