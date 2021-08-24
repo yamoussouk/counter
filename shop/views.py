@@ -1,5 +1,6 @@
 import os
 import re
+import logging
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -19,6 +20,7 @@ from .forms import ContactForm
 from .models import Collection, Product, Notification, ProductType, GiftCard, Message
 
 stripe_product_generator = StripeProductGenerator()
+log = logging.getLogger(__name__)
 
 
 def mobile(request):
@@ -61,11 +63,12 @@ def __get_product_details(request, id: str, slug: str, custom: bool, studio: boo
     try:
         collection = Collection.objects.filter(slug=id)[0]
     except (Collection.DoesNotExist, IndexError):
+        log.info(f'Exception in getting product details - Collection slug {id}')
         return render(request, 'shop/404_termek.html', {})
-    # collection = get_object_or_404(Collection, slug=id)
     try:
         product = Product.objects.filter(collection=collection, slug=slug, available=True, custom=custom)[0]
     except (Product.DoesNotExist, IndexError):
+        log.info(f'Exception in getting product details - Product slug {slug}')
         return render(request, 'shop/404_termek.html', {})
     product_types = Product.objects.prefetch_related('product_types').filter(collection=collection, slug=slug,
                                                                              available=True, custom=custom)
