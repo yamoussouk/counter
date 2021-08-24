@@ -33,6 +33,14 @@ class Cart(object):
         self.discount_products = []
         self.discount_service = Parameter.objects.filter(name="discount_service")[0].value == 'True'
 
+    def __str__(self):
+        repr_ = ''
+        repr_ += 'Cart: '
+        for key, value in self.cart.items():
+            repr_ += f'{key} - {value}'
+        repr_ += f'\ncoupon_id: {self.coupon_id}\norder_id: {self.order_id}\ndelivery_type: {self.delivery_type}'
+        return repr_
+
     def __get_the_lowest_price(self, cart: dict, times: int):
         t = times
         temp = times
