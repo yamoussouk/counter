@@ -77,8 +77,8 @@ def order_create(request):
                 request.session['billing'] = dict(billing_address=cd['billing_address'],
                                                   billing_postal_code=cd['billing_postal_code'],
                                                   billing_city=cd['billing_city'], product_note=cd['product_note'])
-                if cart.order:
-                    order = cart.order
+                order = cart.order
+                if order:
                     order.full_name = request.POST.get('full_name')
                     order.phone = request.POST.get('phone_number')
                     order.email = request.POST.get('email_address')

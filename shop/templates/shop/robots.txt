@@ -1,4 +1,24 @@
 User-agent: *
 Disallow: /admin/
+Disallow: /favicon.ico
+Disallow: /wp-includes/wlwmanifest.xml
+Disallow: /xmlrpc.php
+Disallow: /blog/wp-includes/wlwmanifest.xml
+Disallow: /web/wp-includes/wlwmanifest.xml
+Disallow: /wordpress/wp-includes/wlwmanifest.xml
+Disallow: /website/wp-includes/wlwmanifest.xml
+Disallow: /wp/wp-includes/wlwmanifest.xml
+Disallow: /news/wp-includes/wlwmanifest.xml
+Disallow: /2018/wp-includes/wlwmanifest.xml
+Disallow: /2019/wp-includes/wlwmanifest.xml
+Disallow: /shop/wp-includes/wlwmanifest.xml
+Disallow: /wp1/wp-includes/wlwmanifest.xml
+Disallow: /test/wp-includes/wlwmanifest.xml
+Disallow: /media/wp-includes/wlwmanifest.xml
+Disallow: /wp2/wp-includes/wlwmanifest.xml
+Disallow: /site/wp-includes/wlwmanifest.xml
+Disallow: /cms/wp-includes/wlwmanifest.xml
+Disallow: /sito/wp-includes/wlwmanifest.xml
+Disallow: /cart/
 
 Sitemap: https://www.minervastudio.hu/sitemap.xml

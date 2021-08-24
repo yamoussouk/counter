@@ -268,7 +268,8 @@ class ProductsView(ListView):
                                                                             collection__studio_collection=False)
         slug = self.kwargs['slug'] if 'slug' in self.kwargs else None
         if slug:
-            collection = get_object_or_404(Collection, slug=slug)
+            collection = Collection.objects.filter(slug=slug)
+            collection = collection[0] if len(collection) else None
             products = products.filter(collection=collection)
         return products
 

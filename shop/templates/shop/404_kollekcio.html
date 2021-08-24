@@ -1,0 +1,13 @@
+{% include "shop/base.html" with notification=notification 404=True %}
+{% load static %}
+
+{% block content %}
+<div class="container not-found-page">
+    <div>
+        <h1>A keresett kollekció nem található!</h1>
+    </div>
+</div>
+
+{% endblock %}
+
+{% include 'shop/footer.html' with contact=True %}
