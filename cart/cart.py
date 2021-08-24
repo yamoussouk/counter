@@ -1,5 +1,6 @@
 import math
 from decimal import Decimal
+import logging
 
 from django.conf import settings
 
@@ -8,6 +9,8 @@ from coupon.models import Coupon
 from order.models import Order
 from parameters.models import Parameter
 from shop.models import Product, GiftCard, ProductType
+
+log = logging.getLogger(__name__)
 
 
 class Cart(object):
@@ -225,6 +228,7 @@ class Cart(object):
     @property
     def order(self):
         if self.order_id:
+            log.info(f'Order property, order id: {self.order_id}')
             return Order.objects.prefetch_related('items').filter(id=self.order_id)[0]
         return None
 
