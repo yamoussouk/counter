@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
@@ -9,6 +11,8 @@ from parameters.models import Parameter
 from shop.models import Product, GiftCard, ProductType, Notification
 from .cart import Cart
 from .forms import CartAddProductForm, CartAddCustomProductForm, CartAddGiftCardProductForm, CartDeliveryInfoForm
+
+log = logging.getLogger(__name__)
 
 
 def __validate_stock(cart, product, cd):
@@ -88,7 +92,9 @@ def cart_add_gift_card(request, card_id):
 
 def cart_remove(request, item_id):
     cart = Cart(request)
-    _ = cart.remove(item_id)
+    log.info(f'Requesting to remove an item from the cart with the item id of "{item_id}".\nCart object: {cart}')
+    cart = cart.remove(item_id)
+    log.info(f'Cart object after item removal: {cart}')
     return redirect(reverse('cart:cart_detail'))
 
 
@@ -123,4 +129,5 @@ def cart_detail(request):
                    is_foxpost_enabled=is_foxpost_enabled, is_delivery_enabled=is_delivery_enabled,
                    is_csomagkuldo_enabled=is_csomagkuldo_enabled, is_ajanlott_enabled=is_ajanlott_enabled,
                    ajanlott_cart_limit=ajanlott_cart_limit)  # 'gift_card_apply_form': gift_card_apply_form
+    log.info(f'Cart details: {context.get("cart")}')
     return render(request, 'cart/detail.html', context)
