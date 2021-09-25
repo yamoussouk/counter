@@ -1,18 +1,23 @@
 import csv
 import datetime
+import logging
 
 from django.conf import settings
 from django.contrib import admin
+from django.contrib import messages
 from django.db.models import Count, Sum
 from django.http import HttpResponse
 from django.urls import reverse
 from django.utils.safestring import mark_safe
+from django.utils.translation import ngettext
 
 from logs.models import LogFile
 from parameters.models import Parameter
 from shop.MessageSender import MessageSender
 from shop.models import Message
 from .models import Order, OrderItem, OrderSummary, OrderItemSummary
+
+log = logging.getLogger(__name__)
 
 
 def export_to_csv(modeladmin, request, queryset):
@@ -91,6 +96,35 @@ def re_send_order_email(modeladmin, request, queryset):
 re_send_order_email.short_description = 'Resend Order Email'
 
 
+def _send_message(order):
+    subject = f'Csomag feladva #{str(order.id)}'
+    result, msg = MessageSender(subject=subject, to=order.email,
+                                sender='www.minervastudio.hu').send_shipping_confirmation_email(
+        {'name': order.full_name})
+    sent = True if result == 1 else False
+    Message.objects.create(subject=subject, email=order.email, message=msg,
+                           sender='System message from Minerva Studio', sent=sent)
+
+
+def shipping(modeladmin, request, queryset):
+    updates = 0
+    for order in queryset:
+        log.info(f'Saving order #{order.id} from admin page, shipped is set to true')
+        if order.delivery_type != 'Személyes átvétel':
+            order.shipped = True
+            order.save()
+            log.info(f'Sending message to: {order.email}')
+            _send_message(order)
+            updates += 1
+    orders = ", ".join([str(q.id) for q in queryset])
+    singular = f'%d order ({orders}) was successfully marked as shipped.'
+    plural = f'%d orders ({orders}) were successfully marked as shipped.'
+    modeladmin.message_user(request, ngettext(singular, plural, updates, ) % updates, messages.SUCCESS)
+
+
+shipping.short_description = 'Set Order to be shipped'
+
+
 def order_detail(obj):
     return mark_safe('<a href="{}">View</a>'.format(reverse('orders:admin_order_detail', args=[obj.id])))
 
@@ -109,6 +143,10 @@ class OrderItemInline(admin.TabularInline):
                        'custom_date', show_product]
     exclude = ['gift_card', 'image']
     can_delete = False
+
+    # @admin.display(description='gift_card')
+    # def gift_card_name(self, instance):
+    #     return instance.name
 
     def has_add_permission(self, request, obj):
         return False
@@ -155,21 +193,7 @@ class OrderAdmin(admin.ModelAdmin):
                        'discount_amount', 'paid', 'paid_time', 'shipped',)
     list_editable = ['shipped']
     inlines = [OrderItemInline]
-    actions = [export_to_csv, re_send_order_email]
-
-    def save_model(self, request, obj, form, change):
-        field = 'shipped'
-        super().save_model(request, obj, form, change)
-        if change and field in form.changed_data and form.cleaned_data.get(field):
-            order = Order.objects.prefetch_related('items').filter(id=obj.id)
-            if order[0].delivery_type != 'Személyes átvétel':
-                subject = f'Csomag feladva #{str(order[0].id)}'
-                result, msg = MessageSender(subject=subject, to=order[0].email,
-                                            sender='www.minervastudio.hu').send_shipping_confirmation_email(
-                    {'name': order[0].full_name})
-                sent = True if result == 1 else False
-                Message.objects.create(subject=subject, email=order[0].email, message=msg,
-                                       sender='System message from Minerva Studio', sent=sent)
+    actions = [export_to_csv, re_send_order_email, shipping]
 
     def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
         context.update({
