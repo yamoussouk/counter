@@ -50,12 +50,32 @@
           </div>
           {% endfor %}
       </div>
-    {% if cart.coupon %}
+    {% with amount=cart.get_discount %}
+    {% if cart.coupon and amount != 0 %}
       <div class="row total-row coupon-in-cart-row">
           <div class="col-8 total"><span>"{{ cart.coupon.code }}" kupon ({{ cart.coupon.discount }}% kedvezmény)</span></div>
-          <div class="col-3 total-price"><span>- {{ cart.get_discount|floatformat }} Ft.-</span></div>
+          <div class="col-3 total-price"><span>- {{ amount }} Ft.-</span></div>
       </div>
       <div class="row total-row">
+          <div class="col-8 total"><span>Összesen:</span></div>
+          <div class="col-3 total-price"><span>{{ cart.get_total_price_after_discount|floatformat }} Ft.-</span></div>
+          <div class="col-1"></div>
+      </div>
+    {% elif cart.gift_card_ids %}
+      {% for id in cart.gift_card_ids %}
+        <div class="row total-row gift_card-in-cart-row">
+              <div class="col-8 total"><span>"{{ id.unique_uuid|truncatechars:15 }}" Ajándékkártya</span></div>
+              <div class="col-3 total-price"><span>- {{ id.price }} Ft.-</span></div>
+              <div class="col-1 gift-card-remove">
+                  <a href="{% url 'cart:cart_remove_giftcard' id=id.id %}">
+                    <span>
+                      <img src="{% static 'images/remove_icon.png' %}" alt="Eltávolítás ikon" title="Eltávolítás ikon" />
+                    </span>
+                  </a>
+                </div>
+          </div>
+      {% endfor %}
+          <div class="row total-row">
           <div class="col-8 total"><span>Összesen:</span></div>
           <div class="col-3 total-price"><span>{{ cart.get_total_price_after_discount|floatformat }} Ft.-</span></div>
           <div class="col-1"></div>
@@ -67,7 +87,23 @@
         <div class="col-1"></div>
     </div>
     {% endif %}
-    {% if cart|length > 0 and not cart.coupon %}
+    {% endwith %}
+      <div id="discount-wrapper">
+          <p>
+          {% if cart|length > 0 and not cart.coupon and not cart.gift_card_ids %}
+              <button class="collapse-button" data-toggle="collapse" href="#collapseCoupon" role="button" aria-expanded="false" aria-controls="collapseCoupon">
+                Kuponkód
+              </button>
+          {% endif %}
+          {% if cart|length > 0 and not cart.coupon %}
+              <button class="collapse-button" data-toggle="collapse" href="#collapseGift" role="button" aria-expanded="false" aria-controls="collapseGift">
+                Ajándékkártya
+              </button>
+          {% endif %}
+        </p>
+        <div class="collapse" id="collapseCoupon">
+          <div class="card card-body">
+            {% if cart|length > 0 and not cart.coupon and not cart.gift_card_ids %}
     <div class="row coupon-row">
       <form action="{% url 'coupon:apply' %}" method="post">
         <div class="col-8">
@@ -84,40 +120,44 @@
       </form>
     </div>
 {% endif %}
+          </div>
+        </div>
+        <div class="collapse" id="collapseGift">
+          <div class="card card-body">
+            {% if cart|length > 0 and not cart.coupon %}
+      <div class="row gift-card-row">
+      <form action="{% url 'giftcardpayment:giftcard_apply' %}" method="post">
+        <div class="col-8">
+            <div class="coupon-form-wrapper">
+                <span class="coupon-text">ajándékkártya:</span>
+                {{ gift_card_apply_form }}
+            </div>
+        </div>
+        <div class="col-3">
+            <input type="submit" value="BEVÁLTÁS" id="giftcard-apply-button">
+            {% csrf_token %}
+        </div>
+        <div class="clearfix"></div>
+      </form>
+    </div>
+      {% endif %}
+          </div>
+        </div>
+      </div>
   </div>
 
 <div class="container-md" id="delivery-options">
   <h1>számlázási adatok</h1>
   <form action="{% url 'order:order_create' %}" method="post" id="delivery-form">
       <div class="mandatory-fields-wrapper">
-          <div class="form-group">
-            <label for="full_name">Teljes név*</label>
-            <input type="text" class="form-control" id="full_name" name="full_name" required>
-          </div>
-          <div class="form-group">
-            <label for="phone_number">Telefonszám*</label>
-            <input type="text" class="form-control" id="phone_number" name="phone_number" required>
-          </div>
-          <div class="form-group">
-            <label for="email_address">E-mail cím*</label>
-            <input type="email" class="form-control" id="email_address" name="email_address" required>
-          </div>
-          <div class="form-group">
-            <label for="billing_address">Utca, házszám*</label>
-            <input type="text" class="form-control" id="billing_address" name="billing_address" required>
-          </div>
-          <div class="form-group">
-            <label for="billing_postal_code">Irányítószám*</label>
-            <input type="text" class="form-control" id="billing_postal_code" name="billing_postal_code" required>
-          </div>
-          <div class="form-group">
-            <label for="billing_city">Település*</label>
-            <input type="text" class="form-control" id="billing_city" name="billing_city" required>
-          </div>
-          <div class="form-group">
-            <label for="product_note">Megjegyzés</label>
-            <input type="text" class="form-control" id="product_note" name="product_note" maxlength="100">
-          </div>
+          {% for field in delivery_form %}
+            {% if forloop.counter < 8 %}
+              <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                  {{ field }}
+              </div>
+            {% endif %}
+          {% endfor %}
           <div class="clearfix"></div>
       </div>
       {% if is_product_in_cart %}
@@ -138,7 +178,7 @@
             <div class="card-body">
               <div class="personal-left-wrapper">
                 <div class="form-group">
-                  <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Vezetéknév">
+                    {{ delivery_form.first_name }}
                 </div>
                 <div class="personal-data-text">
                   <span>Átvételi cím</span>
@@ -148,7 +188,7 @@
               </div>
               <div class="personal-right-wrapper">
                 <div class="form-group">
-                  <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Keresztnév" >
+                  {{ delivery_form.last_name }}
                 </div>
                 <div class="personal-data-text">
                   <span>Átvétel menete</span>
@@ -175,6 +215,7 @@
 
           <div id="collapseFour" class="collapse" aria-labelledby="personal" data-parent="#accordion">
             <div id="csomagkuldo-body" class="card-body"></div>
+              {{ delivery_form.csomagkuldo }}
          </div>
         </div>
           {% endif %}
@@ -192,25 +233,25 @@
           <div id="collapseFive" class="collapse" aria-labelledby="envelope" data-parent="#accordion">
             <div class="card-body">
               <div class="form-group">
-                <label for="envelope_full_name">Név*</label>
-                <input type="text" class="form-control" id="envelope_full_name" name="envelope_full_name">
+                <label for="delivery_full_name">{{ delivery_form.delivery_name.label }}</label>
+                {{ delivery_form.delivery_name }}
               </div>
               <div class="form-group">
-                <label for="envelope_address">Utca, házszám*</label>
-                <input type="text" class="form-control" id="envelope_address" name="envelope_address">
+                <label for="d_address">{{ delivery_form.address.label }}</label>
+                {{ delivery_form.address }}
               </div>
               <div class="form-group">
-                <label for="envelope_zip">Irányítószám*</label>
-                <input type="text" class="form-control" id="envelope_zip" name="envelope_zip">
+                <label for="d_zip">{{ delivery_form.postal_code.label }}</label>
+                {{ delivery_form.postal_code }}
               </div>
               <div class="form-group">
-                <label for="envelope_city">Település*</label>
-                <input type="text" class="form-control" id="envelope_city" name="envelope_city">
+                <label for="d_city">{{ delivery_form.city.label }}</label>
+                {{ delivery_form.city }}
               </div>
               <div class="clearfix"></div>
               <div class="form-group">
-                <label for="envelope_note">Egyéb Információk</label>
-                <input type="text" class="form-control" id="envelope_note" name="envelope_note">
+                <label for="d_note">{{ delivery_form.note.label }}</label>
+                {{ delivery_form.note }}
               </div>
             </div>
           </div>
@@ -231,6 +272,7 @@
             <div class="card-body">
                 <iframe frameborder="0" loading="lazy" src="https://cdn.foxpost.hu/apt-finder/v1/app/?discount=1" width="100%" height="600px"></iframe>
             </div>
+              {{ delivery_form.fox_post }}
           </div>
         </div>
           {% endif %}
@@ -248,25 +290,25 @@
           <div id="collapseThree" class="collapse" aria-labelledby="delivery" data-parent="#accordion">
             <div class="card-body">
               <div class="form-group">
-                <label for="delivery_full_name">Név*</label>
-                <input type="text" class="form-control" id="delivery_full_name" name="delivery_full_name">
+                <label for="delivery_full_name">{{ delivery_form.delivery_name.label }}</label>
+                {{ delivery_form.delivery_name }}
               </div>
               <div class="form-group">
-                <label for="d_address">Utca, házszám*</label>
-                <input type="text" class="form-control" id="d_address" name="d_address">
+                <label for="d_address">{{ delivery_form.address.label }}</label>
+                {{ delivery_form.address }}
               </div>
               <div class="form-group">
-                <label for="d_zip">Irányítószám*</label>
-                <input type="text" class="form-control" id="d_zip" name="d_zip">
+                <label for="d_zip">{{ delivery_form.postal_code.label }}</label>
+                {{ delivery_form.postal_code }}
               </div>
               <div class="form-group">
-                <label for="d_city">Település*</label>
-                <input type="text" class="form-control" id="d_city" name="d_city">
+                <label for="d_city">{{ delivery_form.city.label }}</label>
+                {{ delivery_form.city }}
               </div>
               <div class="clearfix"></div>
               <div class="form-group">
-                <label for="d_note">Egyéb Információk</label>
-                <input type="text" class="form-control" id="d_note" name="d_note">
+                <label for="d_note">{{ delivery_form.note.label }}</label>
+                {{ delivery_form.note }}
               </div>
             </div>
           </div>
@@ -274,12 +316,12 @@
           {% endif %}
       </div>
       <input type="hidden" id="delivery_safe" {% if 'delivery' in session and session.delivery.delivery_type == 'FoxPost' %}value="fp;{{ session.delivery.fox_post }}" {% elif 'delivery' in session and session.delivery.delivery_type == 'Csomagkuldo' %}value="cs;{{ session.delivery.csomagkuldo }}" {% endif %} />
+      {% endif %}
       <div id="payment-form">
-          {{ delivery_form }}
+          {{ delivery_form.delivery_type }}
           {% csrf_token %}
       </div>
       </form>
-      {% endif %}
 
       <div id="end-total">
         <div class="end-total-wrapper">
@@ -287,8 +329,8 @@
               <p>Összesen fizetendő:</p>
             </div>
             <div id="end-total-amount">
-              <p id="total_price" data-price="{{ cart|calculate_price:"calculated_total_price,False" }}">
-                  {{ cart|calculate_price:"calculated_total_price,False" }} Ft</p>
+              <p id="total_price" data-price="{{ calculated_total_price }}">
+                  {{ calculated_total_price }} Ft</p>
             </div>
           <div class="clearfix"></div>
         </div>
@@ -296,6 +338,7 @@
 
     <div id="payment-form-submit-button-wrapper">
         <input id="payment-form-submit-button" type="submit" value="ELLENŐRZÉS" form="delivery-form" />
+        {% csrf_token %}
     </div>
 
     {% else %}

@@ -35,7 +35,13 @@ def payment_cancelled(request):
 def payment_process(request):
     order_id = request.session.get('order_id')
     order = get_object_or_404(Order, id=order_id)
-    return render(request, 'payment/process.html', {'order': order})
+    cart = Cart(request)
+    all_product_types = [value['type'] for key, value in cart.cart.items()]
+    delivery = cart.delivery_type is not None
+    gift_card = cart.gift_card_ids is not None
+    calculated_total_price = cart.calculated_total_price(delivery=delivery, gift_card=gift_card, cart=False)
+    return render(request, 'payment/process.html', {'order': order, 'calculated_total_price': calculated_total_price,
+                                                    'delivery': delivery})
 
 
 @csrf_exempt
@@ -56,13 +62,14 @@ def create_checkout_session(request):
     # if any gift card is applied an add hoc payment is created
     # this sucks since 175ft is the minimum limit for a purchase
     if hasattr(cart, 'gift_cards') and cart.gift_cards is not None:
-        total_price = cart.calculated_total_price()
-        items.append(dict(name='valami', amount=int(total_price) * 100, quantity=1,
+        delivery = cart.delivery_type is not None
+        total_price = cart.calculated_total_price(cart=False, delivery=delivery)
+        items.append(dict(name='Kézműves termék', amount=int(total_price) * 100, quantity=1,
                           currency=Parameter.objects.filter(name="currency")[0].value))
     else:
         discount = order[0].coupon if order[0].coupon is not None else ''
         for k, v in cart.cart.items():
-            if v.get('product_id') is not None:
+            if v.get('product_id') is not None and v.get('type') != 'gift_card':
                 product = Product.objects.filter(id=v.get('product_id'))[0]
                 if Parameter.objects.filter(name="discount_service")[0].value == 'True':
                     if v['zero_discount']:
@@ -75,8 +82,9 @@ def create_checkout_session(request):
                 else:
                     items.append(dict(price=product.price_api_id, quantity=int(v.get('quantity'))))
             else:
-                gift_card = GiftCard.objects.filter(id=v.get('gift_card_id'))[0]
-                items.append(dict(price=gift_card.price_api_id, quantity=int(v.get('quantity'))))
+                gift_card = GiftCard.objects.filter(id=v.get('product').get('id'))[0]
+                items.append(dict(name='Kézműves termék', amount=int(gift_card.price) * 100, quantity=1,
+                                  currency=Parameter.objects.filter(name="currency")[0].value))
         delivery_type = order[0].delivery_type
         if delivery_type == 'Házhozszállítás':
             items.append(dict(price=Parameter.objects.filter(name="delivery_price_api_key")[0].value, quantity=1))
@@ -129,8 +137,14 @@ def __post_payment_process(event):
                   Házhozszállítás=int(Parameter.objects.filter(name="delivery_price")[0].value),
                   Személyesátvétel=0,
                   Ajanlott=int(Parameter.objects.filter(name="ajanlott_price")[0].value))
-    order.delivery_cost = prices[order.delivery_type.replace(' ', '')]
+    order.delivery_cost = prices[order.delivery_type.replace(' ', '')] if order.delivery_type != '' else 0
     order.save()
+    if order.used_gift_cards is not None:
+        ids = order.used_gift_cards.split(',')
+        for i in ids:
+            card = BoughtGiftCard.objects.get(id=int(i))
+            card.active = False
+            card.save()
     # decrease the stock number
     order_items = Order.objects.prefetch_related('items').filter(id=order_id)[0].items.all()
     for o in order_items:
@@ -171,13 +185,12 @@ def __post_payment_process(event):
                          Ajanlott={'Szállítási név': o.delivery_name, 'Szállítási cím': o.address,
                                           'Postakód': o.postal_code, 'Település': o.city, 'Megjegyzés': o.note},
                          Személyesátvétel={'Vezetéknév': o.first_name, 'Keresztnév': o.last_name})
-    delivery_price = prices[o.delivery_type.replace(' ', '')]
     delivery_data = delivery_info[o.delivery_type.replace(' ', '')]
     order_total = o.total
     result, msg = MessageSender(subject=f'Rendelés megerősítése #{str(o.id)}', to=o.email,
                                 sender='www.minervastudio.hu').send_order_confirmation_email(
         {'name': o.full_name, 'order': o,
-         'delivery_price': delivery_price,
+         'delivery_price': order.delivery_cost,
          'delivery_info': delivery_data,
          'order_total': order_total})
     sent = True if result == 1 else False
@@ -198,7 +211,7 @@ def __post_payment_process(event):
 def finalize_gift_card_payment(request):
     if request.method == 'POST':
         cart = Cart(request)
-        subtotal = cart.calculated_total_price(gift_card=False)
+        subtotal = cart.calculated_total_price(gift_card=False, cart=False)
         order = get_object_or_404(Order, id=request.POST.get('order_id'))
         order.paid = True
         order.paid_by = 'Ajándékkártya'

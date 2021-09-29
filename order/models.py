@@ -5,6 +5,8 @@ from django.db import models
 
 from coupon.models import Coupon
 from shop.models import Product, GiftCard
+from django.core.validators import int_list_validator
+from giftcardpayment.models import BoughtGiftCard
 
 
 class Order(models.Model):
@@ -13,7 +15,7 @@ class Order(models.Model):
     billing_address = models.CharField(max_length=250, default='', blank=True)
     billing_postal_code = models.CharField(max_length=20, default='', blank=True)
     billing_city = models.CharField(max_length=100, default='', blank=True)
-    delivery_type = models.CharField(max_length=50, default='')
+    delivery_type = models.CharField(max_length=50, default='', null=True, blank=True)
     first_name = models.CharField(max_length=50, default='', blank=True)
     last_name = models.CharField(max_length=50, default='', blank=True)
     delivery_name = models.CharField(max_length=250, default='', blank=True)
@@ -42,6 +44,7 @@ class Order(models.Model):
     phone = models.CharField(max_length=25, default='', blank=True)
     shipped = models.BooleanField(default=False)
     product_note = models.CharField(max_length=250, default='', blank=True)
+    used_gift_cards = models.CharField(validators=[int_list_validator], max_length=100, blank=True, null=True)
 
     class Meta:
         ordering = ('-created',)
@@ -59,6 +62,14 @@ class Order(models.Model):
     def get_discount_amount(self):
         total_cost = sum(item.get_cost() for item in self.items.all())
         return total_cost * (self.discount / Decimal('100'))
+
+    def gift_cards(self):
+        cards = str(self.used_gift_cards).split(',')
+        result = []
+        for c in cards:
+            result.append(BoughtGiftCard.objects.get(id=int(c)).unique_uuid)
+        return result
+
 
 
 class OrderSummary(Order):

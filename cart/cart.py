@@ -5,10 +5,11 @@ import logging
 from django.conf import settings
 
 from coupon.models import Coupon
-# from giftcardpayment.models import BoughtGiftCard
+from giftcardpayment.models import BoughtGiftCard
 from order.models import Order
 from parameters.models import Parameter
 from shop.models import Product, GiftCard, ProductType
+from coupon.views import _recalculate_coupon
 
 log = logging.getLogger(__name__)
 
@@ -16,6 +17,7 @@ log = logging.getLogger(__name__)
 class Cart(object):
 
     def __init__(self, request):
+        self.request = request
         self.session = request.session
         cart = self.session.get(settings.CART_SESSION_ID)
         if not cart:
@@ -113,7 +115,7 @@ class Cart(object):
             for key, value in self.cart.copy().items():
                 if self.cart[key]['product_id'] == product.id and self.cart[key]['type'] == item_type and \
                         self.cart[key]['color'] == color and self.cart[key]['stud'] == stud:
-                    if product.custom:
+                    if hasattr(product, 'custom') and product.custom:
                         # in case of custom product, custom properties must be preserved
                         # therefore a new item must be created in the cart.
                         break
@@ -179,6 +181,13 @@ class Cart(object):
                         Order.objects.filter(id=self.session[p])[0].delete()
                     del self.session[p]
         self.save()
+        return self.cart
+
+    def remove_gift_card(self, id):
+        if any(gc['id'] == int(id) for gc in self.gift_card_ids):
+            idx = [idx for idx, e in enumerate(self.gift_card_ids) if e['id'] == id][0]
+            del self.gift_card_ids[idx]
+            self.save()
         return self.cart
 
     def __iter__(self):
@@ -256,41 +265,45 @@ class Cart(object):
 
     def get_discount(self):
         if self.coupon:
-            return round((self.coupon.discount / float('100')) * float(self.get_total_price()))
+            _, discount = _recalculate_coupon(self.request)
+            return round(discount)
         return float('0')
 
     def get_total_price_after_discount(self):
-        return float(self.get_total_price()) - float(self.get_discount())
+        total_price = float(self.get_total_price()) - float(self.get_discount()) - float(self.get_gift_card_amount())
+        return total_price
 
-    # @property
-    # def gift_cards(self):
-    #     if self.gift_card_ids:
-    #         return [BoughtGiftCard.objects.get(id=gc) for gc in self.gift_card_ids]
-    #     return None
+    @property
+    def gift_cards(self):
+        if self.gift_card_ids:
+            return [BoughtGiftCard.objects.get(id=gc['id']) for gc in self.gift_card_ids]
+        return None
 
-    # @gift_cards.setter
-    # def clear_gift_card(self):
-    #     self.gift_card_ids = []
+    @gift_cards.setter
+    def clear_gift_card(self):
+        self.gift_card_ids = []
 
-    # def get_gift_card_amount(self):
-    #     amount = Decimal('0')
-    #     if self.gift_card_ids:
-    #         for gc in self.gift_cards:
-    #             amount += gc.price
-    #         return amount
-    #     return amount
+    def get_gift_card_amount(self):
+        amount = float('0')
+        if self.gift_card_ids:
+            for gc in self.gift_card_ids:
+                amount += gc["price"]
+            return amount
+        return amount
 
-    def calculated_total_price(self, delivery=True, gift_card=True):
+    def calculated_total_price(self, delivery=False, gift_card=False, cart=True):
         total_price = self.get_total_price_after_discount() if self.coupon else self.get_total_price()
-        if delivery:
-            delivery_type = self.session.get('delivery').get('delivery_type')
-            delivery_amount = self.prices[delivery_type.replace(' ', '')]
+        # gift card is not for delivery
+        if delivery and not cart:
+            if 'delivery' in self.session._session:
+                delivery_type = self.session._session.get('delivery').get('delivery_type')
+                delivery_amount = self.prices[delivery_type.replace(' ', '')]
+            else:
+                delivery_amount = 0
         else:
             delivery_amount = 0
-        # if gift_card:
-        #     amount = self.get_gift_card_amount() if self.gift_cards else 0
-        # else:
-        #     amount = 0
-        amount = 0
+        amount = self.get_gift_card_amount() if self.gift_card_ids else 0
         diff = total_price + delivery_amount - amount
+        if cart:
+            return int(math.ceil(diff))
         return int(math.ceil(diff)) if diff > 0 else 0

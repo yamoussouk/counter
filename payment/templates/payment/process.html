@@ -35,6 +35,7 @@
                       <p>{{ order.phone }}</p>
                   </div>
                   <div class="clearfix"></div>
+                  {% if delivery %}
                   <div class="check-form-key">
                       Kiválasztott szállítási mód:
                   </div>
@@ -110,6 +111,7 @@
                   </div>
                   <div class="clearfix"></div>
                   {% endif %}
+                  {% endif %}
                   {% if order.coupon %}
                   <div class="check-form-key">
                       Felhasznált kupon:
@@ -130,8 +132,8 @@
                       <p>Összesen fizetendő:</p>
                     </div>
                     <div id="end-total-amount">
-                      <p id="total_price" data-price="{{ cart.calculated_total_price|floatformat:0 }}">
-                          {{ cart.calculated_total_price|floatformat:"0" }} Ft</p>
+                      <p id="total_price" data-price="{{ calculated_total_price }}">
+                          {{ calculated_total_price }} Ft</p>
                     </div>
                   <div class="clearfix"></div>
                 </div>
@@ -161,7 +163,7 @@
       <div class="row">
           <div class="col-12">
               <div id="purchase-button-wrapper">
-                  {% if cart.calculated_total_price != 0 %}
+                  {% if calculated_total_price > 0 %}
                   <button class="button is-primary" id="submitBtn">FIZETÉS</button>
                   {% else %}
                   <form action="{% url 'payment:finalize_gift_card_payment' %}" method="post">

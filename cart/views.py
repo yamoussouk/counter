@@ -7,10 +7,10 @@ from django.views.decorators.http import require_http_methods
 
 from coupon.forms import CouponApplyForm
 from parameters.models import Parameter
-# from giftcardpayment.forms import GiftCardApplyForm
+from giftcardpayment.forms import GiftCardApplyForm
 from shop.models import Product, GiftCard, ProductType, Notification
 from .cart import Cart
-from .forms import CartAddProductForm, CartAddCustomProductForm, CartAddGiftCardProductForm, CartDeliveryInfoForm
+from .forms import CartAddProductForm, CartAddCustomProductForm, CartAddGiftCardProductForm, CartDeliveryInfoForm, CartDeliveryInfoFormWithoutDelivery, CartDeliveryInfoFormNotHidden, CartDeliveryInfoFormWithoutDeliveryNotHidden
 
 log = logging.getLogger(__name__)
 
@@ -98,6 +98,14 @@ def cart_remove(request, item_id):
     return redirect(reverse('cart:cart_detail'))
 
 
+def cart_remove_giftcard(request, id):
+    cart = Cart(request)
+    log.info(f'Requesting to remove the gift card from the cart with the item id of "{id}".\nCart object: {cart}')
+    cart = cart.remove_gift_card(id)
+    log.info(f'Cart object after item removal: {cart}')
+    return redirect(reverse('cart:cart_detail'))
+
+
 def cart_detail(request):
     cart = Cart(request)
     is_product_in_cart = False
@@ -107,8 +115,10 @@ def cart_detail(request):
         if cart.cart[key]['type'] in ['product', 'product_type']:
             is_product_in_cart = True
     coupon_apply_form = CouponApplyForm()
-    # gift_card_apply_form = GiftCardApplyForm()
-    delivery_form = CartDeliveryInfoForm()
+    gift_card_apply_form = GiftCardApplyForm()
+    all_product_types = [value['type'] for key, value in cart.cart.items()]
+    is_gift_card_alone_in_the_cart = all(x == 'gift_card' for x in all_product_types)
+    delivery_form = CartDeliveryInfoFormWithoutDeliveryNotHidden() if is_gift_card_alone_in_the_cart else CartDeliveryInfoFormNotHidden()
     current_amount = request.session['current_amount'] if 'current_amount' in request.session else 0
     notification = Notification.objects.all()
     api_key = Parameter.objects.filter(name="csomagkuldo_price_api_key")[0].value
@@ -118,6 +128,10 @@ def cart_detail(request):
     is_csomagkuldo_enabled = Parameter.objects.filter(name="csomagkuldo_enabled")[0].value == 'True'
     is_ajanlott_enabled = Parameter.objects.filter(name="ajanlott_enabled")[0].value == 'True'
     ajanlott_cart_limit = int(Parameter.objects.filter(name="ajanlott_cart_limit")[0].value)
+    all_product_types = [value['type'] for key, value in cart.cart.items()]
+    delivery = cart.delivery_type is not None
+    gift_card = cart.gift_card_ids is not None
+    calculated_total_price = cart.calculated_total_price(delivery=delivery, gift_card=gift_card)
     context = dict(cart=cart, coupon_apply_form=coupon_apply_form, delivery_form=delivery_form,
                    fox_price=Parameter.objects.filter(name="foxpost_price")[0].value,
                    delivery_price=Parameter.objects.filter(name="delivery_price")[0].value,
@@ -128,6 +142,8 @@ def cart_detail(request):
                    is_szemelyes_atvetel_enabled=is_szemelyes_atvetel_enabled,
                    is_foxpost_enabled=is_foxpost_enabled, is_delivery_enabled=is_delivery_enabled,
                    is_csomagkuldo_enabled=is_csomagkuldo_enabled, is_ajanlott_enabled=is_ajanlott_enabled,
-                   ajanlott_cart_limit=ajanlott_cart_limit)  # 'gift_card_apply_form': gift_card_apply_form
+                   ajanlott_cart_limit=ajanlott_cart_limit, gift_card_apply_form=gift_card_apply_form,
+                   calculated_total_price=calculated_total_price,
+                   delivery=delivery)  # 'gift_card_apply_form': gift_card_apply_form
     log.info(f'Cart details: {context.get("cart")}')
     return render(request, 'cart/detail.html', context)

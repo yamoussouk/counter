@@ -184,13 +184,16 @@ class OrderAdmin(admin.ModelAdmin):
         }),
         ('Fizetési részletek', {
             'fields': ('paid', 'paid_time', 'shipped',)
+        }),
+        ('Felhasznált ajándékkártya', {
+            'fields': ('gift_cards',)
         })
     )
     readonly_fields = ('full_name', 'phone', 'email', 'billing_address', 'billing_postal_code', 'billing_city',
                        'product_note', 'delivery_type', 'first_name', 'last_name', 'fox_post', 'csomagkuldo',
                        'delivery_name', 'address', 'postal_code', 'city', 'note', 'products_price',
                        'products_price_with_discount', 'delivery_cost', 'subtotal', 'total', 'coupon', 'discount',
-                       'discount_amount', 'paid', 'paid_time', 'shipped',)
+                       'discount_amount', 'paid', 'paid_time', 'shipped', 'gift_cards',)
     list_editable = ['shipped']
     inlines = [OrderItemInline]
     actions = [export_to_csv, re_send_order_email, shipping]

@@ -1,8 +1,10 @@
 from django.conf import settings
 from django.shortcuts import redirect
 from django.views.decorators.http import require_http_methods
+from django.forms.models import model_to_dict
 
 from coupon.models import Coupon
+from django.contrib import messages
 from .forms import GiftCardApplyForm
 from .models import BoughtGiftCard
 
@@ -19,7 +21,7 @@ def __get_amount(request):
     if 'gift_card_ids' in request.session:
         temp = request.session['gift_card_ids']
         for t in temp:
-            card_price += BoughtGiftCard.objects.get(id=t).price
+            card_price += t.get("price")
     amount = amount - discount - card_price
     return amount
 
@@ -33,12 +35,15 @@ def giftcard_apply(request):
             card = BoughtGiftCard.objects.get(unique_uuid__iexact=unique_uuid, active=True)
             if 'gift_card_ids' in request.session:
                 temp = request.session['gift_card_ids']
-                if card.id not in temp:
-                    temp.append(card.id)
+                if card.id not in [g.get('id') for g in temp]:
+                    temp.append(model_to_dict(card))
+                else:
+                    messages.error(request, 'A megadott ajándékkártya már felhasználásra került!')
                 request.session['gift_card_ids'] = temp
             else:
-                request.session['gift_card_ids'] = [card.id]
+                request.session['gift_card_ids'] = [model_to_dict(card)]
         except BoughtGiftCard.DoesNotExist:
+            messages.error(request, "A megadott ajándékkártya nem érvényes!")
             pass
     request.session['current_amount'] = __get_amount(request)
-    return redirect('payment:process')
+    return redirect('cart:cart_detail')

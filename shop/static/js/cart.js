@@ -1,1 +1,258 @@
-var modes={0:"Személyes átvétel",1:"Csomagkuldo",2:"FoxPost",3:"Házhozszállítás",4:"Ajanlott"};function receiveMessage(e){if("https://cdn.foxpost.hu"==e.origin){var a=JSON.parse(e.data);$("#id_fox_post").val(a.name+";"+a.address),$("#id_delivery_type").val(modes[2]),$("#collapseOne input").removeAttr("required").val(""),$("#id_delivery_name").val(""),$("#id_address").val(""),$("#id_postal_code").val(""),$("#id_city").val(""),$("#id_note").val(""),$("#id_firstname").val(""),$("#id_lastname").val(""),$("#delivery_full_name").val(""),$("#d_address").val(""),$("#d_zip").val(""),$("#d_city").val(""),$("#d_note").val(""),$("#first_name").val(""),$("#last_name").val(""),$("#delivery_safe").val(""),$("#envelope_full_name").val(""),$("#envelope_address").val(""),$("#envelope_zip").val(""),$("#envelope_city").val(""),$("#envelope_note").val(""),$("#id_csomagkuldo").val(""),removeEnvelopeRequired(),removeDeliveryRequired();var l=$("#fox_price").text(),t=$("#total_price").attr("data-price"),o=parseInt(l)+parseInt(t);$("#total_price").text(o+" Ft"),void 0!==a.name&&($("body").prepend('<div id="modal-wrapper"><div id="modal-body"><p>A következő automatát választottad: '+a.name+'</p><div class="modal-button-wrapper"><button class="modal-close" onClick="close_modal()">Bezár</button></div></div></div>'),$("body").prepend('<div id="foxpost-modal-backdrop" />'))}}function close_modal(){$("#modal-wrapper").remove(),$("#foxpost-modal-backdrop").remove()}$("document").ready(function(){if(localStorage.getItem("cart")){var e=JSON.parse(localStorage.getItem("cart"));$("#full_name").val(e.full_name),$("#first_name").val(e.first_name),$("#last_name").val(e.last_name),$("#email_address").val(e.email),$("#phone_number").val(e.phone),$("#billing_address").val(e.billing_address),$("#billing_postal_code").val(e.billing_postal_code),$("#billing_city").val(e.billing_city),$("#delivery_full_name").val(e.delivery_name),$("#d_address").val(e.address),$("#d_zip").val(e.postal_code),$("#envelope_full_name").val(e.delivery_name),$("#envelope_address").val(e.address),$("#envelope_zip").val(e.postal_code),$("#d_city").val(e.city),$("#d_note").val(e.note),$("#id_csomagkuldo").val(e.csomagkuldo),$("#envelope_city").val(e.city),$("#envelope_note").val(e.note),$("#id_fox_post").val(e.fox_post),$("#id_delivery_type").val(modes[e.delivery_type]),$("#product_note").val(e.product_note),"0"==e.delivery_type?($("#personal h5 button").attr("aria-expanded","true"),$("#personal h5 button").addClass("collapsed"),$("#collapseOne").addClass("show"),$("#first_name").attr("required","required"),$("#last_name").attr("required","required")):"1"==e.delivery_type?($("#csomagkuldo h5 button").attr("aria-expanded","true"),$("#csomagkuldo h5 button").addClass("collapsed"),$("#collapseFour").addClass("show"),$("#collapseOne").removeClass("show")):"2"==e.delivery_type?($("#foxt-post h5 button").attr("aria-expanded","true"),$("#foxt-post h5 button").addClass("collapsed"),$("#collapseTwo").addClass("show"),$("#collapseOne").removeClass("show")):"3"==e.delivery_type?($("#delivery h5 button").attr("aria-expanded","true"),$("#delivery h5 button").addClass("collapsed"),$("#collapseThree").addClass("show"),$("#collapseOne").removeClass("show")):"4"==e.delivery_type&&($("#envelope h5 button").attr("aria-expanded","true"),$("#envelope h5 button").addClass("collapsed"),$("#collapseFive").addClass("show"),$("#collapseOne").removeClass("show"))}else $("#id_delivery_type").val(modes[0]);if($("#collapseTwo").hasClass("show")){var a=$("#fox_price").text(),l=$("#total_price").attr("data-price"),t=parseInt(a)+parseInt(l);$("#total_price").text(t+" Ft")}else $("#collapseThree").hasClass("show")?(a=$("#delivery_price").text(),l=$("#total_price").attr("data-price"),t=parseInt(a)+parseInt(l),$("#total_price").text(t+" Ft")):$("#collapseFour").hasClass("show")?(inlineFullHU(),a=$("#csomagkuldo_price").text(),l=$("#total_price").attr("data-price"),t=parseInt(a)+parseInt(l),$("#total_price").text(t+" Ft")):$("#collapseFive").hasClass("show")&&(a=$("#envelope_price").text(),l=$("#total_price").attr("data-price"),t=parseInt(a)+parseInt(l),$("#total_price").text(t+" Ft"))}),$("#personal button").on("click",function(e){$("#collapseOne input").attr("required","true").val(""),$("#id_fox_post").val(""),$("#id_delivery_name").val(""),$("#id_address").val(""),$("#id_postal_code").val(""),$("#id_city").val(""),$("#id_note").val(""),$("#delivery_full_name").val(""),$("#d_address").val(""),$("#d_zip").val(""),$("#d_city").val(""),$("#d_note").val(""),$("#envelope_full_name").val(""),$("#envelope_address").val(""),$("#envelope_zip").val(""),$("#envelope_city").val(""),$("#envelope_note").val(""),$("#delivery_safe").val(""),$("#id_csomagkuldo").val(""),$("#id_delivery_type").val(modes[0]),removeDeliveryRequired(),removeEnvelopeRequired();var a=$("#total_price").attr("data-price");$("#total_price").text(a+" Ft")}),$("#delivery button").on("click",function(e){$("#collapseOne input").removeAttr("required").val(""),$("#collapseThree input:not(#d_note)").attr("required","true").val(""),$("#id_fox_post").val(""),$("#id_firstname").val(""),$("#id_lastname").val(""),$("#first_name").val(""),$("#last_name").val(""),$("#delivery_safe").val(""),$("#envelope_full_name").val(""),$("#envelope_address").val(""),$("#envelope_zip").val(""),$("#envelope_city").val(""),$("#envelope_note").val(""),removeEnvelopeRequired(),$("#id_csomagkuldo").val(""),$("#id_delivery_type").val(modes[3]);var a=$("#delivery_price").text(),l=$("#total_price").attr("data-price"),t=parseInt(a)+parseInt(l);$("#total_price").text(t+" Ft")}),$("#envelope button").on("click",function(e){$("#collapseOne input").removeAttr("required").val(""),$("#collapseFive input:not(#d_note):not(#envelope_note)").attr("required","true").val(""),$("#id_fox_post").val(""),$("#id_firstname").val(""),$("#id_lastname").val(""),$("#first_name").val(""),$("#last_name").val(""),$("#delivery_safe").val(""),$("#delivery_full_name").val(""),$("#d_address").val(""),$("#d_zip").val(""),$("#d_city").val(""),$("#d_note").val(""),removeDeliveryRequired(),$("#id_csomagkuldo").val(""),$("#id_delivery_type").val(modes[4]);var a=$("#envelope_price").text(),l=$("#total_price").attr("data-price"),t=parseInt(a)+parseInt(l);$("#total_price").text(t+" Ft")}),$("#delivery-form").one("submit",function(e){var a={},l=$("#full_name").val();$("#id_fullname").val(l),a.full_name=l,l=$("#email_address").val(),$("#id_email").val(l),a.email=l,l=$("#phone_number").val(),$("#id_phone").val(l),a.phone=l,l=$("#billing_address").val(),$("#id_billing_address").val(l),a.billing_address=l,l=$("#billing_postal_code").val(),$("#id_billing_postal_code").val(l),a.billing_postal_code=l,l=$("#billing_city").val(),$("#id_billing_city").val(l),a.billing_city=l,l=$("#product_note").val(),$("#id_product_note").val(l),a.product_note=l,void 0!==(l=$("#first_name").val())&&""!=l&&($("#id_firstname").val(l),a.first_name=l,a.delivery_type="0",a.csomagkuldo="",a.fox_post=""),void 0!==(l=$("#last_name").val())&&""!=l&&($("#id_lastname").val(l),a.last_name=l),void 0!==(l=$("#delivery_full_name").val())&&""!=l&&($("#id_delivery_name").val(l),a.delivery_name=l,a.delivery_type="3",a.csomagkuldo="",a.fox_post=""),void 0!==(l=$("#d_address").val())&&""!=l&&($("#id_address").val(l),a.address=l),void 0!==(l=$("#d_zip").val())&&""!=l&&($("#id_postal_code").val(l),a.postal_code=l),void 0!==(l=$("#d_city").val())&&""!=l&&($("#id_city").val(l),a.city=l),void 0!==(l=$("#d_note").val())&&""!=l&&($("#id_note").val(l),a.note=l),void 0!==(l=$("#d_zip").val())&&""!=l&&($("#id_postal_code").val(l),a.postal_code=l),void 0!==(l=$("#id_fox_post").val())&&""!=l&&(a.delivery_type="2",a.fox_post=$("#id_fox_post").val(),a.csomagkuldo=""),void 0!==(l=$("#id_csomagkuldo").val())&&""!=l&&(a.delivery_type="1",a.fox_post="",a.csomagkuldo=$("#id_csomagkuldo").val()),void 0!==(l=$("#envelope_full_name").val())&&""!=l&&($("#id_delivery_name").val(l),a.delivery_name=l,a.delivery_type="4",a.csomagkuldo="",a.fox_post=""),void 0!==(l=$("#envelope_address").val())&&""!=l&&($("#id_address").val(l),a.address=l),void 0!==(l=$("#envelope_zip").val())&&""!=l&&($("#id_postal_code").val(l),a.postal_code=l),void 0!==(l=$("#envelope_city").val())&&""!=l&&($("#id_city").val(l),a.city=l),void 0!==(l=$("#envelope_note").val())&&""!=l&&($("#id_note").val(l),a.note=l),a.timestamp=(new Date).getTime(),window.removeEventListener("message",receiveMessage,!1),localStorage.setItem("cart",JSON.stringify(a)),$(this).submit()}),window.addEventListener("message",receiveMessage,!1),$("document").ready(function(){$("#errorModal .modal-body .messages").length>0&&$("#error_button").click()});var packetaApiKey=$("meta[name=cs_a]").attr("content");function clear(){for(var e=document.querySelectorAll(".method-detail"),a=0;a<e.length;a++)e[a].innerText="",e[a].style.height="0";Packeta.Widget.close()}function inlineFullHU(){var e=document.getElementById("csomagkuldo-body");clear(),e.style.height="600px",Packeta.Widget.pick(packetaApiKey,showSelectedPickupPoint.bind(e),{country:"hu",language:"hu"},e)}function showSelectedPickupPoint(e){var a=document.getElementById("csomagkuldo-body");$("#collapseFour").removeClass("show"),a.style.height="0px";var l=e?e.name:"None";$("#id_csomagkuldo").val(l),$("#id_delivery_type").val(modes[1]),$("#collapseOne input").removeAttr("required").val(""),$("#id_fox_post").val(""),$("#id_delivery_name").val(""),$("#id_address").val(""),$("#id_postal_code").val(""),$("#id_city").val(""),$("#id_note").val(""),$("#id_firstname").val(""),$("#id_lastname").val(""),$("#delivery_full_name").val(""),$("#d_address").val(""),$("#d_zip").val(""),$("#d_city").val(""),$("#d_note").val(""),$("#envelope_full_name").val(""),$("#envelope_address").val(""),$("#envelope_zip").val(""),$("#envelope_city").val(""),$("#envelope_note").val(""),$("#first_name").val(""),$("#last_name").val(""),$("#delivery_safe").val(""),removeDeliveryRequired(),removeEnvelopeRequired();var t=$("#csomagkuldo_price").text(),o=$("#total_price").attr("data-price"),d=parseInt(t)+parseInt(o);$("#total_price").text(d+" Ft"),"None"!==l&&($("body").prepend('<div id="modal-wrapper"><div id="modal-body"><p>A következő automatát választottad: '+l+'</p><div class="modal-button-wrapper"><button class="modal-close" onClick="close_modal()">Bezár</button></div></div></div>'),$("body").prepend('<div id="foxpost-modal-backdrop" />'))}function removeDeliveryRequired(){$("#delivery_full_name").removeAttr("required"),$("#d_address").removeAttr("required"),$("#d_zip").removeAttr("required"),$("#d_city").removeAttr("required")}function removeEnvelopeRequired(){$("#envelope_full_name").removeAttr("required"),$("#envelope_address").removeAttr("required"),$("#envelope_zip").removeAttr("required"),$("#envelope_city").removeAttr("required")}
+var modes = { 0: "Személyes átvétel", 1: "Csomagkuldo", 2: "FoxPost", 3: "Házhozszállítás", 4: "Ajanlott" };
+var packetaApiKey = $("meta[name=cs_a]").attr("content");
+var foxpostID = '#id_fox_post'
+var csomagkuldoID = '#id_csomagkuldo'
+var delivery_type = 0
+
+$("document").ready(function () {
+    // coupon - gift card button collapses
+    $('#collapseCoupon').on('show.bs.collapse', function () {
+      if (!$('button[aria-controls="collapseGift"]').hasClass("collapsed")) {
+            $("#collapseGift").collapse('hide');
+        }
+    }),
+    $('#collapseGift').on('show.bs.collapse', function () {
+      if (!$('button[aria-controls="collapseCoupon"]').hasClass("collapsed")) {
+            $("#collapseCoupon").collapse('hide');
+        }
+    }),
+    $("#errorModal .modal-body .messages").length > 0 && $("#error_button").click();
+    if (localStorage.getItem("cart")) {
+        fill_info_from_local_storage()
+    } else set_delivery_type(0);
+    if ($("#collapseTwo").hasClass("show")) {
+        set_total_price(get_fox_post_price() + get_total_price());
+    } else
+        l = get_total_price();
+        if ($("#collapseThree").hasClass("show")) {
+            set_total_price(get_delivery_price() + l);
+        }
+        if ($("#collapseFour").hasClass("show")) {
+            inlineFullHU();
+            set_total_price(get_csomagkuldo_price() + l);
+        }
+        if ($("#collapseFive").hasClass("show")) {
+            set_total_price(get_envelope_price() + l);
+        }
+})
+$("#personal button").on("click", function (e) {
+    $("#collapseOne input").attr("required", "true").val(""),
+    resetFoxPost(),
+    removeDeliveryRequired(),
+    resetCsomagkuldo(),
+    set_delivery_type(0),
+    removeDeliveryRequired(),
+    resetDeliverySafe(),
+    set_total_price(get_total_price());
+})
+$("#delivery button").on("click", function (e) {
+    $("#collapseThree input:not(#d_note)").attr("required", "true").val(""),
+    resetFoxPost(),
+    resetPersonal(),
+    resetCsomagkuldo(),
+    set_delivery_type(3);
+    set_total_price(get_delivery_price() + get_total_price());
+    resetDeliverySafe()
+})
+$("#envelope button").on("click", function (e) {
+    $("#collapseFive input:not(#d_note)").attr("required", "true").val(""),
+    resetFoxPost(),
+    resetPersonal(),
+    removeDeliveryRequired(),
+    removeDeliveryRequired(),
+    resetCsomagkuldo(),
+    set_delivery_type(4);
+    set_total_price(get_envelope_price() + get_total_price());
+    resetDeliverySafe()
+})
+$("#delivery-form").one("submit", function (e) {
+    var a = {};
+    a.full_name = $("#full_name").val(),
+    a.email = $("#email_address").val(),
+    a.phone = $("#phone_number").val(),
+    a.billing_address = $("#billing_address").val(),
+    a.billing_postal_code = $("#billing_postal_code").val(),
+    a.billing_city = $("#billing_city").val(),
+    a.product_note = $("#product_note").val(),
+    a.delivery_type = delivery_type,
+    a.timestamp = new Date().getTime();
+    if ($("#first_name").val() != '') {
+        a.csomagkuldo = "", a.fox_post = "", a.delivery_name = "", a.address = "", a.postal_code = "", a.city = "", a.note = "", a.first_name = $("#first_name").val(), a.last_name = $("#last_name").val()
+    } else if ($("#collapseFive #delivery_full_name").val() != '') {
+        a.csomagkuldo = "";
+        a.fox_post = "";
+        a.first_name = "";
+        a.last_name = "";
+        address = $("#collapseFive #d_address").val(), postal_code = $("#collapseFive #d_zip").val(), city = $("#collapseFive #d_city").val(),
+        delivery_name = $("#collapseFive #delivery_full_name").val(), note = $("#collapseFive #d_note").val(),
+        a.delivery_name = delivery_name, a.address = address, a.postal_code = postal_code, a.city = city, a.note = note,
+        $('input[name="address"]').val(address), $('input[name="delivery_name"]').val(delivery_name),
+        $('input[name="postal_code"]').val(postal_code), $('input[name="city"]').val(city), $('input[name="note"]').val(note)
+    } else if ($("#collapseThree #delivery_full_name").val() != '') {
+        a.csomagkuldo = "";
+        a.fox_post = "";
+        a.first_name = "";
+        a.last_name = "";
+        address = $("#collapseThree #d_address").val(), postal_code = $("#collapseThree #d_zip").val(), city = $("#collapseThree #d_city").val(),
+        delivery_name = $("#collapseThree #delivery_full_name").val(), note = $("#collapseThree #d_note").val(),
+        a.delivery_name = delivery_name, a.address = address, a.postal_code = postal_code, a.city = city, a.note = note,
+        $('input[name="address"]').val(address), $('input[name="delivery_name"]').val(delivery_name),
+        $('input[name="postal_code"]').val(postal_code), $('input[name="city"]').val(city), $('input[name="note"]').val(note)
+    } else if ($(foxpostID).val() != '') {
+        a.csomagkuldo = "", a.fox_post = $(foxpostID).val(), a.delivery_name = "", a.address = "", a.postal_code = "", a.city = "", a.note = "", a.first_name = "", a.last_name = ""
+    } else if ($(csomagkuldoID).val() != '') {
+        a.csomagkuldo = $(csomagkuldoID).val(), a.fox_post = "", a.delivery_name = "", a.address = "", a.postal_code = "", a.city = "", a.note = "", a.first_name = "", a.last_name = ""
+    }
+    window.removeEventListener("message", receiveMessage, !1),
+    localStorage.setItem("cart", JSON.stringify(a)),
+    set_delivery_type(delivery_type)
+    $(this).submit();
+})
+window.addEventListener("message", receiveMessage, !1);
+function showSelectedPickupPoint(e) {
+    var a = document.getElementById("csomagkuldo-body");
+    $("#collapseFour").removeClass("show"), (a.style.height = "0px");
+    var l = e ? e.name : "None";
+    if (localStorage.getItem("cart")) {
+        var cart = JSON.parse(localStorage.getItem("cart"));
+        cart.csomagkuldo = l
+        localStorage.setItem("cart", JSON.stringify(cart))
+    }
+    $(csomagkuldoID).val(l),
+    set_delivery_type(1),
+    resetPersonal(),
+    resetFoxPost(),
+    removeDeliveryRequired(),
+    resetPersonal(),
+    resetDeliverySafe(),
+    removeDeliveryRequired(),
+    set_total_price(get_csomagkuldo_price() + get_total_price());
+    "None" !== l &&
+        ($("body").prepend(
+            '<div id="modal-wrapper"><div id="modal-body"><p>A következő automatát választottad: ' + l + '</p><div class="modal-button-wrapper"><button class="modal-close" onClick="close_modal()">Bezár</button></div></div></div>'
+        ),
+        $("body").prepend('<div id="foxpost-modal-backdrop" />'));
+}
+function removeDeliveryRequired() {
+    $("#delivery_full_name").removeAttr("required").val(""), $("#d_address").removeAttr("required").val(""), $("#d_zip").removeAttr("required").val(""), $("#d_city").removeAttr("required").val("");
+}
+
+function resetCsomagkuldo() {
+    $(csomagkuldoID).val("");
+}
+
+function resetFoxPost() {
+    $(foxpostID).val("");
+}
+
+function resetPersonal() {
+    $("#collapseOne input").removeAttr("required").val("");
+}
+
+function set_delivery_type(type) {
+    $("#id_delivery_type").val(type);
+    delivery_type = type;
+}
+
+function resetDeliverySafe() {
+    $("#delivery_safe").val("");
+}
+
+function set_total_price(price) {
+    $("#total_price").text(price + " Ft");
+}
+
+function get_total_price() {
+    return parseInt($("#total_price").attr("data-price"));
+}
+
+function clear() {
+    for (var e = document.querySelectorAll(".method-detail"), a = 0; a < e.length; a++) (e[a].innerText = ""), (e[a].style.height = "0");
+    Packeta.Widget.close();
+}
+
+function inlineFullHU() {
+    var e = document.getElementById("csomagkuldo-body");
+    clear(), (e.style.height = "600px"), Packeta.Widget.pick(packetaApiKey, showSelectedPickupPoint.bind(e), { country: "hu", language: "hu" }, e);
+}
+
+function receiveMessage(e) {
+    if ("https://cdn.foxpost.hu" == e.origin) {
+        var a = JSON.parse(e.data);
+        $(foxpostID).val(a.name + ";" + a.address),
+        set_delivery_type(2),
+        resetPersonal(),
+        resetDeliverySafe(),
+        resetCsomagkuldo(),
+        removeDeliveryRequired();
+        set_total_price(get_fox_post_price() + get_total_price()),
+            void 0 !== a.name &&
+                ($("body").prepend(
+                    '<div id="modal-wrapper"><div id="modal-body"><p>A következő automatát választottad: ' +
+                        a.name +
+                        '</p><div class="modal-button-wrapper"><button class="modal-close" onClick="close_modal()">Bezár</button></div></div></div>'
+                ),
+                $("body").prepend('<div id="foxpost-modal-backdrop" />'));
+    } else {
+        resetPersonal(), removeDeliveryRequired(), resetFoxPost();
+    }
+}
+
+function close_modal() {
+    $("#modal-wrapper").remove(), $("#foxpost-modal-backdrop").remove();
+}
+
+function show_collapse(collapse) {
+    $(collapse).addClass("show");
+}
+
+function hide_collapse(collapse) {
+    $(collapse).removeClass("show");
+}
+
+function get_fox_post_price() {
+    return parseInt($("#fox_price").text());
+}
+
+function get_envelope_price() {
+    return parseInt($("#envelope_price").text());
+}
+
+function get_csomagkuldo_price() {
+    return parseInt($("#csomagkuldo_price").text());
+}
+
+function get_delivery_price() {
+    return parseInt($("#delivery_price").text());
+}
+
+function fill_info_from_local_storage() {
+    var e = JSON.parse(localStorage.getItem("cart"));
+    $("#full_name").val(e.full_name),
+    $("#email_address").val(e.email),
+    $("#phone_number").val(e.phone),
+    $("#billing_address").val(e.billing_address),
+    $("#billing_postal_code").val(e.billing_postal_code),
+    $("#billing_city").val(e.billing_city),
+    $("#product_note").val(e.product_note),
+    set_delivery_type(e.delivery_type),
+    removeDeliveryRequired(),
+    "0" == e.delivery_type
+        ? ($("#personal h5 button").attr("aria-expanded", "true").addClass("collapsed"),
+          $("#collapseOne").addClass("show"),
+          $("#first_name").val(e.first_name).attr("required", "required"),
+          $("#last_name").val(e.last_name).attr("required", "required"))
+        : "1" == e.delivery_type
+        ? ($("#csomagkuldo h5 button").attr("aria-expanded", "true").addClass("collapsed"), show_collapse("#collapseFour"), hide_collapse("#collapseOne"), resetPersonal(), resetFoxPost(), removeDeliveryRequired(),
+        $("#id_csomagkuldo").val(e.csomagkuldo))
+        : "2" == e.delivery_type
+        ? ($("#foxt-post h5 button").attr("aria-expanded", "true").addClass("collapsed"), show_collapse("#collapseTwo"), hide_collapse("#collapseOne"), resetPersonal(), resetCsomagkuldo(), removeDeliveryRequired(),
+        $("#id_fox_post").val(e.fox_post))
+        : "3" == e.delivery_type
+        ? ($("#delivery h5 button").attr("aria-expanded", "true").addClass("collapsed"), show_collapse("#collapseThree"), hide_collapse("#collapseOne"), resetPersonal(), resetFoxPost(), resetCsomagkuldo(),
+        $("#collapseThree #delivery_full_name").val(e.delivery_name), $("#collapseThree #d_address").val(e.address),
+        $("#collapseThree #d_zip").val(e.postal_code), $("#collapseThree #d_city").val(e.city), $("#collapseThree #d_note").val(e.note))
+        : "4" == e.delivery_type && ($("#envelope h5 button").attr("aria-expanded", "true").addClass("collapsed"), show_collapse("#collapseFive"), hide_collapse("#collapseOne"), resetPersonal(), resetFoxPost(), resetCsomagkuldo(),
+        $("#collapseFive #delivery_full_name").val(e.delivery_name), $("#collapseFive #d_address").val(e.address),
+        $("#collapseFive #d_zip").val(e.postal_code), $("#collapseFive #d_city").val(e.city), $("#collapseFive #d_note").val(e.note));
+    }

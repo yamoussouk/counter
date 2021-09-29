@@ -212,6 +212,11 @@ class GiftCard(models.Model):
     updated = models.DateTimeField(auto_now=True)
     price_api_id = models.CharField(max_length=50, blank=True, default='')
 
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super(GiftCard, self).save(*args, **kwargs)
+        convert()
+
     class Meta:
         verbose_name = 'Ajándékkártya'
         verbose_name_plural = 'Ajándékkártyák'
