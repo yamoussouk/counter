@@ -108,7 +108,7 @@ admin.site.register(GiftCard, GiftCardAdmin)
 
 
 class MessageAdmin(admin.ModelAdmin):
-    list_display = ['sender', 'subject', 'email', 'message', 'created', 'sent']
+    list_display = ['sender', 'name', 'subject', 'email', 'message', 'created', 'sent']
 
 
 admin.site.register(Message, MessageAdmin)

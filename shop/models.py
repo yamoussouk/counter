@@ -227,6 +227,7 @@ class Message(models.Model):
     sender = models.CharField(max_length=200, default='')
     created = models.DateTimeField(auto_now_add=True)
     sent = models.BooleanField(default=False)
+    name = models.TextField(max_length=2000, default='')
 
     class Meta:
         verbose_name = 'Üzenet'
