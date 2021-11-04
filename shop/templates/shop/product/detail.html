@@ -36,7 +36,7 @@
                                         <picture>
                                           <source data-name="{{ type.color }}" srcset="{{ type.image.url|wp }}" type="image/webp">
                                           <img src="{{ type.image.url }}" alt="{{ product.name }}"
-                                               title="{{ product.name }} thumbnail photo" data-name="{{ type.color }}"/>
+                                               title="{{ product.name }} thumbnail photo" data-name="{{ type.color }}"  width="625" height="625" style="aspect-ratio: 1;"/>
                                         </picture>
                                     </div>
                                     {% endif %}
