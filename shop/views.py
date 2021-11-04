@@ -106,6 +106,8 @@ def __get_product_details(request, id: str, slug: str, custom: bool, studio: boo
     view = 'shop:studio_products_view' if studio else ('shop:custom_products_view' if custom else 'shop:products_view')
     template = 'shop/product/custom_detail.html' if custom else 'shop/product/detail.html'
     param = Parameter.objects.filter(name="shipping_information")
+    nemes_acel = Parameter.objects.filter(name="nemesacel_beszuro")[0].value
+    muanyag = Parameter.objects.filter(name="muanyag_beszuro")[0].value
     shipping_information = param[0].value if len(param) and param[0].active else None
     return render(request, template,
                   {'product': product,
@@ -120,7 +122,9 @@ def __get_product_details(request, id: str, slug: str, custom: bool, studio: boo
                    'images': imgs,
                    'view': view,
                    'slug': collection_slug,
-                   'shipping_information': shipping_information
+                   'shipping_information': shipping_information,
+                   'nemes_acel': nemes_acel,
+                   'muanyag': muanyag
                    })
 
 

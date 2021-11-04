@@ -1,4 +1,4 @@
-{% include "shop/base.html" with notification=notification index=True %}
+{% include "shop/base.html" with notification=notification index=True notfound=False %}
 {% load static %}
 
 {% block content %}
@@ -9,12 +9,12 @@
                 <picture id="desktop-image">
                   <source srcset="{% static 'images/home.webp' %}" type="image/webp">
                   <source srcset="{% static 'images/home_mobile.webp' %}" type="image/webp">
-                  <img src="{% static 'images/home.png' %}" alt="Minervastudio home image" title="Minervastudio home image photo">
+                  <img src="{% static 'images/home.png' %}" alt="Minervastudio home image" title="Minervastudio home image photo" width="1903" height="710" style="aspect-ratio:1903/710;">
                 </picture>
                 <picture id="mobile-image">
                   <source srcset="{% static 'images/home_mobile.webp' %}" type="image/webp">
                   <source srcset="{% static 'images/home_mobile.png' %}" type="image/png">
-                  <img src="{% static 'images/home_mobile.png' %}" alt="Minervastudio home image" title="Minervastudio home image photo">
+                  <img src="{% static 'images/home_mobile.png' %}" alt="Minervastudio home image" title="Minervastudio home image photo" width="1024" height="1095" style="aspect-ratio:1024/1095;">
                 </picture>
             </div>
         </div>
@@ -44,17 +44,17 @@
                 <h2>ALAP KOLLEKCIÓ</h2>
             </div>
         </div>
-        <div class="row">
+        <div class="row" id="carousel-row">
             <div class="owl-carousel owl-theme">
                 {% for product in basic_products %}
                     {% if product.image %}
                     <a href="{% url 'shop:product_detail' id=product.collection.slug slug=product.slug %}" title="{{ product.name }}">
                         <picture>
                           <source srcset="{{ product.image.url|wp }}" type="image/webp">
-                          <source srcset="{{ product.image.url }}" type="image/png">
+                          <source srcset="{{ product.image.url }}" type="image/jpg">
                           <img class="img-fluid" src="{{ product.image.url }}"
                                alt="{{ product.name }}"
-                               title="{{ product.name }} photo" />
+                               title="{{ product.name }} photo" width="394" height="394" style="aspect-ratio:394/394;"/>
                         </picture>
                     </a>
                     {% endif %}
@@ -83,9 +83,9 @@
                             <div class="text-on-image-image-wrapper">
                                 <picture>
                                   <source srcset="{{ collection.image.url|wp }}" type="image/webp">
-                                  <source srcset="{{ collection.image.url }}" type="image/png">
+                                  <source srcset="{{ collection.image.url }}" type="image/jpg">
                                   <img src="{{ collection.image.url }}" alt="{{ collection.name }}"
-                                       title="{{ collection.name }} photo" />
+                                       title="{{ collection.name }} photo" width="612" height="612" style="aspect-ratio: 1;"/>
                                 </picture>
                             </div>
                             <div class="text-on-image-wrapper">
@@ -117,7 +117,7 @@
                                   <source srcset="{{ collection.image.url|wp }}" type="image/webp">
                                   <source srcset="{{ collection.image.url }}" type="image/png">
                                   <img src="{{ collection.image.url }}" alt="{{ collection.name }}"
-                                       title="{{ collection.name }} photo" />
+                                       title="{{ collection.name }} photo" width="612" height="612" style="aspect-ratio: 1;" />
                                 </picture>
                             </div>
                             <div class="text-on-image-wrapper">
@@ -138,7 +138,7 @@
             <div class="fluid-image-wrapper">
                 <picture>
                   <source srcset="{% static 'images/home2.webp' %}" type="image/webp">
-                  <img src="{% static 'images/home2.png' %}" alt="Minerva Studio home" title="Minerva Studio home image" />
+                  <img src="{% static 'images/home2.png' %}" alt="Minerva Studio home" title="Minerva Studio home image"  width="1903" height="535" style="aspect-ratio:1903/535;"/>
                 </picture>
             </div>
         </div>
@@ -158,7 +158,7 @@
                 <div class="home-image-wrapper">
                     <picture>
                       <source srcset="{% static 'images/home3.webp' %}" type="image/webp">
-                      <img src="{% static 'images/home3.png' %}" alt="Környezetbarát csomagolás" title="Környezetbarát csomagolás">
+                      <img src="{% static 'images/home3.png' %}" alt="Környezetbarát csomagolás" title="Környezetbarát csomagolás"  width="500" height="500" style="aspect-ratio:500/500;">
                     </picture>
                 </div>
                 <div class="home-text-wrapper">

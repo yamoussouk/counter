@@ -6,11 +6,11 @@
             {% if page_obj.has_previous %}
             <a class="pagination-action" href="?page={{ page_obj.previous_page_number }}">
                 <img class="previous-page" src="{% static 'images/arrow_left_150.png' %}"
-                     alt="előző oldal" title="előző oldal" />
+                     alt="előző oldal" title="előző oldal" width="50" height="33" style="aspect-ratio: 50/33;"/>
             </a>
             {% else %}
             <img class="previous-page" src="{% static 'images/arrow_left_150.png' %}"
-                     alt="előző oldal" title="előző oldal" />
+                     alt="előző oldal" title="előző oldal"  width="50" height="33" style="aspect-ratio: 50/33;"/>
             {% endif %}
             {% for num in page_obj.paginator.page_range %}
                 {% if page_obj.number == num %}
@@ -22,11 +22,11 @@
             {% if page_obj.has_next %}
                 <a class="pagination-action" href="?page={{ page_obj.next_page_number }}">
                     <img class="next-page" src="{% static 'images/arrow_right_150.png' %}"
-                         alt="következő oldal" title="következő oldal" />
+                         alt="következő oldal" title="következő oldal"  width="50" height="33" style="aspect-ratio: 50/33;"/>
                 </a>
             {% else %}
                 <img class="next-page" src="{% static 'images/arrow_right_150.png' %}"
-                             alt="következő oldal" title="következő oldal" />
+                             alt="következő oldal" title="következő oldal"  width="50" height="33" style="aspect-ratio: 50/33;"/>
             {% endif %}
         </div>
     </div>

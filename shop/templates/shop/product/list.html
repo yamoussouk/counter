@@ -1,4 +1,4 @@
-{% include "shop/base.html" with notification=notification product_list=True %}
+{% include "shop/base.html" with notification=notification product_list=True notfound=False %}
 {% load static %}
 
 {% block content %}
@@ -21,14 +21,14 @@
                                   <source class="product-element-image" srcset="{{ product.image.url|wp }}" type="image/webp">
                                   <source class="product-element-image" srcset="{{ product.image.url }}" type="image/png">
                                   <img src="{{ product.image.url }}" alt="{{ product.name }}" title="{{ product.name }} photo"
-                                     class="product-element-image"/>
+                                     class="product-element-image" width="625" height="625" style="aspect-ratio: 1;"/>
                                 </picture>
                                 {% endif %}
                                 <picture>
                                   <source class="sold-out-icon" srcset="{% static 'images/sold_out_150.webp' %}" type="image/webp">
                                   <source class="sold-out-icon" srcset="{% static 'images/sold_out_150.png' %}" type="image/png">
                                   <img src="{% static 'images/sold_out_150.png' %}" alt="Elfogyott" title="Elfogyott"
-                                     class="sold-out-icon"/>
+                                     class="sold-out-icon" width="204" height="206" style="aspect-ratio: 204/206;"/>
                                 </picture>
 
                             </a>
