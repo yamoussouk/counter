@@ -1,4 +1,4 @@
-{% include "shop/base.html" with notification=notification product_details=True %}
+{% include "shop/base.html" with notification=notification product_details=True notfound=False %}
 {% load static %}
 
 {% block content %}
@@ -18,7 +18,7 @@
                             <picture>
                               <source class="product_image" srcset="{{ product.image.url|wp }}" type="image/webp">
                               <img src="{{ product.image.url }}" alt="{{ product.name }}"
-                                   title="{{ product.name }} photo" class="product_image"/>
+                                   title="{{ product.name }} photo" class="product_image" width="625" height="625" style="aspect-ratio: 1;"/>
                             </picture>
                         </div>
                         <div class="product-thumbnails-wrapper">
@@ -26,7 +26,7 @@
                                 <picture>
                                   <source class="product_image" srcset="{{ product.image.url|wp }}" type="image/webp">
                                   <img src="{{ product.image.url }}" alt="{{ product.name }}"
-                                       title="{{ product.name }} thumbnail photo" class="product_image"/>
+                                       title="{{ product.name }} thumbnail photo" class="product_image" width="625" height="625" style="aspect-ratio: 1;"/>
                                 </picture>
                             </div>
                             {% if types %}
@@ -47,7 +47,7 @@
                                         <picture>
                                           <source data-name="{{ type.color }}" srcset="{{ img.image.url|wp }}" type="image/webp">
                                           <img src="{{ img.image.url }}" alt="{{ product.name }}"
-                                               title="{{ product.name }} thumbnail photo" />
+                                               title="{{ product.name }} thumbnail photo" width="625" height="625" style="aspect-ratio: 1;" />
                                         </picture>
                                     </div>
                                 {% endfor %}
@@ -108,8 +108,13 @@
                                 <label class="studs-container"><span class="label-text">{{ product|get_stud:stud }}</span>
                                 <input type="radio" {% if forloop.counter == 1 %}checked="checked"{% endif %}
                                        name="stud" value="{{ product|get_stud:stud }}" >
+                                    <picture>
+                                      <source srcset="{% static 'images/info_icon.webp' %}" type="image/webp">
+                                      <img src="{% static 'images/info_icon.jpg' %}" title="{% if forloop.counter == 1 %}{{ nemes_acel }}{% else %}{{ muanyag }}{% endif %}" alt="info icon" width="15" height="15" style="aspect-ratio:15/15;"/>
+                                    </picture>
                                     <span class="checkmark"></span>
                                 </label>
+
                                 {% endfor %}
                             </div>
                             {% endif %}
@@ -129,12 +134,12 @@
                 <div class="back-to-link">
                     {% if collection_slug.strip %}
                     <a href="{% url 'shop:products_view' collection_slug %}" title="Vissza a kollekcióhoz" alt="Vissza a kollekcióhoz">
-                        <img src="{% static 'images/arrow_left_150.png' %}" alt="Vissza a kollekcióhoz" title="Vissza a kollekcióhoz" />
+                        <img src="{% static 'images/arrow_left_150.png' %}" alt="Vissza a kollekcióhoz" title="Vissza a kollekcióhoz" width="50" height="33" style="aspect-ratio: 50/33;"/>
                         <span>VISSZA A KOLLEKCIÓHOZ</span>
                     </a>
                     {% else %}
                     <a href="{% url 'shop:studio_products_view' %}" title="Vissza a termékekhez" alt="Vissza a termékekhez">
-                        <img src="{% static 'images/arrow_left_150.png' %}" alt="Vissza a termékekhez" title="Vissza a termékekhez" />
+                        <img src="{% static 'images/arrow_left_150.png' %}" alt="Vissza a termékekhez" title="Vissza a termékekhez" width="50" height="33" style="aspect-ratio: 50/33;" />
                         <span>VISSZA A TERMÉKEKHEZ</span>
                     </a>
                     {% endif %}

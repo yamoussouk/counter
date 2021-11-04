@@ -2,8 +2,38 @@ from django.contrib import admin
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.utils.text import slugify
+from django.conf import settings
+import os
+import re
 
 from .models import Collection, Product, Image, Notification, ProductType, GiftCard, Message
+
+
+def delete_image_path(request, obj):
+    # in case of clear, remove the file as well
+    if "image-clear" in request.POST and request.POST.get("image-clear") == "on":
+        pr = Product.objects.get(id=obj.id)
+        file_name = pr.image.name.split('.')[0]
+        base = settings.BASE_DIR
+        media_path = os.path.join(base, 'media')
+        for filename in os.listdir(media_path):
+            if file_name in filename:
+                os.remove(os.path.join(media_path, filename))
+    keys = request.POST.keys()
+    key = [k for k in keys if "image-clear" in k and 'product_types' in k]
+    if len(key):
+        indices = [re.findall(r"\d", k)[0] for k in key]
+        product_type_id = request.POST['product_types-' + indices[0] + '-id']
+        pr = Product.objects.prefetch_related('product_types').filter(id=obj.id)[0]
+        types = pr.product_types.all()
+        for product_type in types:
+            if product_type.id == int(product_type_id):
+                file_name = product_type.image.name.split('.')[0]
+                base = settings.BASE_DIR
+                media_path = os.path.join(base, 'media')
+                for filename in os.listdir(media_path):
+                    if file_name in filename:
+                        os.remove(os.path.join(media_path, filename))
 
 
 class CollectionAdmin(admin.ModelAdmin):
@@ -14,6 +44,7 @@ class CollectionAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         if change:
+            delete_image_path(request, obj)
             super().save_model(request, obj, form, change)
         else:
             slug = slugify(obj.name)
@@ -62,6 +93,7 @@ class ProductAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         if change:
+            delete_image_path(request, obj)
             super().save_model(request, obj, form, change)
         else:
             slug = slugify(obj.name)
