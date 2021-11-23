@@ -108,6 +108,7 @@ def __get_product_details(request, id: str, slug: str, custom: bool, studio: boo
     param = Parameter.objects.filter(name="shipping_information")
     nemes_acel = Parameter.objects.filter(name="nemesacel_beszuro")[0].value
     muanyag = Parameter.objects.filter(name="muanyag_beszuro")[0].value
+    nikkel_mentes = Parameter.objects.filter(name="nikkel_mentes")[0].value
     shipping_information = param[0].value if len(param) and param[0].active else None
     return render(request, template,
                   {'product': product,
@@ -124,7 +125,8 @@ def __get_product_details(request, id: str, slug: str, custom: bool, studio: boo
                    'slug': collection_slug,
                    'shipping_information': shipping_information,
                    'nemes_acel': nemes_acel,
-                   'muanyag': muanyag
+                   'muanyag': muanyag,
+                   'nikkel_mentes': nikkel_mentes
                    })
 
 
