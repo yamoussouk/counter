@@ -113,7 +113,15 @@
                                     </label>
                                     <picture class="stud-info">
                                       <source srcset="{% static 'images/info_icon.webp' %}" type="image/webp">
-                                      <img src="{% static 'images/info_icon.jpg' %}" title="{% if forloop.counter == 1 %}{{ nemes_acel }}{% else %}{{ muanyag }}{% endif %}" alt="info icon" width="15" height="15" style="aspect-ratio:15/15;"/>
+                                      <img src="{% static 'images/info_icon.jpg' %}"
+                                           title="
+                                           {% if stud == '1' %}
+                                             {{ nemes_acel }}
+                                           {% elif stud == '2' %}
+                                             {{ nikkel_mentes }}
+                                           {% else %}
+                                             {{ muanyag }}
+                                           {% endif %}" alt="info icon" width="15" height="15" style="aspect-ratio:15/15;"/>
                                     </picture>
                                     <div class="clearfix"></div>
                                 </div>
