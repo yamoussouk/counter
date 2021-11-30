@@ -114,9 +114,10 @@
             <label for="billing_city">Település*</label>
             <input type="text" class="form-control" id="billing_city" name="billing_city" required>
           </div>
-          <div class="form-group">
+          <div class="form-group t-area">
             <label for="product_note">Megjegyzés</label>
-            <input type="text" class="form-control" id="product_note" name="product_note" maxlength="100">
+              <textarea class="form-control" id="product_note" name="product_note" maxlength="200"></textarea>
+              <span id='remainingC'>200/200</span>
           </div>
           <div class="clearfix"></div>
       </div>
@@ -208,9 +209,10 @@
                 <input type="text" class="form-control" id="envelope_city" name="envelope_city">
               </div>
               <div class="clearfix"></div>
-              <div class="form-group">
+                <div class="form-group t-area">
                 <label for="envelope_note">Egyéb Információk</label>
-                <input type="text" class="form-control" id="envelope_note" name="envelope_note">
+                <textarea class="form-control" id="envelope_note" name="envelope_note" maxlength="200"></textarea>
+                <span id='remainingEC'>200/200</span>
               </div>
             </div>
           </div>
@@ -264,9 +266,10 @@
                 <input type="text" class="form-control" id="d_city" name="d_city">
               </div>
               <div class="clearfix"></div>
-              <div class="form-group">
+              <div class="form-group t-area">
                 <label for="d_note">Egyéb Információk</label>
-                <input type="text" class="form-control" id="d_note" name="d_note">
+                <textarea class="form-control" id="d_note" name="d_note" maxlength="200"></textarea>
+                <span id='remainingDC'>200/200</span>
               </div>
             </div>
           </div>
