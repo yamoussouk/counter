@@ -11,6 +11,7 @@ from parameters.models import Parameter
 from shop.models import ProductType
 from .forms import OrderCreateForm
 from .models import Order, OrderItem
+from logs.models import LogFile
 
 prices = dict(FoxPost=int(Parameter.objects.filter(name="foxpost_price")[0].value),
               Csomagkuldo=int(Parameter.objects.filter(name="csomagkuldo_price")[0].value),
@@ -47,6 +48,15 @@ def __validate_stock(cart, product, cd):
             return True, 0, 0
     else:
         return True, 0, 0
+
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
 
 
 def order_create(request):
@@ -171,6 +181,10 @@ def order_create(request):
                                     request.session['cart'][key][key2][key3])
             request.session['order_id'] = order.id
             request.session['delivery_type'] = order.delivery_type
+            LogFile.objects.create(
+                type='INFO', message=f'Process initiated, '
+                                     f'items: {", ".join([str(i.id) for i in order_items])}, '
+                                     f'user: {get_client_ip(request)}')
             return redirect(reverse('payment:process'))
     else:
         form = OrderCreateForm()

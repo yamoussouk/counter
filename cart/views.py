@@ -9,6 +9,7 @@ from coupon.forms import CouponApplyForm
 from parameters.models import Parameter
 # from giftcardpayment.forms import GiftCardApplyForm
 from shop.models import Product, GiftCard, ProductType, Notification
+from logs.models import LogFile
 from .cart import Cart
 from .forms import CartAddProductForm, CartAddCustomProductForm, CartAddGiftCardProductForm, CartDeliveryInfoForm
 
@@ -46,8 +47,18 @@ def __validate_stock(cart, product, cd):
         return True, 0, 0
 
 
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
+
 @require_http_methods(['POST'])
 def cart_add(request, product_id):
+    ip_address = get_client_ip(request)
     cart = Cart(request)
     product = get_object_or_404(Product, id=product_id)
     redirect_url = 'shop:studio_product_detail' if product.collection.studio_collection \
@@ -68,8 +79,14 @@ def cart_add(request, product_id):
                      first_initial=cd['first_initial'] if 'first_initial' in cd else '',
                      second_initial=cd['second_initial'] if 'second_initial' in cd else '',
                      custom_date=cd['custom_date'] if 'custom_date' in cd else '')
+            LogFile.objects.create(type='INFO',
+                                   message=f'Product with the id of {product_id} has been '
+                                           f'added to the cart, user: {ip_address}')
             return redirect(reverse(redirect_url, args=[product.collection.slug, product.slug]))
         else:
+            LogFile.objects.create(
+                type='INFO', message=f'Tried to add product with the id of {product_id} '
+                                     f'to the cart but it was out of stock, user: {ip_address}')
             messages.error(request, f'A hozzáadni kívánt, illetve a kosaradban található termék összes mennyisége'
                                     f' meghaladja az elérhető mennyiséget, amely {stock}. A kosaradban az aktuális termék '
                                     f'mennyisége {item_in_cart}.')
@@ -93,7 +110,11 @@ def cart_add_gift_card(request, card_id):
 def cart_remove(request, item_id):
     cart = Cart(request)
     log.info(f'Requesting to remove an item from the cart with the item id of "{item_id}".\nCart object: {cart}')
+    product_id = cart.cart[str(item_id)]["product_id"]
     cart = cart.remove(item_id)
+    LogFile.objects.create(type='INFO',
+                           message=f'Item with the id of {product_id} was '
+                                   f'removed from the cart, user: {get_client_ip(request)}')
     log.info(f'Cart object after item removal: {cart}')
     return redirect(reverse('cart:cart_detail'))
 
