@@ -53,9 +53,11 @@ def index(request):
     param = Parameter.objects.filter(name="shipping_information")
     shipping_information = param[0].value if len(param) and param[0].active else None
     ratio = 0.93 if is_mobile else 2.44
+    home_page_carousel_images = [f'images/home_page_carousel/homenew{i}-01.png' for i in range(1, 5)]
     context = dict(basic_collection=basic_collection, basic_products=basic_products,
                    regular_collections=regular_collections, temporary_collections=temporary_collections,
-                   notification=notification, ratio=ratio, shipping_information=shipping_information)
+                   notification=notification, ratio=ratio, shipping_information=shipping_information,
+                   home_page_carousel_images=home_page_carousel_images)
     return render(request, 'shop/index_hid.html', context)
 
 

@@ -1,21 +1,24 @@
 {% include "shop/base.html" with notification=notification index=True notfound=False %}
 {% load static %}
+{% get_static_prefix as STATIC_URL %}
 
 {% block content %}
 <div class="content">
     <section class="home-image">
         <div class="row">
-            <div class="fluid-image-wrapper">
-                <picture id="desktop-image">
-                  <source srcset="{% static 'images/home.webp' %}" type="image/webp">
-                  <source srcset="{% static 'images/home_mobile.webp' %}" type="image/webp">
-                  <img src="{% static 'images/home.png' %}" alt="Minervastudio home image" title="Minervastudio home image photo" width="1903" height="710" style="aspect-ratio:1903/710;">
-                </picture>
-                <picture id="mobile-image">
-                  <source srcset="{% static 'images/home_mobile.webp' %}" type="image/webp">
-                  <source srcset="{% static 'images/home_mobile.png' %}" type="image/png">
-                  <img src="{% static 'images/home_mobile.png' %}" alt="Minervastudio home image" title="Minervastudio home image photo" width="1024" height="1095" style="aspect-ratio:1024/1095;">
-                </picture>
+            <div class="home-page-carousel">
+                <div id="owl-home-carousel" class="owl-carousel owl-theme">
+                    {% for img in home_page_carousel_images %}
+                    <div class="carousel-image-wrapper">
+                        <picture>
+                          <source srcset="{% static img|wp %}" type="image/webp">
+                          <source srcset="{% static img %}" type="image/png">
+                          <img src="{% static img %}" alt="kezdőoldal slider kép {{ forloop.counter }}"
+                               title="kezdőoldal slider kép {{ forloop.counter }}"/>
+                        </picture>
+                    </div>
+                    {% endfor%}
+                </div>
             </div>
         </div>
     </section>
@@ -45,7 +48,7 @@
             </div>
         </div>
         <div class="row" id="carousel-row">
-            <div class="owl-carousel owl-theme">
+            <div id="owl-products-carousel" class="owl-carousel owl-theme">
                 {% for product in basic_products %}
                     {% if product.image %}
                     <a href="{% url 'shop:product_detail' id=product.collection.slug slug=product.slug %}" title="{{ product.name }}">
