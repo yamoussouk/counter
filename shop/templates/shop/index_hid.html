@@ -8,16 +8,38 @@
         <div class="row">
             <div class="home-page-carousel">
                 <div id="owl-home-carousel" class="owl-carousel owl-theme">
-                    {% for img in home_page_carousel_images %}
                     <div class="carousel-image-wrapper">
                         <picture>
-                          <source srcset="{% static img|wp %}" type="image/webp">
-                          <source srcset="{% static img %}" type="image/png">
-                          <img src="{% static img %}" alt="kezdőoldal slider kép {{ forloop.counter }}"
-                               title="kezdőoldal slider kép {{ forloop.counter }}"/>
+                          <source srcset="{% static 'images/home_page_carousel/homenew1-01.webp' %}" type="image/webp">
+                          <source srcset="{% static 'images/home_page_carousel/homenew1-01.png' %}" type="image/png">
+                          <img src="{% static 'images/home_page_carousel/homenew1-01.png' %}" alt="kezdőoldal slider kép 1"
+                               title="kezdőoldal slider kép 1"/>
                         </picture>
                     </div>
-                    {% endfor%}
+                    <div class="carousel-image-wrapper">
+                        <picture>
+                          <source srcset="{% static 'images/home_page_carousel/homenew1-02.webp' %}" type="image/webp">
+                          <source srcset="{% static 'images/home_page_carousel/homenew1-02.png' %}" type="image/png">
+                          <img src="{% static 'images/home_page_carousel/homenew1-02.png' %}" alt="kezdőoldal slider kép 2"
+                               title="kezdőoldal slider kép 2"/>
+                        </picture>
+                    </div>
+                    <div class="carousel-image-wrapper">
+                        <picture>
+                          <source srcset="{% static 'images/home_page_carousel/homenew1-03.webp' %}" type="image/webp">
+                          <source srcset="{% static 'images/home_page_carousel/homenew1-03.png' %}" type="image/png">
+                          <img src="{% static 'images/home_page_carousel/homenew1-03.png' %}" alt="kezdőoldal slider kép 3"
+                               title="kezdőoldal slider kép 3"/>
+                        </picture>
+                    </div>
+                    <div class="carousel-image-wrapper">
+                        <picture>
+                          <source srcset="{% static 'images/home_page_carousel/homenew1-04.webp' %}" type="image/webp">
+                          <source srcset="{% static 'images/home_page_carousel/homenew1-04.png' %}" type="image/png">
+                          <img src="{% static 'images/home_page_carousel/homenew1-04.png' %}" alt="kezdőoldal slider kép 4"
+                               title="kezdőoldal slider kép 4"/>
+                        </picture>
+                    </div>
                 </div>
             </div>
         </div>
