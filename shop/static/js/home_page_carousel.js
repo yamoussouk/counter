@@ -15,14 +15,14 @@ $(document).ready(function () {
         responsive: { 0: { items: 1 }, 600: { items: 2 }, 1025: { items: 4 } }
     });
     a.owlCarousel({
-        loop: !0,
+        loop: true,
         margin: 30,
-        lazyLoad: !0,
-        nav: !1,
-        dots: !0,
-        autoplay: !0,
+        lazyLoad: true,
+        nav: false,
+        dots: true,
+        autoplay: true,
         autoplayTimeout: 3e3,
-        autoplayHoverPause: !1,
+        autoplayHoverPause: true,
         animateOut: "fadeOut",
         responsive: { 0: { items: 1 }, 600: { items: 1 }, 1025: { items: 1 } } })
 });
