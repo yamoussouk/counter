@@ -96,6 +96,11 @@
 	</div>
 </section>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+{% if home %}
+    <script src="{% static 'js/owl.carousel.min.js' %}" defer></script>
+    <script src="{% static 'js/home_page_carousel.js' %}" defer></script>
+    <script src="{% static 'js/home.js' %}" defer></script>
+{% endif %}
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" defer integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
 <script>
 jQuery.event.special.touchstart = {
@@ -120,11 +125,6 @@ jQuery.event.special.touchmove = {
 {% endif %}
 {% if contact %}
     <script src="{% static 'js/contact.js' %}" defer></script>
-{% endif %}
-{% if home %}
-    <script src="{% static 'js/owl.carousel.min.js' %}" defer></script>
-    <script src="{% static 'js/home_page_carousel.js' %}" defer></script>
-    <script src="{% static 'js/home.js' %}" defer></script>
 {% endif %}
 {% if product_list %}
     <script src="{% static 'js/product_list.js' %}" defer></script>
