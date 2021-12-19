@@ -61,7 +61,7 @@ def index(request):
     return render(request, 'shop/index_hid.html', context)
 
 
-def __get_product_details(request, id: str, slug: str, custom: bool, studio: bool):
+def __get_product_details(request, id: str, slug: str, custom: bool, studio: bool, page_id: int):
     try:
         collection = Collection.objects.filter(slug=id)[0]
     except (Collection.DoesNotExist, IndexError):
@@ -128,20 +128,27 @@ def __get_product_details(request, id: str, slug: str, custom: bool, studio: boo
                    'shipping_information': shipping_information,
                    'nemes_acel': nemes_acel,
                    'muanyag': muanyag,
-                   'nikkel_mentes': nikkel_mentes
+                   'nikkel_mentes': nikkel_mentes,
+                   'previous_page_id': page_id
                    })
 
 
 def product_detail(request, id: str, slug: str):
-    return __get_product_details(request, id, slug, False, False)
+    referer = request.META.get('HTTP_REFERER')
+    page_id = int(referer.split('=')[1]) if 'page' in referer else 0
+    return __get_product_details(request, id, slug, False, False, page_id)
 
 
 def studio_product_detail(request, id: str, slug: str):
-    return __get_product_details(request, id, slug, False, True)
+    referer = request.META.get('HTTP_REFERER')
+    page_id = int(referer.split('=')[1]) if 'page' in referer else 0
+    return __get_product_details(request, id, slug, False, True, page_id)
 
 
 def custom_product_detail(request, id: str, slug: str):
-    return __get_product_details(request, id, slug, True, False)
+    referer = request.META.get('HTTP_REFERER')
+    page_id = int(referer.split('=')[1]) if 'page' in referer else 0
+    return __get_product_details(request, id, slug, True, False, page_id)
 
 
 def faq(request):

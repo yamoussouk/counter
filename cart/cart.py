@@ -91,7 +91,7 @@ class Cart(object):
         temp = self.discount_products
         return temp
 
-    def add(self, product, color, stud, first_initial='', second_initial='', custom_date='',
+    def add(self, product, color, stud, delivery_size, first_initial='', second_initial='', custom_date='',
             quantity=1, update_quantity=False):
         item_type = 'product_type'
         try:
@@ -141,6 +141,7 @@ class Cart(object):
         self.cart[new_cart_id]['zero_discount'] = False
         self.cart[new_cart_id]['discount_show_price'] = None
         self.cart[new_cart_id]['discount_quantity'] = 0
+        self.cart[new_cart_id]['delivery_size'] = delivery_size[0]
 
         if self.discount_service:
             cart_length = self.get_length()

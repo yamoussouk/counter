@@ -79,11 +79,11 @@ class ProductTypeInline(admin.StackedInline):
 class ProductAdmin(admin.ModelAdmin):
     error_while_saving = False
     inlines = [ProductImageAdmin, ProductTypeInline]
-    list_display = ['name', 'collection', 'studs', 'price', 'stock', 'available', 'created', 'updated']
+    list_display = ['name', 'collection', 'studs', 'price', 'stock', 'available', 'created', 'updated', 'delivery_size']
     list_filter = ['available', 'created', 'updated', 'collection', 'custom']
-    list_editable = ['price', 'available']
+    list_editable = ['price', 'available', 'delivery_size']
     fields = ('collection', 'name', 'image', 'description', 'size', 'price', 'custom', 'studs', 'key_ring',
-              'custom_date', 'initials', 'available', 'stock', 'price_api_id')
+              'custom_date', 'initials', 'available', 'stock', 'price_api_id', 'delivery_size')
 
     class Media:
         js = (

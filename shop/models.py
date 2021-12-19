@@ -67,6 +67,10 @@ KEY_RING_CHOICES = ((1, 'KEREK'),
                     (2, 'KARABINER'),
                     (3, 'SZIV'))
 
+DELIVERY_SIZES = ((1, 'S'),
+                  (2, 'M'),
+                  (3, 'L'))
+
 
 class Product(models.Model):
     collection = models.ForeignKey(Collection, related_name='products', on_delete=models.CASCADE)
@@ -86,6 +90,7 @@ class Product(models.Model):
     custom = models.BooleanField(default=False)
     custom_date = models.BooleanField(default=False)
     initials = models.BooleanField(default=False)
+    delivery_size = MultiSelectField(choices=DELIVERY_SIZES, max_choices=1, min_choices=1, default=DELIVERY_SIZES[0], null=True)
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
