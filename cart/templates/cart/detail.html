@@ -179,7 +179,7 @@
          </div>
         </div>
           {% endif %}
-          {% if is_ajanlott_enabled and cart.cart|length <= ajanlott_cart_limit %}
+          {% if is_ajanlott_enabled and cart.cart|length <= ajanlott_cart_limit and is_delivery_size_ok %}
           <div class="card">
           <div class="card-header" id="envelope">
             <h5 class="mb-0">

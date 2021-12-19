@@ -78,7 +78,8 @@ def cart_add(request, product_id):
                      update_quantity=cd['update'], color=cd['color'], stud=cd['stud'],
                      first_initial=cd['first_initial'] if 'first_initial' in cd else '',
                      second_initial=cd['second_initial'] if 'second_initial' in cd else '',
-                     custom_date=cd['custom_date'] if 'custom_date' in cd else '')
+                     custom_date=cd['custom_date'] if 'custom_date' in cd else '',
+                     delivery_size=product.delivery_size)
             LogFile.objects.create(type='INFO',
                                    message=f'Product with the id of {product_id} has been '
                                            f'added to the cart, user: {ip_address}')
@@ -139,6 +140,7 @@ def cart_detail(request):
     is_csomagkuldo_enabled = Parameter.objects.filter(name="csomagkuldo_enabled")[0].value == 'True'
     is_ajanlott_enabled = Parameter.objects.filter(name="ajanlott_enabled")[0].value == 'True'
     ajanlott_cart_limit = int(Parameter.objects.filter(name="ajanlott_cart_limit")[0].value)
+    is_delivery_size_ok = sum(int(value['delivery_size']) for key, value in cart.cart.items()) <= 10
     context = dict(cart=cart, coupon_apply_form=coupon_apply_form, delivery_form=delivery_form,
                    fox_price=Parameter.objects.filter(name="foxpost_price")[0].value,
                    delivery_price=Parameter.objects.filter(name="delivery_price")[0].value,
@@ -149,6 +151,7 @@ def cart_detail(request):
                    is_szemelyes_atvetel_enabled=is_szemelyes_atvetel_enabled,
                    is_foxpost_enabled=is_foxpost_enabled, is_delivery_enabled=is_delivery_enabled,
                    is_csomagkuldo_enabled=is_csomagkuldo_enabled, is_ajanlott_enabled=is_ajanlott_enabled,
-                   ajanlott_cart_limit=ajanlott_cart_limit)  # 'gift_card_apply_form': gift_card_apply_form
+                   ajanlott_cart_limit=ajanlott_cart_limit,
+                   is_delivery_size_ok=is_delivery_size_ok)  # 'gift_card_apply_form': gift_card_apply_form
     log.info(f'Cart details: {context.get("cart")}')
     return render(request, 'cart/detail.html', context)
