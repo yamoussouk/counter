@@ -135,19 +135,19 @@ def __get_product_details(request, id: str, slug: str, custom: bool, studio: boo
 
 def product_detail(request, id: str, slug: str):
     referer = request.META.get('HTTP_REFERER')
-    page_id = int(referer.split('=')[1]) if 'page' in referer else 0
+    page_id = int(referer.split('=')[1]) if referer is not None and 'page' in referer else 0
     return __get_product_details(request, id, slug, False, False, page_id)
 
 
 def studio_product_detail(request, id: str, slug: str):
     referer = request.META.get('HTTP_REFERER')
-    page_id = int(referer.split('=')[1]) if 'page' in referer else 0
+    page_id = int(referer.split('=')[1]) if referer is not None and 'page' in referer else 0
     return __get_product_details(request, id, slug, False, True, page_id)
 
 
 def custom_product_detail(request, id: str, slug: str):
     referer = request.META.get('HTTP_REFERER')
-    page_id = int(referer.split('=')[1]) if 'page' in referer else 0
+    page_id = int(referer.split('=')[1]) if referer is not None and 'page' in referer else 0
     return __get_product_details(request, id, slug, True, False, page_id)
 
 
