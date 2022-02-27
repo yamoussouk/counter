@@ -44,6 +44,13 @@ class CollectionAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         if change:
+            if 'available' in form.changed_data:
+                products = Product.objects.filter(collection=obj)
+                new_availability = False if not obj.available else True
+                for product in products:
+                    if product.available is not new_availability:
+                        product.available = new_availability
+                        product.save()
             delete_image_path(request, obj)
             super().save_model(request, obj, form, change)
         else:
