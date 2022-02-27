@@ -146,17 +146,10 @@
         <div class="row">
             <div class="col-sm-12">
                 <div class="back-to-link">
-                    {% if collection_slug.strip %}
-                    <a href="{% url 'shop:products_view' collection_slug %}" title="Vissza a kollekcióhoz" alt="Vissza a kollekcióhoz">
+                    <a href="{{ referer }}" title="Vissza a kollekcióhoz" alt="Vissza a kollekcióhoz">
                         <img src="{% static 'images/arrow_left_150.png' %}" alt="Vissza a kollekcióhoz" title="Vissza a kollekcióhoz" width="50" height="33" style="aspect-ratio: 50/33;"/>
                         <span>VISSZA A KOLLEKCIÓHOZ</span>
                     </a>
-                    {% else %}
-                    <a href="{% url 'shop:studio_products_view' %}" title="Vissza a termékekhez" alt="Vissza a termékekhez">
-                        <img src="{% static 'images/arrow_left_150.png' %}" alt="Vissza a termékekhez" title="Vissza a termékekhez" width="50" height="33" style="aspect-ratio: 50/33;" />
-                        <span>VISSZA A TERMÉKEKHEZ</span>
-                    </a>
-                    {% endif %}
                 </div>
             </div>
         </div>
