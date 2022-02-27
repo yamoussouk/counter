@@ -61,7 +61,7 @@ def index(request):
     return render(request, 'shop/index_hid.html', context)
 
 
-def __get_product_details(request, id: str, slug: str, custom: bool, studio: bool, page_id: int):
+def __get_product_details(request, id: str, slug: str, custom: bool, studio: bool, referer: str):
     try:
         collection = Collection.objects.filter(slug=id)[0]
     except (Collection.DoesNotExist, IndexError):
@@ -112,6 +112,11 @@ def __get_product_details(request, id: str, slug: str, custom: bool, studio: boo
     muanyag = Parameter.objects.filter(name="muanyag_beszuro")[0].value
     nikkel_mentes = Parameter.objects.filter(name="nikkel_mentes")[0].value
     shipping_information = param[0].value if len(param) and param[0].active else None
+    if referer == settings.MAIN_URL or referer is None:
+        if studio:
+            referer = settings.MAIN_URL + 'slowstudio'
+        else:
+            referer = settings.MAIN_URL + 'termekek/' + product.collection.slug
     return render(request, template,
                   {'product': product,
                    'notification': notification,
@@ -129,26 +134,23 @@ def __get_product_details(request, id: str, slug: str, custom: bool, studio: boo
                    'nemes_acel': nemes_acel,
                    'muanyag': muanyag,
                    'nikkel_mentes': nikkel_mentes,
-                   'previous_page_id': page_id
+                   'referer': referer
                    })
 
 
 def product_detail(request, id: str, slug: str):
     referer = request.META.get('HTTP_REFERER')
-    page_id = int(referer.split('=')[1]) if referer is not None and 'page' in referer else 0
-    return __get_product_details(request, id, slug, False, False, page_id)
+    return __get_product_details(request, id, slug, False, False, referer)
 
 
 def studio_product_detail(request, id: str, slug: str):
     referer = request.META.get('HTTP_REFERER')
-    page_id = int(referer.split('=')[1]) if referer is not None and 'page' in referer else 0
-    return __get_product_details(request, id, slug, False, True, page_id)
+    return __get_product_details(request, id, slug, False, True, referer)
 
 
 def custom_product_detail(request, id: str, slug: str):
     referer = request.META.get('HTTP_REFERER')
-    page_id = int(referer.split('=')[1]) if referer is not None and 'page' in referer else 0
-    return __get_product_details(request, id, slug, True, False, page_id)
+    return __get_product_details(request, id, slug, True, False, referer)
 
 
 def faq(request):
