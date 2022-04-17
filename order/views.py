@@ -157,6 +157,10 @@ def order_create(request):
                     if cart.coupon else cart.get_total_price()
                 order.delivery_cost = prices[order.delivery_type.replace(' ', '')]
                 order.total = cart.get_total_price_after_discount() + order.delivery_cost
+                if Parameter.objects.filter(name="discount_service")[0].value == 'True' and len(cart) > 2:
+                    order.coupon = None
+                    order.discount = 0
+                    order.discount_amount = 0
                 order.save()
         else:
             print('error', form.errors.as_data())
@@ -181,6 +185,7 @@ def order_create(request):
                                     request.session['cart'][key][key2][key3])
             request.session['order_id'] = order.id
             request.session['delivery_type'] = order.delivery_type
+            # items = ", ".join(["NAME: {}, COLOR: {}".format(i["product"].name, i["color"]) for i in cart])
             LogFile.objects.create(
                 type='INFO', message=f'Process initiated, '
                                      f'items: {", ".join([str(i.id) for i in order_items])}, '

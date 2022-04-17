@@ -141,6 +141,7 @@ def cart_detail(request):
     is_ajanlott_enabled = Parameter.objects.filter(name="ajanlott_enabled")[0].value == 'True'
     ajanlott_cart_limit = int(Parameter.objects.filter(name="ajanlott_cart_limit")[0].value)
     is_delivery_size_ok = sum(int(value['delivery_size']) for key, value in cart.cart.items()) <= 10
+    is_discount_enabled = Parameter.objects.filter(name="discount_service")[0].value == 'True'  # 3/2
     context = dict(cart=cart, coupon_apply_form=coupon_apply_form, delivery_form=delivery_form,
                    fox_price=Parameter.objects.filter(name="foxpost_price")[0].value,
                    delivery_price=Parameter.objects.filter(name="delivery_price")[0].value,
@@ -152,6 +153,7 @@ def cart_detail(request):
                    is_foxpost_enabled=is_foxpost_enabled, is_delivery_enabled=is_delivery_enabled,
                    is_csomagkuldo_enabled=is_csomagkuldo_enabled, is_ajanlott_enabled=is_ajanlott_enabled,
                    ajanlott_cart_limit=ajanlott_cart_limit,
+                   is_discount_enabled=is_discount_enabled,
                    is_delivery_size_ok=is_delivery_size_ok)  # 'gift_card_apply_form': gift_card_apply_form
     log.info(f'Cart details: {context.get("cart")}')
     return render(request, 'cart/detail.html', context)
