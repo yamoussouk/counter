@@ -76,6 +76,8 @@ class Cart(object):
                 self.cart[k]['discount_quantity'] = 0
                 if k in self.discount_products:
                     del self.discount_products[k]
+        if times != 0:
+            self.clear_coupon()
 
     def get_cart(self):
         temp = self.cart
@@ -226,6 +228,13 @@ class Cart(object):
                 del self.session[p]
         self.session.modified = True
 
+    def _clear_coupon(self):
+        props = ['coupon_id', 'coupon']
+        for p in props:
+            if p in self.session:
+                del self.session[p]
+        self.session.modified = True
+
     def set_delivery_type(self, delivery_type):
         self.delivery_type = delivery_type
 
@@ -251,9 +260,9 @@ class Cart(object):
             return Coupon.objects.get(id=self.coupon_id)
         return None
 
-    @coupon.setter
     def clear_coupon(self):
-        self.coupon = None
+        self.coupon_id = None
+        self._clear_coupon()
 
     def get_discount(self):
         if self.coupon:

@@ -67,7 +67,7 @@
         <div class="col-1"></div>
     </div>
     {% endif %}
-    {% if cart|length > 0 and not cart.coupon %}
+    {% if is_discount_enabled and cart|length <= 2 and not cart.coupon or not is_discount_enabled and cart|length > 0 and not cart.coupon %}
     <div class="row coupon-row">
       <form action="{% url 'coupon:apply' %}" method="post">
         <div class="col-8">
@@ -83,7 +83,7 @@
         <div class="clearfix"></div>
       </form>
     </div>
-{% endif %}
+    {% endif %}
   </div>
 
 <div class="container-md" id="delivery-options">
