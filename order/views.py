@@ -7,11 +7,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 
 from cart.cart import Cart
+from logs.models import LogFile
 from parameters.models import Parameter
 from shop.models import ProductType
 from .forms import OrderCreateForm
 from .models import Order, OrderItem
-from logs.models import LogFile
 
 prices = dict(FoxPost=int(Parameter.objects.filter(name="foxpost_price")[0].value),
               Csomagkuldo=int(Parameter.objects.filter(name="csomagkuldo_price")[0].value),
@@ -77,6 +77,8 @@ def order_create(request):
                                    f'A megvásárolni kívánt, illetve a kosaradban található termék összes mennyisége'
                                    f' meghaladja az elérhető mennyiséget, amely {stock}. A kosaradban az aktuális termék '
                                    f'mennyisége {item_in_cart}.')
+            LogFile.objects.create(type='INFO',
+                                   message=f'Valid form, order received, user: {get_client_ip(request)}')
             if not out_of_stock:
                 request.session['delivery'] = dict(delivery_type=cd['delivery_type'], address=cd['address'],
                                                    postal_code=cd['postal_code'], city=cd['city'], note=cd['note'],
@@ -87,6 +89,9 @@ def order_create(request):
                 request.session['billing'] = dict(billing_address=cd['billing_address'],
                                                   billing_postal_code=cd['billing_postal_code'],
                                                   billing_city=cd['billing_city'], product_note=cd['product_note'])
+                LogFile.objects.create(type='INFO',
+                                       message=f'Delivery method: {request.session["delivery"]}, '
+                                               f'user: {get_client_ip(request)}')
                 order = cart.order
                 if order:
                     order.full_name = request.POST.get('full_name')
@@ -116,6 +121,8 @@ def order_create(request):
                     order.fox_post = request.POST.get('fox_post')
                     order.csomagkuldo = request.POST.get('csomagkuldo')
                     order.product_note = request.POST.get('product_note')
+                    LogFile.objects.create(type='INFO',
+                                           message=f'Order "{order.id}" already exists, user: {get_client_ip(request)}')
                 else:
                     order = form.save(commit=False)
                 order.subtotal = cart.get_total_price_after_discount()  # delivery excluded
@@ -124,6 +131,8 @@ def order_create(request):
                     order.discount = cart.coupon.discount
                     order.discount_amount = float(cart.get_total_price()) - float(cart.get_total_price_after_discount())
                 order.save()
+                LogFile.objects.create(type='INFO',
+                                       message=f'Order "{order.id}" is saved, user: {get_client_ip(request)}')
                 order_items = Order.objects.prefetch_related('items').filter(id=order.id)[0].items.all()
                 # some item was removed from the cart
                 if len([i for i in cart]) < len(order_items):
@@ -161,6 +170,10 @@ def order_create(request):
                     order.coupon = None
                     order.discount = 0
                     order.discount_amount = 0
+                LogFile.objects.create(
+                    type='INFO', message=f'Order process initiated, '
+                                         f'items: {", ".join([str(i["product_id"]) for i in cart])}, '
+                                         f'user: {get_client_ip(request)}')
                 order.save()
         else:
             print('error', form.errors.as_data())
@@ -186,10 +199,6 @@ def order_create(request):
             request.session['order_id'] = order.id
             request.session['delivery_type'] = order.delivery_type
             # items = ", ".join(["NAME: {}, COLOR: {}".format(i["product"].name, i["color"]) for i in cart])
-            LogFile.objects.create(
-                type='INFO', message=f'Process initiated, '
-                                     f'items: {", ".join([str(i.id) for i in order_items])}, '
-                                     f'user: {get_client_ip(request)}')
             return redirect(reverse('payment:process'))
     else:
         form = OrderCreateForm()
