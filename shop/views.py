@@ -298,7 +298,7 @@ class ProductsView(ListView):
             context['collection'] = get_object_or_404(Collection, name=self.kwargs['collection_name'])
             context['collection_name'] = self.kwargs['collection_name']
         if 'slug' in self.kwargs:
-            context['collection'] = get_object_or_404(Collection, name=self.kwargs['slug'])
+            context['collection'] = get_object_or_404(Collection, slug=self.kwargs['slug'])
         else:
             context['collection'] = dict(seo_title='', seo_description='', seo_keywords='')
         context['basic_collections'] = Collection.objects.filter(
