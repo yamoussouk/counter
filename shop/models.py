@@ -36,6 +36,15 @@ class Collection(models.Model):
     studio_collection = models.BooleanField(default=False, help_text="Kollekció, amely összefogja az "
                                                                      "összes olyan terméket, amelyik csak a "
                                                                      "studióban elérhető")
+    seo_title = models.CharField(
+        max_length=200, db_index=True, blank=True, help_text="SEO title a google crawler számára. "
+                                                             "Ez látszik a böngésző tabon, ha rávisszük az egeret.")
+    seo_description = models.CharField(
+        max_length=200, db_index=True, blank=True, help_text="SEO description a google crawler számára. "
+                                                             "Ez sehol sem látszik a weboldalon.")
+    seo_keywords = models.CharField(
+        max_length=200, db_index=True, blank=True, help_text="SEO keywords a google crawler számára. "
+                                                             "Ez sehol sem látszik a weboldalon.")
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
@@ -85,12 +94,25 @@ class Product(models.Model):
     available = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    price_api_id = models.CharField(max_length=50, blank=True, default='')
+    price_api_id = models.CharField(max_length=50, default='')
     key_ring = MultiSelectField(choices=KEY_RING_CHOICES, max_choices=3, default=KEY_RING_CHOICES[0], max_length=50)
     custom = models.BooleanField(default=False)
     custom_date = models.BooleanField(default=False)
     initials = models.BooleanField(default=False)
-    delivery_size = MultiSelectField(choices=DELIVERY_SIZES, max_choices=1, min_choices=1, default=DELIVERY_SIZES[0], null=True)
+    delivery_size = MultiSelectField(choices=DELIVERY_SIZES, max_choices=1, min_choices=1, default=DELIVERY_SIZES[0],
+                                     null=True)
+    seo_title = models.CharField(
+        max_length=200, db_index=True, blank=True, help_text="SEO title a google crawler számára. "
+                                                             "Ez látszik a böngésző tabon, ha rávisszük az egeret.")
+    seo_description = models.CharField(
+        max_length=200, db_index=True, blank=True, help_text="SEO description a google crawler számára. "
+                                                             "Ez sehol sem látszik a weboldalon.")
+    seo_keywords = models.CharField(
+        max_length=200, db_index=True, blank=True, help_text="SEO keywords a google crawler számára. "
+                                                             "Ez sehol sem látszik a weboldalon.")
+    seo_image_alt = models.CharField(
+        max_length=200, db_index=True, blank=True, help_text="SEO alt a google crawler számára. "
+                                                             "Ez sehol sem látszik a weboldalon.")
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
@@ -149,6 +171,9 @@ class ProductType(models.Model):
     color_hex = models.CharField(max_length=7, default='#FFFFFF')
     stock = models.PositiveIntegerField()
     image = models.ImageField(blank=True)
+    seo_image_alt = models.CharField(
+        max_length=200, db_index=True, blank=True, help_text="SEO alt a google crawler számára. "
+                                                             "Ez sehol sem látszik a weboldalon.")
 
     class Meta:
         ordering = ('color',)

@@ -1,4 +1,4 @@
-{% include "shop/base.html" with notification=notification product_details=True notfound=False %}
+{% include "shop/base.html" with notification=notification product_details=True notfound=False seo_title=product.seo_title seo_description=product.seo_description seo_keywords=product.seo_keywords %}
 {% load static %}
 
 {% block content %}
@@ -17,7 +17,7 @@
                         <div class="product-image">
                             <picture>
                               <source class="product_image" srcset="{{ product.image.url|wp }}" type="image/webp">
-                              <img src="{{ product.image.url }}" alt="{{ product.name }}"
+                              <img src="{{ product.image.url }}" alt="{% if product.seo_image_alt %}{{ product.seo_image_alt }}{% else %}{{ product.name }}{% endif %}"
                                    title="{{ product.name }} photo" class="product_image" width="625" height="625" style="aspect-ratio: 1;"/>
                             </picture>
                         </div>
@@ -25,7 +25,7 @@
                             <div class="product-thumbnail selected">
                                 <picture>
                                   <source class="product_image" srcset="{{ product.image.url|wp }}" type="image/webp">
-                                  <img src="{{ product.image.url }}" alt="{{ product.name }}"
+                                  <img src="{{ product.image.url }}" alt="{% if product.seo_image_alt %}{{ product.seo_image_alt }}{% else %}{{ product.name }}{% endif %}"
                                        title="{{ product.name }} thumbnail photo" class="product_image" width="625" height="625" style="aspect-ratio: 1;"/>
                                 </picture>
                             </div>
@@ -35,7 +35,7 @@
                                     <div class="product-thumbnail">
                                         <picture>
                                           <source data-name="{{ type.color }}" srcset="{{ type.image.url|wp }}" type="image/webp">
-                                          <img src="{{ type.image.url }}" alt="{{ product.name }}"
+                                          <img src="{{ type.image.url }}" alt="{% if type.seo_image_alt %}{{ type.seo_image_alt }}{% else %}{{ type.color }}{% endif %}"
                                                title="{{ product.name }} thumbnail photo" data-name="{{ type.color }}"  width="625" height="625" style="aspect-ratio: 1;"/>
                                         </picture>
                                     </div>
@@ -46,7 +46,7 @@
                                     <div class="product-thumbnail">
                                         <picture>
                                           <source data-name="{{ type.color }}" srcset="{{ img.image.url|wp }}" type="image/webp">
-                                          <img src="{{ img.image.url }}" alt="{{ product.name }}"
+                                          <img src="{{ img.image.url }}" alt="{% if product.seo_image_alt %}{{ product.seo_image_alt }}{% else %}{{ product.name }}{% endif %}"
                                                title="{{ product.name }} thumbnail photo" width="625" height="625" style="aspect-ratio: 1;" />
                                         </picture>
                                     </div>

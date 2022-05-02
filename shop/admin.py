@@ -40,7 +40,7 @@ class CollectionAdmin(admin.ModelAdmin):
     error_while_saving = False
     list_display = ['name']
     fields = ('name', 'image', 'available', 'custom', 'show_on_home_page', 'basic_collection',
-              'regular_collection', 'studio_collection')
+              'regular_collection', 'studio_collection', 'seo_title', 'seo_description', 'seo_keywords')
 
     def save_model(self, request, obj, form, change):
         if change:
@@ -85,12 +85,14 @@ class ProductTypeInline(admin.StackedInline):
 
 class ProductAdmin(admin.ModelAdmin):
     error_while_saving = False
+    # save_as = True
     inlines = [ProductImageAdmin, ProductTypeInline]
     list_display = ['name', 'collection', 'studs', 'price', 'stock', 'available', 'created', 'updated']
     list_filter = ['available', 'created', 'updated', 'collection', 'custom']
     list_editable = ['price', 'available']
     fields = ('collection', 'name', 'image', 'description', 'size', 'price', 'custom', 'studs', 'key_ring',
-              'custom_date', 'initials', 'available', 'stock', 'price_api_id', 'delivery_size')
+              'custom_date', 'initials', 'available', 'stock', 'price_api_id',
+              'delivery_size', 'seo_title', 'seo_description', 'seo_keywords', 'seo_image_alt')
 
     class Media:
         js = (
@@ -103,6 +105,21 @@ class ProductAdmin(admin.ModelAdmin):
             delete_image_path(request, obj)
             super().save_model(request, obj, form, change)
         else:
+            # obj_id = obj.id
+            # if obj_id is None:  # save as
+            #     previous_product_id = request.resolver_match.kwargs["object_id"]
+            #     pr = Product.objects.prefetch_related('product_types').get(id=int(previous_product_id))
+            #     types_ = pr.product_types.all()
+            #     if len(types_):
+            #         _mutable = form.data._mutable
+            #         form.data._mutable = True
+            #         for idx, type_ in enumerate(types_):
+            #             i = type_.image
+            #             form.data.__setitem__(f'product_types-{idx}-image', i)
+            #         form.data._mutable = _mutable
+            #     if obj.image is None or obj.image.name == '':
+            #         image_url = pr.image
+            #         obj.image = image_url
             slug = slugify(obj.name)
             product = Product.objects.filter(slug=slug)
             if len(product):
