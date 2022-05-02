@@ -1,4 +1,4 @@
-{% include "shop/base.html" with notification=notification product_list=True notfound=False %}
+{% include "shop/base.html" with notification=notification product_list=True notfound=False seo_title=collection.seo_title seo_description=collection.seo_description seo_keywords=collection.seo_keywords %}
 {% load static %}
 
 {% block content %}
@@ -20,7 +20,7 @@
                                 <picture>
                                   <source class="product-element-image" srcset="{{ product.image.url|wp }}" type="image/webp">
                                   <source class="product-element-image" srcset="{{ product.image.url }}" type="image/png">
-                                  <img src="{{ product.image.url }}" alt="{{ product.name }}" title="{{ product.name }} photo"
+                                  <img src="{{ product.image.url }}" alt="{% if product.seo_image_alt %}{{ product.seo_image_alt }}{% else %}{{ product.name }}{% endif %}" title="{{ product.name }} photo"
                                      class="product-element-image" width="625" height="625" style="aspect-ratio: 1;"/>
                                 </picture>
                                 {% endif %}

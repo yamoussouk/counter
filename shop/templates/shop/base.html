@@ -9,14 +9,14 @@
     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-WNX756V');</script>
     <!-- End Google Tag Manager -->
-    <meta name="description" content="A Minerva Studio ékszerei kis darabszámban kézzel készült, egyedi termékek.
-     A fülbevalók modernek, elegánsak, letisztultak.">
-    <meta name="keywords" content="kézműves fülbevaló, kézzel készített fülbevaló, egyedi fülbevaló, fülbarát fülbevaló" >
+    <meta name="description" content="{% if seo_description %}{{ seo_description }}{% else %}A Minerva Studio ékszerei kis darabszámban kézzel készült, egyedi termékek.
+     A fülbevalók modernek, elegánsak, letisztultak.{% endif %}">
+    <meta name="keywords" content="{% if seo_keywords %}{{ seo_keywords }}{% else %}kézműves fülbevaló, kézzel készített fülbevaló, egyedi fülbevaló, fülbarát fülbevaló{% endif %}" >
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="icon" sizes="192x192" href="{% url 'shop:get_icon' %}">
     <link rel="apple-touch-icon" href="{% url 'shop:get_icon' %}" />
-    <title>Minerva Studio - modern, egyedi, könnyű fülbevalók | Kézműves fülbevalók</title>
+    <title>{% if seo_title %}{{ seo_title }}{% else %}Minerva Studio - modern, egyedi, könnyű fülbevalók | Kézműves fülbevalók{% endif %}</title>
 <!--    <link href="{% static "css/font-awesome.mint.css" %}" rel="preload" as="font" onload="this.rel='stylesheet'" />-->
     {% if CUSTOM %}
       <link href="{% static "css/base.css" %}" rel="stylesheet" />
