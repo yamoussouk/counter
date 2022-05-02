@@ -2,6 +2,8 @@ import os
 import re
 import logging
 
+
+from django.db.models import Case, When
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db.utils import OperationalError
@@ -223,6 +225,23 @@ def impresszum(request):
                                                     'shipping_information': shipping_information})
 
 
+def _get_stock_list(temp):
+    stock_dict = dict()
+    for i in temp:
+        if len(i.product_types.all()) > 0:
+            for h in i.product_types.all().values():
+                if h.get('product_id') not in stock_dict:
+                    stock_dict[h.get('product_id')] = int(h.get('stock'))
+                else:
+                    stock_dict[h.get('product_id')] += int(h.get('stock'))
+        else:
+            if i.id not in stock_dict:
+                stock_dict[i.id] = int(i.stock)
+            else:
+                stock_dict[i.id] += int(i.stock)
+    return stock_dict
+
+
 class ProductsView(ListView):
     try:
         collection = None
@@ -230,22 +249,10 @@ class ProductsView(ListView):
         paginate_by = 9
         template_name = 'shop/product/list.html'
         context_object_name = 'products'
-        stock_dict = dict()
         temp = Product.objects.prefetch_related('product_types').filter(available=True, custom=False,
                                                                         collection__available=True,
                                                                         collection__studio_collection=False)
-        for i in temp:
-            if len(i.product_types.all()) > 0:
-                for h in i.product_types.all().values():
-                    if h.get('product_id') not in stock_dict:
-                        stock_dict[h.get('product_id')] = int(h.get('stock'))
-                    else:
-                        stock_dict[h.get('product_id')] += int(h.get('stock'))
-            else:
-                if i.id not in stock_dict:
-                    stock_dict[i.id] = int(i.stock)
-                else:
-                    stock_dict[i.id] += int(i.stock)
+        stock_dict = _get_stock_list(temp)
         gift_card = GiftCard.objects.filter(available=True)
         card_gift_cart_product_form = CartAddGiftCardProductForm()
         param = Parameter.objects.filter(name="shipping_information")
@@ -262,28 +269,19 @@ class ProductsView(ListView):
         pass
 
     def check_product_stock(self, products) -> dict:
-        stock_dict = dict()
-        for p in products:
-            pr = Product.objects.prefetch_related('product_types').filter(id=p.id, available=True, custom=False,
-                                                                          collection__available=True,
-                                                                          collection__studio_collection=False)[0]
-            if len(pr.product_types.all()) > 0:
-                for h in pr.product_types.all().values():
-                    if h.get('product_id') not in stock_dict:
-                        stock_dict[h.get('product_id')] = int(h.get('stock'))
-                    else:
-                        stock_dict[h.get('product_id')] += int(h.get('stock'))
-            else:
-                if pr.id not in stock_dict:
-                    stock_dict[pr.id] = int(pr.stock)
-                else:
-                    stock_dict[pr.id] += int(pr.stock)
-        return stock_dict
+        return _get_stock_list(products)
 
     def get_queryset(self):
         products = Product.objects.prefetch_related('product_types').filter(available=True, custom=False,
                                                                             collection__available=True,
                                                                             collection__studio_collection=False)
+        self.kwargs["stock_dict"] = stock_dict = _get_stock_list(products)
+        keys = [[k, stock_dict[k]] for k in list(stock_dict.keys())]
+        sorted_list = sorted(keys, key=lambda x: not x[1])
+        sorted_list = [sl[0] for sl in sorted_list]
+        preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(sorted_list)])
+        products = Product.objects.prefetch_related('product_types').filter(pk__in=sorted_list).order_by(preserved)
+
         slug = self.kwargs['slug'] if 'slug' in self.kwargs else None
         if slug:
             collection = Collection.objects.filter(slug=slug)
@@ -293,7 +291,7 @@ class ProductsView(ListView):
 
     def get_context_data(self):
         context = super().get_context_data(**self.kwargs)
-        stock_dict = self.check_product_stock(context.get('products'))
+        stock_dict = self.kwargs["stock_dict"]
         context['notification'] = Notification.objects.all()
         context['product_stock'] = stock_dict
         if 'collection_name' in self.kwargs:
