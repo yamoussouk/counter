@@ -56,7 +56,7 @@
                           <source srcset="{{ product.image.url|wp }}" type="image/webp">
                           <source srcset="{{ product.image.url }}" type="image/jpg">
                           <img class="img-fluid" src="{{ product.image.url }}"
-                               alt="{{ product.name }}"
+                               alt="{% if product.seo_image_alt %}{{ product.seo_image_alt }}{% else %}{{ product.name }}{% endif %}"
                                title="{{ product.name }} photo" width="394" height="394" style="aspect-ratio:394/394;"/>
                         </picture>
                     </a>
@@ -87,7 +87,7 @@
                                 <picture>
                                   <source srcset="{{ collection.image.url|wp }}" type="image/webp">
                                   <source srcset="{{ collection.image.url }}" type="image/jpg">
-                                  <img src="{{ collection.image.url }}" alt="{{ collection.name }}"
+                                  <img src="{{ collection.image.url }}" alt="{% if collection.seo_image_alt %}{{ collection.seo_image_alt }}{% else %}{{ collection.name }}{% endif %}"
                                        title="{{ collection.name }} photo" width="612" height="612" style="aspect-ratio: 1;"/>
                                 </picture>
                             </div>
@@ -119,7 +119,7 @@
                                 <picture>
                                   <source srcset="{{ collection.image.url|wp }}" type="image/webp">
                                   <source srcset="{{ collection.image.url }}" type="image/png">
-                                  <img src="{{ collection.image.url }}" alt="{{ collection.name }}"
+                                  <img src="{{ collection.image.url }}" alt="{% if collection.seo_image_alt %}{{ collection.seo_image_alt }}{% else %}{{ collection.name }}{% endif %}"
                                        title="{{ collection.name }} photo" width="612" height="612" style="aspect-ratio: 1;" />
                                 </picture>
                             </div>
