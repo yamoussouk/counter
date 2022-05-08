@@ -78,7 +78,7 @@
                 <h2>ÁLLANDÓ KOLLEKCIÓK</h2>
             </div>
         </div>
-        <div class="row">
+        <div class="row" id="regular-collections-wrapper">
             <div class="home-collection-wrapper d-flex justify-content-center">
                 {% for collection in regular_collections %}
                     {% if collection.image %}
@@ -101,6 +101,35 @@
                 {% endfor %}
             </div>
         </div>
+        {% if best_sellers_collection %}
+        <div class="row">
+            <div class="header-text-wrapper">
+                <h2>BESTSELLERS</h2>
+            </div>
+        </div>
+        <div class="row" id="bs-carousel-row">
+            <div id="owl-bs-products-carousel" class="owl-carousel owl-theme">
+                {% for product in bs_products %}
+                    {% if product.image %}
+                    <a href="{% url 'shop:product_detail' id=product.collection.slug slug=product.slug %}" title="{{ product.name }}">
+                        <picture>
+                          <source srcset="{{ product.image.url|wp }}" type="image/webp">
+                          <source srcset="{{ product.image.url }}" type="image/jpg">
+                          <img class="img-fluid" src="{{ product.image.url }}"
+                               alt="{% if product.seo_image_alt %}{{ product.seo_image_alt }}{% else %}{{ product.name }}{% endif %}"
+                               title="{{ product.name }} photo" width="394" height="394" style="aspect-ratio:394/394;"/>
+                        </picture>
+                    </a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        <div class="fluid-text-anchor container-fluid" id="home-page-bs-carousel-buy-button">
+            {% with best_sellers_collection.all|first as collection %}
+                <a title="Teljes kollekció" href="{% url 'shop:products_view' slug=collection.slug %}">Teljes kollekció</a>
+            {% endwith %}
+        </div>
+        {% endif %}
         {% endif %}
         <!-- end of regular collections -->
         <!-- temporary collections -->
