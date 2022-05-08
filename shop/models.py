@@ -36,6 +36,7 @@ class Collection(models.Model):
     studio_collection = models.BooleanField(default=False, help_text="Kollekció, amely összefogja az "
                                                                      "összes olyan terméket, amelyik csak a "
                                                                      "studióban elérhető")
+    best_seller_collection = models.BooleanField(default=False, help_text="Best seller kollekció jelölő")
     seo_title = models.CharField(
         max_length=200, db_index=True, blank=True, help_text="SEO title a google crawler számára. "
                                                              "Ez látszik a böngésző tabon, ha rávisszük az egeret.")

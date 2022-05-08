@@ -2,7 +2,6 @@ import os
 import re
 import logging
 
-
 from django.db.models import Case, When
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -39,17 +38,23 @@ def index_hid(request):
 
 def index(request):
     basic_collection = Collection.objects.filter(available=True, custom=False, show_on_home_page=True,
-                                                 basic_collection=True)
+                                                 basic_collection=True, best_seller_collection=False)
     if len(basic_collection):
         basic_products = Product.objects.filter(collection=basic_collection[0])
     else:
         basic_products = []
     regular_collections = Collection.objects.filter(available=True, custom=False, show_on_home_page=True,
-                                                    regular_collection=True).order_by('-created')[:3]
+                                                    regular_collection=True, best_seller_collection=False).order_by('-created')[:3]
     temporary_collections = (
         Collection.objects.filter(available=True, custom=False, show_on_home_page=True, basic_collection=False,
-                                  regular_collection=False)
+                                  regular_collection=False, best_seller_collection=False)
             .order_by('-created')[:9])
+    best_sellers_collection = Collection.objects.filter(available=True, custom=False, show_on_home_page=True,
+                                                        best_seller_collection=True).order_by('-created')
+    if len(best_sellers_collection):
+        bs_products = Product.objects.filter(collection=best_sellers_collection[0])
+    else:
+        bs_products = []
     notification = Notification.objects.all()
     is_mobile = mobile(request)
     param = Parameter.objects.filter(name="shipping_information")
@@ -59,6 +64,7 @@ def index(request):
     context = dict(basic_collection=basic_collection, basic_products=basic_products,
                    regular_collections=regular_collections, temporary_collections=temporary_collections,
                    notification=notification, ratio=ratio, shipping_information=shipping_information,
+                   best_sellers_collection=best_sellers_collection, bs_products=bs_products,
                    home_page_carousel_images=home_page_carousel_images)
     return render(request, 'shop/index_hid.html', context)
 
@@ -98,6 +104,7 @@ def __get_product_details(request, id: str, slug: str, custom: bool, studio: boo
     temporary_collections = [] if studio else Collection.objects.filter(available=True, custom=custom,
                                                                         basic_collection=False,
                                                                         regular_collection=False,
+                                                                        best_seller_collection=False,
                                                                         studio_collection=False).order_by('-created')
     # find if there is utolsó darabok
     temp = list(temporary_collections)
@@ -309,7 +316,8 @@ class ProductsView(ListView):
         temporary_collections = Collection.objects.filter(available=True, custom=False,
                                                           basic_collection=False,
                                                           regular_collection=False,
-                                                          studio_collection=False).order_by('-created')
+                                                          studio_collection=False,
+                                                          best_seller_collection=False).order_by('-created')
         # find if there is utolsó darabok
         temp = list(temporary_collections)
         upper = [e.name for e in temp if e.name.isupper()]
