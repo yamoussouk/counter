@@ -91,7 +91,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_display = ['name', 'collection', 'studs', 'price', 'stock', 'available', 'created', 'updated']
     list_filter = ['available', 'created', 'updated', 'collection', 'custom']
     list_editable = ['price', 'available']
-    fields = ('collection', 'name', 'image', 'description', 'size', 'price', 'custom', 'studs', 'key_ring',
+    fields = ('collection', 'name', 'product_name', 'image', 'description', 'size', 'price', 'custom', 'studs', 'key_ring',
               'custom_date', 'initials', 'available', 'stock', 'price_api_id',
               'delivery_size', 'seo_title', 'seo_description', 'seo_keywords', 'seo_image_alt')
 

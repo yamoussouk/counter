@@ -117,6 +117,8 @@ class Product(models.Model):
     seo_image_alt = models.CharField(
         max_length=200, db_index=True, blank=True, help_text="SEO alt a google crawler számára. "
                                                              "Ez sehol sem látszik a weboldalon.")
+    product_name = models.CharField(max_length=200, db_index=True,
+                                    blank=True, help_text="Termék neve, ami a h1 tagba fog kerülni")
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
