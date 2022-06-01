@@ -57,7 +57,7 @@
                     </div>
                     <div class="product-description-wrapper">
                         <div class="product-name">
-                            <h1>{{ product.name }}</h1>
+                            <h1>{% if product.product_name %}{{ product.product_name }}{% else %}{{ product.name }}{% endif %}</h1>
                         </div>
                         <div class="product-collection-name">
                             {{ product.collection.name }}
