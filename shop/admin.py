@@ -1,12 +1,88 @@
+import os
+import re
+
+from django.conf import settings
 from django.contrib import admin
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.utils.text import slugify
-from django.conf import settings
-import os
-import re
+from unidecode import unidecode
 
 from .models import Collection, Product, Image, Notification, ProductType, GiftCard, Message
+
+"""
+    Since we are trying to get better seo rank we change how the images are named. The logic is the following:
+    It takes the Product model's product_name property, concatenate it by hyphens in a lower case mode with their
+    original extension. In case of the main image and the product types, saving the object creates the webp as well.
+    We delete the original webps.
+"""
+
+
+def change_image(modeladmin, request, queryset):
+    opts = modeladmin.model._meta
+    fields = [field for field in opts.get_fields() if not field.many_to_many and not field.one_to_many]
+    for obj in queryset:
+        field = [f for f in fields if f.name == 'product_name'][0]
+        value = getattr(obj, field.name)
+        if value not in ['', ' ']:
+            new_value = unidecode(value, "utf-8").lower().replace(' ', '-').replace("'", "")
+            main_image = [f for f in fields if f.name == 'image'][0]
+            file_name = getattr(obj, main_image.name).name.split('.')[0]
+            if new_value != file_name:
+                base = settings.BASE_DIR
+                media_path = os.path.join(base, 'media')
+                for filename in os.listdir(media_path):
+                    if file_name in filename:
+                        if 'webp' in filename:
+                            os.remove(os.path.join(media_path, filename))
+                        else:
+                            new_name = f'{new_value}.png' if 'png' in filename.lower() else f'{new_value}.jpg'
+                            os.rename(os.path.join(media_path, filename), os.path.join(media_path, new_name))
+                            obj.image = new_name
+                            obj.save()
+
+                # save and rename extra images
+                extra_images = obj.images.all()
+                for idx, extra_image in enumerate(extra_images):
+                    extra_image_name = extra_image.image.name
+                    temp = extra_image_name.split('/')[1].split('.')
+                    extra_image_name_ = temp[0]
+                    ext_ = temp[1]
+                    new_image_name = f'{new_value}{idx + 2}'
+                    extra_image.image.name = f'images/{new_image_name}.{ext_}'
+                    extra_image.save()
+                    images_path = os.path.join(media_path, 'images')
+                    for filename in os.listdir(images_path):
+                        if extra_image_name_ in filename:
+                            new_name = f'{new_image_name}.png' if 'png' in filename.lower() \
+                                else (f'{new_image_name}.webp' if 'webp' in filename.lower()
+                                      else f'{new_image_name}.jpg')
+                            os.rename(os.path.join(images_path, filename), os.path.join(images_path, new_name))
+
+                # save and rename product types
+                product_types = obj.product_types.all()
+                for product_type in product_types:
+                    product_type_name = product_type.image.name
+                    color = product_type.color
+                    color_ = unidecode(color, "utf-8").lower().replace(' ', '-')
+                    temp = product_type_name.split('.')
+                    product_type_name_ = temp[0]
+                    new_image_name = f'{color_}-{new_value}'
+                    for filename in os.listdir(media_path):
+                        if product_type_name_ in filename:
+                            if 'webp' in filename:
+                                os.remove(os.path.join(media_path, filename))
+                            else:
+                                new_name = f'{new_image_name}.png' if 'png' in filename.lower() else f'{new_image_name}.jpg'
+                                try:
+                                    os.rename(os.path.join(media_path, filename), os.path.join(media_path, new_name))
+                                except FileExistsError:
+                                    print(f'Tried to rename {filename} to {new_name} but it failed')
+                                product_type.image.name = new_name
+                                product_type.save()
+
+
+change_image.short_description = 'Change image'
 
 
 def delete_image_path(request, obj):
@@ -91,9 +167,11 @@ class ProductAdmin(admin.ModelAdmin):
     list_display = ['name', 'collection', 'studs', 'price', 'stock', 'available', 'created', 'updated']
     list_filter = ['available', 'created', 'updated', 'collection', 'custom']
     list_editable = ['price', 'available']
-    fields = ('collection', 'name', 'product_name', 'image', 'description', 'size', 'price', 'custom', 'studs', 'key_ring',
-              'custom_date', 'initials', 'available', 'stock', 'price_api_id',
-              'delivery_size', 'seo_title', 'seo_description', 'seo_keywords', 'seo_image_alt')
+    fields = (
+        'collection', 'name', 'product_name', 'image', 'description', 'size', 'price', 'custom', 'studs', 'key_ring',
+        'custom_date', 'initials', 'available', 'stock', 'price_api_id',
+        'delivery_size', 'seo_title', 'seo_description', 'seo_keywords', 'seo_image_alt')
+    actions = [change_image]
 
     class Media:
         js = (
