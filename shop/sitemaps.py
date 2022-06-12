@@ -16,6 +16,9 @@ class CollectionSitemap(Sitemap):
     def items(self):
         return Collection.objects.filter(available=True)
 
+    def lastmod(self, obj):
+        return obj.updated
+
 
 class ProductSitemap(Sitemap):
     def items(self):
