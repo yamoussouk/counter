@@ -33,6 +33,9 @@ class BlogCategory(models.Model):
         self.slug = slugify(self.title)
         super(BlogCategory, self).save(*args, **kwargs)
 
+    def get_absolute_url(self):
+        return '/%s/' % self.slug
+
 
 def get_upload_path(instance, filename):
     return f'images/blog/{instance.post.slug}/{filename}'
@@ -73,6 +76,9 @@ class Post(models.Model):
         self.slug = slugify(self.title)
         super(Post, self).save(*args, **kwargs)
         convert()
+
+    def get_absolute_url(self):
+        return '/blog/%s/' % self.slug
 
 
 class PostImage(models.Model):

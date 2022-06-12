@@ -2,6 +2,7 @@ from django.contrib.sitemaps.views import sitemap
 from django.urls import path
 from django.views.generic import TemplateView
 
+from blog.sitemaps import BlogCategorySitemap, PostSitemap
 from parameters.models import Parameter
 from . import views
 from .sitemaps import StaticViewsSitemap, CollectionSitemap, ProductSitemap
@@ -9,7 +10,9 @@ from .sitemaps import StaticViewsSitemap, CollectionSitemap, ProductSitemap
 sitemaps = {
     'static': StaticViewsSitemap,
     'product': ProductSitemap,
-    'collection': CollectionSitemap
+    'collection': CollectionSitemap,
+    'blog-category': BlogCategorySitemap,
+    'post': PostSitemap
 }
 
 app_name = 'shop'
