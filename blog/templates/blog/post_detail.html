@@ -1,0 +1,80 @@
+{% include "shop/base.html" with notification=notification notfound=False blog_detail=True seo_title=seo_title seo_description=seo_description %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row" id="blog-header">
+        <div class="col-12">
+            <a href="{% url 'blog:blog-bejegyzesek' %}" title="Blog - Minervastudio"><h1>minerva blog</h1></a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-10 col-12 offset-md-1">
+            {% if post.cover_image %}
+            <div class="post-banner-wrapper">
+                <picture>
+                  <source class="product-element-image" srcset="{{ post.banner_image.url|wp }}" type="image/webp">
+                  <source class="product-element-image" srcset="{{ post.banner_image.url }}" type="image/png">
+                  <img src="{{ post.banner_image.url }}" alt="{{ post.banner_image_alt }}" title="{{ post.banner_image_title }}"
+                     class="img-fluid" style="aspect-ratio: 1;"/>
+                </picture>
+            </div>
+            {% endif %}
+            <div class="post-title">
+                <h1>{{ post.title }}</h1>
+            </div>
+            <div class="post-description">
+                <p>{{ post.short_description }}</p>
+            </div>
+            {% if post.hashtags.strip %}
+            <div class="post-hashtags">
+                <p>{{ post.hashtags|hashtags }}</p>
+            </div>
+            {% endif %}
+            {% if post.template == 0 %}
+            {% include "blog/simple_text.html" with post=post %}
+            {% elif post.template == 1 %}
+            {% include "blog/text_with_images.html" with post=post %}
+            {% else %}
+            {% include "blog/text_next_to_images.html" with post=post %}
+            {% endif %}
+            <div class="post-create-time-wrapper">
+                <p>{{ post.created_on|date:"Y.m.d." }}</p>
+            </div>
+            <div class="signature-wrapper">
+                <img src="{% static 'images/betti-alairas.png' %}" alt="Betti aláírása" title="Betti aláírása" class="img-fluid" />
+            </div>
+            <div class="clearfix"></div>
+            <div class="post-navigation">
+                {% if prev != '' %}
+                <div class="prev-post">
+                    <a href="{% url 'blog:post_detail' prev  %}" title="{{ prev }}">
+                        <div class="prev-arrow-wrapper">
+                            <img src="{% static 'images/nyil.png' %}" alt="előző post jelölő nyíl" title="előző post jelölő nyíl" class="img-fluid" />
+                        </div>
+                        <div class="prev-post-text-wrapper">
+                            <p>Előző bejegyzés</p>
+                        </div>
+                    </a>
+                </div>
+                {% endif %}
+                {% if next != '' %}
+                <div class="next-post">
+                    <a href="{% url 'blog:post_detail' next  %}" title="{{ next }}">
+                        <div class="next-post-text-wrapper">
+                            <p>Következő bejegyzés</p>
+                        </div>
+                        <div class="next-arrow-wrapper">
+                            <img src="{% static 'images/nyil.png' %}" alt="következő post jelölő nyíl" title="következő post jelölő nyíl" class="img-fluid" />
+                        </div>
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% include 'shop/footer.html' %}

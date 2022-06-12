@@ -1,0 +1,67 @@
+{% include "shop/base.html" with notification=notification notfound=False canonical=canonical blog=True seo_title="Blog - Minervastudio" seo_description="Fedezd fel a Minervastudio blogját. Légy része a világunknak." %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row" id="blog-header">
+        <div class="col-12">
+            <h1>minerva blog</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xl-8 col-lg-10 col-12 offset-xl-2 offset-lg-1">
+            {% for post in post_list %}
+            <div class="row product-row">
+                <div class="col-md-4 col-sm-10 offset-sm-1 offset-md-0 col-12">
+                    {% if post.cover_image %}
+                    <div class="post-image-cover-wrapper">
+                        <picture>
+                          <source class="product-element-image" srcset="{{ post.cover_image.url|wp }}" type="image/webp">
+                          <source class="product-element-image" srcset="{{ post.cover_image.url }}" type="image/png">
+                          <img src="{{ post.cover_image.url }}" alt="{{ post.cover_image_alt }}" title="{{ post.cover_image_title }}"
+                             class="product-element-image" width="320" height="320" style="aspect-ratio: 1;"/>
+                        </picture>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-8 col-sm-10 offset-sm-1 offset-md-0 col-12">
+                    <div class="post-title">
+                        <h3>{{ post.title }}</h3>
+                    </div>
+                    <div class="post-description">
+                        <p>{{ post.short_description }}</p>
+                    </div>
+                    {% if post.hashtags.strip %}
+                    <div class="post-hashtags">
+                        <p>{{ post.hashtags|hashtags }}</p>
+                    </div>
+                    {% endif %}
+                    <div class="post-created-time">
+                        <p>{{ post.created_on|date:"Y.m.d." }}</p>
+                    </div>
+                    <div class="post-content-short">
+                        <p>{{ post.content|remove_html }}</p>
+                    </div>
+                    <div class="post-read-more-wrapper">
+                        <a href="{% url 'blog:post_detail' post.slug  %}" title="{{ post.title }}">TOVÁBB OLVASOM</a>
+                    </div>
+                </div>
+            </div>
+
+            {% endfor %}
+        </div>
+    </div>
+    <div class="row" id="post-pagination-wrapper">
+        <div class="col-12">
+        {% if page_obj.paginator.num_pages > 1 %}
+
+        {% include 'shop/_pagination.html' with page_obj=page_obj %}
+
+        {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% include 'shop/footer.html' %}

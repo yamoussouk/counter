@@ -16,6 +16,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="icon" sizes="192x192" href="{% url 'shop:get_icon' %}">
     <link rel="apple-touch-icon" href="{% url 'shop:get_icon' %}" />
+    {% if canonical %}
+    <link rel="canonical" href="{{ canonical }}">
+    {% endif %}
     <title>{% if seo_title %}{{ seo_title }}{% else %}Minerva Studio - modern, egyedi, könnyű fülbevalók | Kézműves fülbevalók{% endif %}</title>
 <!--    <link href="{% static "css/font-awesome.mint.css" %}" rel="preload" as="font" onload="this.rel='stylesheet'" />-->
     {% if CUSTOM %}
@@ -53,6 +56,12 @@
     {% endif %}
     {% if notfound %}
       <link href="{% static "css/404.css" %}" rel="stylesheet" />
+    {% endif %}
+    {% if blog %}
+      <link href="{% static "css/blog.css" %}" rel="stylesheet" />
+    {% endif %}
+    {% if blog_detail %}
+      <link href="{% static "css/blog_detail.css" %}" rel="stylesheet" />
     {% endif %}
     {% block ga %}
         {% if use_ga %}
@@ -119,6 +128,9 @@
                   <li class="{% if '/kapcsolat' in request.path %}current{% endif %} menu-item">
                     <a title="Kapcsolat" href="{% url 'shop:contact' %}" >Kapcsolat</a>
                   </li>
+                  <li class="{% if request.path == '/blog/' %}current{% endif %} menu-item">
+                    <a title="Blog" href="{% url 'blog:blog-bejegyzesek' %}" >Blog</a>
+                  </li>
                   {% if CUSTOM %}
                   <li class="{% if '/egyedi-rendelés' in request.path %}current{% endif %} menu-item">
                     <a title="Kapcsolat" href="{% url 'shop:custom_products_view' %}" >Egyedi rendelés</a>
@@ -163,6 +175,9 @@
                 <li class="{% if '/kapcsolat' in request.path %}current{% endif %} menu-item">
                   <a title="Kapcsolat" href="{% url 'shop:contact' %}" >Kapcsolat</a>
                 </li>
+                <li class="{% if request.path == '/blog/' %}current{% endif %} menu-item">
+                  <a title="Blog" href="{% url 'blog:blog-bejegyzesek' %}" >Blog</a>
+                </li>
                 {% if CUSTOM %}
                 <li class="{% if '/egyedi-rendelés' in request.path %}current{% endif %} menu-item">
                   <a title="Kapcsolat" href="{% url 'shop:custom_products_view' %}" >Egyedi rendelés</a>
@@ -186,6 +201,9 @@
               </li>
               <li class="{% if '/kapcsolat' in request.path %}current{% endif %} menu-item">
                 <a title="Kapcsolat" href="{% url 'shop:contact' %}" >Kapcsolat</a>
+              </li>
+              <li class="{% if request.path == '/blog/' %}current{% endif %} menu-item">
+                <a title="Blog" href="{% url 'blog:blog-bejegyzesek' %}" >Blog</a>
               </li>
               {% if CUSTOM %}
               <li class="{% if '/egyedi-rendelés' in request.path %}current{% endif %} menu-item">

@@ -1,0 +1,7 @@
+{% load static %}
+
+<div class="content">
+    {% for line in post.content|split|replace_images:images %}
+    {{ line|safe }}
+    {% endfor %}
+</div>
