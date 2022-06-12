@@ -6,9 +6,11 @@ from shop.models import Collection, Product
 
 class StaticViewsSitemap(Sitemap):
     def items(self):
-        return ['index', 'products_view', 'faq', 'contact', 'data_handling', 'aszf', 'impresszum']
+        return ['index', 'products_view', 'faq', 'contact', 'data_handling', 'aszf', 'impresszum', 'blog-bejegyzesek']
 
     def location(self, obj):
+        if 'blog' in obj:
+            return reverse('blog:' + obj)
         return reverse('shop:' + obj)
 
 
