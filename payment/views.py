@@ -1,5 +1,6 @@
 import json
 from datetime import datetime, timedelta
+from smtplib import SMTPAuthenticationError
 
 import stripe
 from django.conf import settings
@@ -16,6 +17,11 @@ from order.models import Order
 from parameters.models import Parameter
 from shop.MessageSender import MessageSender
 from shop.models import Notification, Product, GiftCard, Message
+
+
+def __create_log_file(message: str, type_: str = 'INFO'):
+    log = LogFile(type=type_, message=message)
+    log.save()
 
 
 @csrf_exempt
@@ -57,7 +63,7 @@ def create_checkout_session(request):
     # this sucks since 175ft is the minimum limit for a purchase
     if hasattr(cart, 'gift_cards') and cart.gift_cards is not None:
         total_price = cart.calculated_total_price()
-        items.append(dict(name='valami', amount=int(total_price) * 100, quantity=1,
+        items.append(dict(name='Ajándékkártya', amount=int(total_price) * 100, quantity=1,
                           currency=Parameter.objects.filter(name="currency")[0].value))
     else:
         discount = order[0].coupon if order[0].coupon is not None else ''
@@ -116,83 +122,103 @@ class CancelledView(TemplateView):
     template_name = 'payment/cancelled.html'
 
 
-def __post_payment_process(event):
-    # save the order
-    order_id = event['data']['object']['metadata']['order_id']
-    order = get_object_or_404(Order, id=order_id)
+def __save_order(event, order, prices):
     order.paid = True
     order.paid_by = 'Stripe'
     order.paid_time = (datetime.utcfromtimestamp(event['created'])
                        + timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S')
-    prices = dict(FoxPost=int(Parameter.objects.filter(name="foxpost_price")[0].value),
-                  Csomagkuldo=int(Parameter.objects.filter(name="csomagkuldo_price")[0].value),
-                  Házhozszállítás=int(Parameter.objects.filter(name="delivery_price")[0].value),
-                  Személyesátvétel=0,
-                  Ajanlott=int(Parameter.objects.filter(name="ajanlott_price")[0].value))
     order.delivery_cost = prices[order.delivery_type.replace(' ', '')]
     order.save()
-    # decrease the stock number
-    order_items = Order.objects.prefetch_related('items').filter(id=order_id)[0].items.all()
-    for o in order_items:
+
+
+def __save_order_items(order):
+    for o in order.items.all():
         if o.product is not None and not o.product.custom:
             product = Product.objects.prefetch_related('product_types').filter(id=o.product.id)[0]
             if len(product.product_types.all()) > 0:
                 product_type = [pt for pt in product.product_types.all() if pt.color == o.color]
-                log = LogFile(type='INFO', message=f'Stock of product with the ID of "{product.id}" '
-                                                   f'and the name of "{product.name}" '
-                                                   f'and the color of "{product_type[0].color}" was decreased'
-                                                   f' with {o.quantity}. Previous stock was "{product_type[0].stock}",'
-                                                   f' current stock is ')
+                msg = f'Stock of product with the ID of "{product.id}" and the name of "{product.name}" and the' \
+                      f' color of "{product_type[0].color}" was decreased with {o.quantity}. ' \
+                      f'Previous stock was "{product_type[0].stock}", '
                 product_type[0].stock = product_type[0].stock - o.quantity
                 product_type[0].save()
-                log.message += f'"{product_type[0].stock}". Order ID: {order.id}'
-                log.save()
+                msg += f'current stock is "{product_type[0].stock}". Order ID: {order.id}'
+                __create_log_file(msg)
             else:
-                log = LogFile(type='INFO', message=f'Stock of product with the ID of "{product.id}"'
-                                                   f' and the name of "{product.name}" was decreased'
-                                                   f' with {o.quantity}. Previous stock was "{product.stock}",'
-                                                   f' current stock is ')
+                msg = f'Stock of product with the ID of "{product.id}" and the name of "{product.name}" was ' \
+                      f'decreased with {o.quantity}. Previous stock was "{product.stock}", current stock is '
                 product.stock = product.stock - o.quantity
+                msg += f'"{product.stock}". Order ID: {order.id}'
+                __create_log_file(msg)
             product.save()
-            if len(product.product_types.all()) == 0:
-                log.message += f'"{product.stock}". Order ID: {order.id}'
-                log.save()
         if o.gift_card is not None:
             gift_card = GiftCard.objects.get(id=o.gift_card.id)
             bought_card = BoughtGiftCard(price=gift_card.price, bought=datetime.now, email=order.email, active=True)
             bought_card.save()
 
-    # SEND AN ORDER CONFIRMATION MAIL
-    o = Order.objects.prefetch_related('items').filter(id=order_id)[0]
+
+def __send_order_confirmation_email(o, prices):
     delivery_info = dict(FoxPost={'Átvételi pont': o.fox_post},
                          Csomagkuldo={'Átvételi pont': o.csomagkuldo},
                          Házhozszállítás={'Szállítási név': o.delivery_name, 'Szállítási cím': o.address,
                                           'Postakód': o.postal_code, 'Település': o.city, 'Megjegyzés': o.note},
                          Ajanlott={'Szállítási név': o.delivery_name, 'Szállítási cím': o.address,
-                                          'Postakód': o.postal_code, 'Település': o.city, 'Megjegyzés': o.note},
+                                   'Postakód': o.postal_code, 'Település': o.city, 'Megjegyzés': o.note},
                          Személyesátvétel={'Vezetéknév': o.first_name, 'Keresztnév': o.last_name})
     delivery_price = prices[o.delivery_type.replace(' ', '')]
     delivery_data = delivery_info[o.delivery_type.replace(' ', '')]
     order_total = o.total
-    result, msg = MessageSender(subject=f'Rendelés megerősítése #{str(o.id)}', to=o.email,
-                                sender='www.minervastudio.hu').send_order_confirmation_email(
-        {'name': o.full_name, 'order': o,
-         'delivery_price': delivery_price,
-         'delivery_info': delivery_data,
-         'order_total': order_total})
-    sent = True if result == 1 else False
+    data = {'name': o.full_name, 'order': o,
+            'delivery_price': delivery_price,
+            'delivery_info': delivery_data,
+            'order_total': order_total}
+    subject = f'Rendelés megerősítése #{str(o.id)}'
+    sender = 'www.minervastudio.hu'
+    try:
+        result, msg = MessageSender(subject=subject, to=o.email, sender=sender).send_order_confirmation_email(data)
+        sent = True if result == 1 else False
+    except SMTPAuthenticationError:
+        msg = f'Could not send order confirmation message to the following order id: "{str(o.id)}"'
+        __create_log_file(type_='ERROR', message=msg)
+        sent = 0
     Message.objects.create(subject=f'Rendelés megerősítése #{str(o.id)}', email=o.email, message=msg,
                            sender='System message from Minerva Studio', sent=sent)
-    # SEND EMAIL ABOUT THE ORDER
-    product = ', '.join([i.product.name for i in order_items])
-    msg = f'Új rendelés:\nA rendelés száma: #{str(o.id)}\nA rendelés összege: {str(order_total)} Ft\nTermékek: {product}'
-    result = MessageSender(subject=f'Új rendelés #{str(o.id)}', to=settings.EMAIL_HOST_USER,
-                           sender='www.minervastudio.hu',
-                           message=msg).send_mail()
-    sent = True if result == 1 else False
-    LogFile.objects.create(type='INFO', message=f'Message is sent to "{o.email}", status: "{result}"')
+
+
+def __send_email_about_the_order(o):
+    product = ', '.join([i.product.name for i in o.items.all()])
+    msg = f'Új rendelés:\nA rendelés száma: #{str(o.id)}\nA rendelés összege: {str(o.total)} Ft\nTermékek: {product}'
+    subject = f'Új rendelés #{str(o.id)}'
+    sender = 'www.minervastudio.hu'
+    try:
+        result = MessageSender(subject=subject, to=settings.EMAIL_HOST_USER, sender=sender, message=msg).send_mail()
+        sent = True if result == 1 else False
+    except SMTPAuthenticationError:
+        msg = f'Could not send email about the order to the following order id: "{str(o.id)}"'
+        __create_log_file(type_='ERROR', message=msg)
+        sent = 0
+    __create_log_file(f'Message is sent to "{o.email}", status: "{sent}"')
     Message.objects.create(subject=f'Új rendelés #{str(o.id)}', email=settings.EMAIL_HOST_USER, message=msg,
                            sender='System message from Minerva Studio', sent=sent)
+
+
+def __post_payment_process(event):
+    prices = dict(FoxPost=int(Parameter.objects.filter(name="foxpost_price")[0].value),
+                  Csomagkuldo=int(Parameter.objects.filter(name="csomagkuldo_price")[0].value),
+                  Házhozszállítás=int(Parameter.objects.filter(name="delivery_price")[0].value),
+                  Személyesátvétel=0,
+                  Ajanlott=int(Parameter.objects.filter(name="ajanlott_price")[0].value))
+    order_id = event['data']['object']['metadata']['order_id']
+    order_with_items = Order.objects.prefetch_related('items').filter(id=order_id)[0]
+    if order_with_items.paid_time == '':
+        # save the order
+        __save_order(event, order_with_items, prices)
+        # decrease the stock number
+        __save_order_items(order_with_items)
+    # SEND AN ORDER CONFIRMATION MAIL
+    __send_order_confirmation_email(order_with_items, prices)
+    # SEND EMAIL ABOUT THE ORDER
+    __send_email_about_the_order(order_with_items)
 
 
 def finalize_gift_card_payment(request):
