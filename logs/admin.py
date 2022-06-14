@@ -6,6 +6,7 @@ from .models import LogFile
 class LogFileAdmin(admin.ModelAdmin):
     list_display = ['type', 'message', 'created']
     readonly_fields = ['type', 'message', 'created']
+    list_filter = ['type']
     can_delete = False
 
     def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
