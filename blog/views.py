@@ -11,7 +11,7 @@ class PostList(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["canonical"] = self.request.META["HTTP_HOST"] + self.request.META["PATH_INFO"]
+        context["canonical"] = f'https://{self.request.META["HTTP_HOST"]}{self.request.META["PATH_INFO"]}'
         return context
 
 
@@ -36,5 +36,5 @@ class PostDetail(generic.DetailView):
         context["prev"] = prev_slug
         context["seo_title"] = images[0].title + ' - Minervastudio'
         context["seo_description"] = images[0].short_description
-        context["canonical"] = self.request.META["HTTP_HOST"] + self.request.META["PATH_INFO"]
+        context["canonical"] = f'https://{self.request.META["HTTP_HOST"]}{self.request.META["PATH_INFO"]}'
         return context
