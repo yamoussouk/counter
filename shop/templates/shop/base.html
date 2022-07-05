@@ -2,16 +2,9 @@
 <!DOCTYPE html>
 <html{% if cart_border %} id="cart"{% endif %} lang="hu">
   <head>
-    <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-WNX756V');</script>
-    <!-- End Google Tag Manager -->
     <meta name="description" content="{% if seo_description %}{{ seo_description }}{% else %}A Minerva Studio ékszerei kis darabszámban kézzel készült, egyedi termékek.
      A fülbevalók modernek, elegánsak, letisztultak.{% endif %}">
-    <meta name="keywords" content="{% if seo_keywords %}{{ seo_keywords }}{% else %}kézműves fülbevaló, kézzel készített fülbevaló, egyedi fülbevaló, fülbarát fülbevaló{% endif %}" >
+    <meta name="keywords" content="{% if seo_keywords %}{{ seo_keywords }}{% else %}fülbevalók, süthető gyurma fülbevaló, orvosi fém, nemesacél fülbevalók{% endif %}" >
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="icon" sizes="192x192" href="{% url 'shop:get_icon' %}">
@@ -19,7 +12,7 @@
     {% if canonical %}
     <link rel="canonical" href="{{ canonical }}">
     {% endif %}
-    <title>{% if seo_title %}{{ seo_title }}{% else %}Minerva Studio - modern, egyedi, könnyű fülbevalók | Kézműves fülbevalók{% endif %}</title>
+    <title>{% if seo_title %}{{ seo_title }}{% else %}Egyedi fülbevalók süthető gyurmából - Minervastudio{% endif %}</title>
 <!--    <link href="{% static "css/font-awesome.mint.css" %}" rel="preload" as="font" onload="this.rel='stylesheet'" />-->
     {% if CUSTOM %}
       <link href="{% static "css/base.css" %}" rel="stylesheet" />

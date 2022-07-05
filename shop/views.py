@@ -170,9 +170,13 @@ def faq(request):
     notification = Notification.objects.all()
     param = Parameter.objects.filter(name="shipping_information")
     shipping_information = param[0].value if len(param) and param[0].active else None
+    seo_title = "Gyakori kérdések"
+    seo_description = "Gyakori kérdések - kényelmes megoldás Önnek, ha otthonról vásárolna."
     return render(request, 'shop/faq.html',
                   {'csomagkuldo': csomagkuldo, 'foxpost': foxpost, 'delivery': delivery,
-                   'ajanlott': ajanlott, 'notification': notification, 'shipping_information': shipping_information})
+                   'ajanlott': ajanlott, 'notification': notification, 'shipping_information': shipping_information,
+                   'seo_title': seo_title,
+                   'seo_description': seo_description})
 
 
 def contact(request):
@@ -180,24 +184,36 @@ def contact(request):
     notification = Notification.objects.all()
     param = Parameter.objects.filter(name="shipping_information")
     shipping_information = param[0].value if len(param) and param[0].active else None
+    seo_title = "Kapcsolat"
+    seo_description = "Kapcsolat - kényelmes megoldás Önnek, ha otthonról vásárolna."
     return render(request, 'shop/contact.html', {'contact_form': contact_form, 'notification': notification,
-                                                 'shipping_information': shipping_information})
+                                                 'shipping_information': shipping_information,
+                                                 'seo_title': seo_title,
+                                                 'seo_description': seo_description})
 
 
 def data_handling(request):
     notification = Notification.objects.all()
     param = Parameter.objects.filter(name="shipping_information")
     shipping_information = param[0].value if len(param) and param[0].active else None
+    seo_title = "Adatkezelési tájékoztató"
+    seo_description = "Adatkezelési tájékoztató - kényelmes megoldás Önnek, ha otthonról vásárolna."
     return render(request, 'shop/data_handling.html', {'notification': notification,
-                                                       'shipping_information': shipping_information})
+                                                       'shipping_information': shipping_information,
+                                                       'seo_title': seo_title,
+                                                       'seo_description': seo_description})
 
 
 def aszf(request):
     notification = Notification.objects.all()
     param = Parameter.objects.filter(name="shipping_information")
     shipping_information = param[0].value if len(param) and param[0].active else None
+    seo_title = "Vásárlási feltételek"
+    seo_description = "Vásárlási feltételek - kényelmes megoldás Önnek, ha otthonról vásárolna."
     return render(request, 'shop/aszf.html', {'notification': notification,
-                                              'shipping_information': shipping_information})
+                                              'shipping_information': shipping_information,
+                                              'seo_title': seo_title,
+                                              'seo_description': seo_description})
 
 
 def contact_message(request):
@@ -228,8 +244,12 @@ def impresszum(request):
     notification = Notification.objects.all()
     param = Parameter.objects.filter(name="shipping_information")
     shipping_information = param[0].value if len(param) and param[0].active else None
+    seo_title = "Impresszum"
+    seo_description = "Impresszum - kényelmes megoldás Önnek, ha otthonról vásárolna."
     return render(request, 'shop/impresszum.html', {'notification': notification,
-                                                    'shipping_information': shipping_information})
+                                                    'shipping_information': shipping_information,
+                                                    'seo_title': seo_title,
+                                                    'seo_description': seo_description})
 
 
 def _get_stock_list(temp):
@@ -307,7 +327,10 @@ class ProductsView(ListView):
         if 'slug' in self.kwargs:
             context['collection'] = get_object_or_404(Collection, slug=self.kwargs['slug'])
         else:
-            context['collection'] = dict(seo_title='', seo_description='', seo_keywords='')
+            context['collection'] = dict(seo_title='Fülbevaló választék, kézműves fülbevalók - Minervastudio',
+                                         seo_description='Egyedi, kézzel készített fülbevalók süthető gyurmából '
+                                                         'és nemesacél elemekkel, csak Neked.',
+                                         seo_keywords='fülbevalók, süthető gyurma fülbevalók, kézműves fülbevalók')
         context['basic_collections'] = Collection.objects.filter(
             available=True, basic_collection=True, custom=False, studio_collection=False).order_by('-created')
         context['regular_collections'] = Collection.objects.filter(available=True, custom=False,
