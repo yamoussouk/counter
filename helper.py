@@ -25,12 +25,26 @@ def convert():
             convert_file(os.path.join(media_path, filename))
             print(filename)
 
+    for filename in os.listdir(collections_path):
+        if (filename.endswith(".png") or filename.endswith(".jpg")) and \
+                not os.path.isfile(os.path.join(media_path, filename.split('.')[0] + '.webp')):
+            convert_file(os.path.join(media_path, filename))
+            print(filename)
+
+    for filename in os.listdir(images_path):
+        if (filename.endswith(".png") or filename.endswith(".jpg")) and \
+                not os.path.isfile(os.path.join(media_path, filename.split('.')[0] + '.webp')):
+            convert_file(os.path.join(media_path, filename))
+            print(filename)
+
     for dirpath, dirnames, filenames in os.walk(blog_path):
         for filename in [f for f in filenames if
                          (f.endswith(".png") or f.endswith(".jpg") or f.endswith(".jpeg")) and not os.path.isfile(
                                  os.path.join(dirpath, f.split('.')[0] + '.webp'))]:
             convert_file(os.path.join(dirpath, filename))
             print(filename)
+
+
 
 
 if __name__ == '__main__':
