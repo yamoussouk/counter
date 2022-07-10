@@ -11,7 +11,6 @@ STATUS = (
 TEMPLATES = (
     (0, "Only text"),
     (1, "Content-image"),
-    (2, "Content-next-image")
 )
 
 
@@ -56,7 +55,15 @@ class Post(models.Model):
     banner_image_alt = models.CharField(max_length=200, blank=True)
     banner_image_title = models.CharField(max_length=200, blank=True)
     updated_on = models.DateTimeField(auto_now=True)
-    content = models.TextField()
+    content = models.TextField(help_text="<div style=\"font-size: 16px;\">"
+                                         "Paragraph: &lt;p&gt;some text&lt;/p&gt;<br>"
+                                         "Image: &lt;img&gt;&lt;/img&gt;<br>"
+                                         "Image underlying text: &lt;div class&quot;\"image-note\"&gt;&lt;span&gt;some text&lt;/span&gt;&lt;/div&gt;<br>"
+                                         "Bold text: &lt;b&gt;some text&lt;/b&gt;<br>"
+                                         "Bigger size: &lt;em&gt;some text&lt;/em&gt;<br>"
+                                         "Italic style: &lt;i&gt;some text&lt;/i&gt;<br>"
+                                         "Left-right columns: &lt;div class=\"left\"&gt;some text or image&lt;/div&gt;&lt;div class=\"right\"&gt;some text or image&lt;/div&gt;&lt;div class=\"clearfix\"&gt;&lt;/div&gt;"
+                                         "</div>")
     created_on = models.DateTimeField(auto_now_add=True)
     status = models.IntegerField(choices=STATUS, default=0)
     time_to_read = models.CharField(max_length=3, blank=True)
