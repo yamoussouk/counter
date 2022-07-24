@@ -42,6 +42,9 @@ class Order(models.Model):
     phone = models.CharField(max_length=25, default='', blank=True)
     shipped = models.BooleanField(default=False)
     product_note = models.CharField(max_length=250, default='', blank=True)
+    billing_address_number = models.CharField(max_length=20, default='', blank=True)
+    address_number = models.CharField(max_length=20, default='', blank=True)
+    delivery_type_code = models.IntegerField(null=True, blank=True)
 
     class Meta:
         ordering = ('-created',)

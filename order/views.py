@@ -18,6 +18,11 @@ prices = dict(FoxPost=int(Parameter.objects.filter(name="foxpost_price")[0].valu
               Házhozszállítás=int(Parameter.objects.filter(name="delivery_price")[0].value),
               Személyesátvétel=0,
               Ajanlott=int(Parameter.objects.filter(name="ajanlott_price")[0].value))
+delivery_types = {"0": "Személyes átvétel", "1": "Csomagkuldo", "2": "Ajanlott", "3": "FoxPost", "4": "Házhozszállítás"}
+
+
+def create_log_file(message: str, log_type: str = 'INFO') -> 'None':
+    LogFile.objects.create(type=log_type, message=message)
 
 
 def __validate_stock(cart, product, cd):
@@ -53,7 +58,11 @@ def __validate_stock(cart, product, cd):
 def get_client_ip(request):
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
     if x_forwarded_for:
-        ip = x_forwarded_for.split(',')[0]
+        ip = x_forwarded_for.split(',')
+        if len(ip):
+            return ip[0]
+        else:
+            return ip
     else:
         ip = request.META.get('REMOTE_ADDR')
     return ip
@@ -77,62 +86,54 @@ def order_create(request):
                                    f'A megvásárolni kívánt, illetve a kosaradban található termék összes mennyisége'
                                    f' meghaladja az elérhető mennyiséget, amely {stock}. A kosaradban az aktuális termék '
                                    f'mennyisége {item_in_cart}.')
-            LogFile.objects.create(type='INFO',
-                                   message=f'Valid form, order received, user: {get_client_ip(request)}')
+            create_log_file(f'Valid form, order received, user: {get_client_ip(request)}')
             if not out_of_stock:
-                request.session['delivery'] = dict(delivery_type=cd['delivery_type'], address=cd['address'],
+                request.session['delivery'] = dict(delivery_type=delivery_types[str(cd['delivery_type_code'])],
+                                                   delivery_code=str(cd['delivery_type_code']),
+                                                   address=cd['address'],
                                                    postal_code=cd['postal_code'], city=cd['city'], note=cd['note'],
-                                                   fox_post=cd['fox_post'], delivery_name=cd['delivery_name'],
+                                                   fox_post=cd['fox_post'],
+                                                   delivery_name=cd['delivery_name'],
                                                    first_name=cd['first_name'], last_name=cd['last_name'],
-                                                   csomagkuldo=cd['csomagkuldo'])
+                                                   csomagkuldo=cd['csomagkuldo'], address_number=cd['address_number'])
                 request.session['mandatory'] = dict(full_name=cd['full_name'], email=cd['email'], phone=cd['phone'])
                 request.session['billing'] = dict(billing_address=cd['billing_address'],
+                                                  billing_address_number=cd['billing_address_number'],
                                                   billing_postal_code=cd['billing_postal_code'],
                                                   billing_city=cd['billing_city'], product_note=cd['product_note'])
-                LogFile.objects.create(type='INFO',
-                                       message=f'Delivery method: {request.session["delivery"]}, '
-                                               f'user: {get_client_ip(request)}')
+                create_log_file(f'Delivery method: {request.session["delivery"]}, user: {get_client_ip(request)}')
                 order = cart.order
                 if order:
-                    order.full_name = request.POST.get('full_name')
-                    order.phone = request.POST.get('phone_number')
-                    order.email = request.POST.get('email_address')
-                    order.billing_address = request.POST.get('billing_address')
-                    order.billing_postal_code = request.POST.get('billing_postal_code')
-                    order.billing_city = request.POST.get('billing_city')
-                    order.first_name = request.POST.get('first_name')
-                    order.last_name = request.POST.get('last_name')
-                    v = 'delivery_full_name' if request.POST.get(
-                        'delivery_type') == 'Házhozszállítás' else 'delivery_name'
-                    order.delivery_name = request.POST.get(v)
-                    v = 'd_address' if request.POST.get(
-                        'delivery_type') == 'Házhozszállítás' else 'address'
-                    order.address = request.POST.get(v)
-                    v = 'd_zip' if request.POST.get(
-                        'delivery_type') == 'Házhozszállítás' else 'postal_code'
-                    order.postal_code = request.POST.get(v)
-                    v = 'd_city' if request.POST.get(
-                        'delivery_type') == 'Házhozszállítás' else 'city'
-                    order.city = request.POST.get(v)
-                    v = 'd_note' if request.POST.get(
-                        'delivery_type') == 'Házhozszállítás' else 'note'
-                    order.note = request.POST.get(v)
-                    order.delivery_type = request.POST.get('delivery_type')
-                    order.fox_post = request.POST.get('fox_post')
-                    order.csomagkuldo = request.POST.get('csomagkuldo')
-                    order.product_note = request.POST.get('product_note')
-                    LogFile.objects.create(type='INFO',
-                                           message=f'Order "{order.id}" already exists, user: {get_client_ip(request)}')
+                    order.full_name = cd['full_name']
+                    order.phone = cd['phone']
+                    order.email = cd['email']
+                    order.billing_address = cd['billing_address']
+                    order.billing_address_number = cd['billing_address_number']
+                    order.billing_postal_code = cd['billing_postal_code']
+                    order.billing_city = cd['billing_city']
+                    order.first_name = cd['first_name']
+                    order.last_name = cd['last_name']
+                    order.delivery_name = cd["delivery_name"]
+                    order.address = cd["address"]
+                    order.address_number = cd["address_number"]
+                    order.postal_code = cd["postal_code"]
+                    order.city = cd["city"]
+                    order.note = cd["note"]
+                    order.delivery_type = delivery_types[str(cd['delivery_type_code'])]
+                    order.fox_post = cd['fox_post']
+                    order.csomagkuldo = cd['csomagkuldo']
+                    order.product_note = cd['product_note']
+                    create_log_file(f'Order "{order.id}" already exists, user: {get_client_ip(request)}')
                 else:
                     order = form.save(commit=False)
+                    order.delivery_type = delivery_types[str(cd['delivery_type_code'])]
                 order.subtotal = cart.get_total_price_after_discount()  # delivery excluded
                 if cart.coupon:
                     order.coupon = cart.coupon
                     order.discount = cart.coupon.discount
                     order.discount_amount = float(cart.get_total_price()) - float(cart.get_total_price_after_discount())
                 order.save()
-                LogFile.objects.create(type='INFO',
-                                       message=f'Order "{order.id}" is saved, user: {get_client_ip(request)}')
+                create_log_file(f'Order "{order.id}" is saved, user: {get_client_ip(request)}')
                 order_items = Order.objects.prefetch_related('items').filter(id=order.id)[0].items.all()
                 # some item was removed from the cart
                 if len([i for i in cart]) < len(order_items):
@@ -170,10 +171,8 @@ def order_create(request):
                     order.coupon = None
                     order.discount = 0
                     order.discount_amount = 0
-                LogFile.objects.create(
-                    type='INFO', message=f'Order process initiated, '
-                                         f'items: {", ".join([str(i["product_id"]) for i in cart])}, '
-                                         f'user: {get_client_ip(request)}')
+                create_log_file(f'Order process initiated, items: {", ".join([str(i["product_id"]) for i in cart])},'
+                                f' user: {get_client_ip(request)}')
                 order.save()
         else:
             print('error', form.errors.as_data())

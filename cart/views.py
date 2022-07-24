@@ -1,19 +1,33 @@
 import logging
 
 from django.contrib import messages
+from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
 from coupon.forms import CouponApplyForm
+from logs.models import LogFile
 from parameters.models import Parameter
 # from giftcardpayment.forms import GiftCardApplyForm
 from shop.models import Product, GiftCard, ProductType, Notification
-from logs.models import LogFile
 from .cart import Cart
 from .forms import CartAddProductForm, CartAddCustomProductForm, CartAddGiftCardProductForm, CartDeliveryInfoForm
 
 log = logging.getLogger(__name__)
+
+CSOMAGKULDO_PRICE_API_KEY = 'csomagkuldo_price_api_key'
+SZEMELYES_ATVETEL_ENABLED = 'szemelyes_atvetel_enabled'
+FOXPOST_ENABLED = 'foxpost_enabled'
+DELIVERY_ENABLED = 'delivery_enabled'
+CSOMAGKULDO_ENABLED = 'csomagkuldo_enabled'
+AJANLOTT_ENABLED = 'ajanlott_enabled'
+DISCOUNT_SERVICE = 'discount_service'
+FOXPOST_PRICE = 'foxpost_price'
+DELIVERY_PRICE = 'delivery_price'
+CSOMAGKULDO_PRICE = 'csomagkuldo_price'
+AJANLOTT_PRICE = 'ajanlott_price'
+AJANLOTT_CART_LIMIT = 'ajanlott_cart_limit'
 
 
 def __validate_stock(cart, product, cd):
@@ -120,6 +134,63 @@ def cart_remove(request, item_id):
     return redirect(reverse('cart:cart_detail'))
 
 
+def set_delivery_form(delivery_form, request):
+    delivery_form.fields["delivery_name"].initial = request.session["delivery"].get("delivery_name", "")
+    delivery_form.fields["address"].initial = request.session["delivery"].get("address", "")
+    delivery_form.fields["address_number"].initial = request.session["delivery"].get("address_number", "")
+    delivery_form.fields["postal_code"].initial = request.session["delivery"].get("postal_code", "")
+    delivery_form.fields["city"].initial = request.session["delivery"].get("city", "")
+    delivery_form.fields["note"].initial = request.session["delivery"].get("note", "")
+
+
+def set_personal_form(delivery_form, request):
+    delivery_form.fields["first_name"].required = True
+    delivery_form.fields["first_name"].initial = request.session["delivery"].get("first_name", "")
+    delivery_form.fields["last_name"].required = True
+    delivery_form.fields["last_name"].initial = request.session["delivery"].get("last_name", "")
+
+
+def initiate_the_cart_delivery_form(request) -> 'CartDeliveryInfoForm':
+    delivery_form = CartDeliveryInfoForm()
+    if request.session.get('delivery', None) is not None:
+        delivery_code = request.session["delivery"].get("delivery_code")
+        if delivery_code is not None:
+            delivery_form.fields["delivery_type_code"].initial = str(delivery_code)
+            if delivery_code == "0":  # szemelyes atvetel
+                set_personal_form(delivery_form, request)
+            elif delivery_code in ["2", "4"]:  # hazhozszallitas, ajanlott
+                set_delivery_form(delivery_form, request)
+            elif delivery_code == "1":  # csomagkuldo
+                delivery_form.fields["csomagkuldo"].required = True
+                delivery_form.fields["csomagkuldo"].initial = request.session["delivery"].get("csomagkuldo", "")
+            elif delivery_code == "3":  # foxpost
+                delivery_form.fields["fox_post"].required = True
+                delivery_form.fields["fox_post"].initial = request.session["delivery"].get("fox_post", "")
+    return delivery_form
+
+
+def is_parameter_enabled(parameters, name: str) -> bool:
+    filter_ = [param for param in parameters if param.name == name]
+    if len(filter_):
+        return filter_[0].value == 'True'
+    else:
+        LogFile.objects.create(type='WARNING',
+                               message=f'There is no such parameter: {name} in the Parameters; '
+                                       f'must have returned False')
+        return False
+
+
+def get_parameter_value(parameters, name: str):
+    filter_ = [param for param in parameters if param.name == name]
+    if len(filter_):
+        return filter_[0].value
+    else:
+        LogFile.objects.create(type='WARNING',
+                               message=f'There is no such parameter: {name} in the Parameters; '
+                                       f'must have returned empty string')
+        return ''
+
+
 def cart_detail(request):
     cart = Cart(request)
     is_product_in_cart = False
@@ -130,23 +201,35 @@ def cart_detail(request):
             is_product_in_cart = True
     coupon_apply_form = CouponApplyForm()
     # gift_card_apply_form = GiftCardApplyForm()
-    delivery_form = CartDeliveryInfoForm()
-    current_amount = request.session['current_amount'] if 'current_amount' in request.session else 0
+    delivery_form = initiate_the_cart_delivery_form(request)
+    current_amount = request.session.get('current_amount', 0)
     notification = Notification.objects.all()
-    api_key = Parameter.objects.filter(name="csomagkuldo_price_api_key")[0].value
-    is_szemelyes_atvetel_enabled = Parameter.objects.filter(name="szemelyes_atvetel_enabled")[0].value == 'True'
-    is_foxpost_enabled = Parameter.objects.filter(name="foxpost_enabled")[0].value == 'True'
-    is_delivery_enabled = Parameter.objects.filter(name="delivery_enabled")[0].value == 'True'
-    is_csomagkuldo_enabled = Parameter.objects.filter(name="csomagkuldo_enabled")[0].value == 'True'
-    is_ajanlott_enabled = Parameter.objects.filter(name="ajanlott_enabled")[0].value == 'True'
-    ajanlott_cart_limit = int(Parameter.objects.filter(name="ajanlott_cart_limit")[0].value)
+    parameters = Parameter.objects.filter(Q(name=CSOMAGKULDO_PRICE_API_KEY) |
+                                          Q(name=SZEMELYES_ATVETEL_ENABLED) |
+                                          Q(name=FOXPOST_ENABLED) |
+                                          Q(name=DELIVERY_ENABLED) |
+                                          Q(name=CSOMAGKULDO_ENABLED) |
+                                          Q(name=AJANLOTT_ENABLED) |
+                                          Q(name=AJANLOTT_CART_LIMIT) |
+                                          Q(name=DISCOUNT_SERVICE) |
+                                          Q(name=FOXPOST_PRICE) |
+                                          Q(name=DELIVERY_PRICE) |
+                                          Q(name=CSOMAGKULDO_PRICE) |
+                                          Q(name=AJANLOTT_PRICE))
+    api_key = [param for param in parameters if param.name == CSOMAGKULDO_PRICE_API_KEY][0].value
+    is_szemelyes_atvetel_enabled = is_parameter_enabled(parameters, SZEMELYES_ATVETEL_ENABLED)
+    is_foxpost_enabled = is_parameter_enabled(parameters, FOXPOST_ENABLED)
+    is_delivery_enabled = is_parameter_enabled(parameters, DELIVERY_ENABLED)
+    is_csomagkuldo_enabled = is_parameter_enabled(parameters, CSOMAGKULDO_ENABLED)
+    is_ajanlott_enabled = is_parameter_enabled(parameters, AJANLOTT_ENABLED)
+    ajanlott_cart_limit = int([param for param in parameters if param.name == AJANLOTT_CART_LIMIT][0].value)
     is_delivery_size_ok = sum(int(value['delivery_size']) for key, value in cart.cart.items()) <= 10
-    is_discount_enabled = Parameter.objects.filter(name="discount_service")[0].value == 'True'  # 3/2
+    is_discount_enabled = is_parameter_enabled(parameters, DISCOUNT_SERVICE)  # 3/2
     context = dict(cart=cart, coupon_apply_form=coupon_apply_form, delivery_form=delivery_form,
-                   fox_price=Parameter.objects.filter(name="foxpost_price")[0].value,
-                   delivery_price=Parameter.objects.filter(name="delivery_price")[0].value,
-                   csomagkuldo_price=Parameter.objects.filter(name="csomagkuldo_price")[0].value,
-                   ajanlott_price=Parameter.objects.filter(name="ajanlott_price")[0].value,
+                   fox_price=get_parameter_value(parameters, FOXPOST_PRICE),
+                   delivery_price=get_parameter_value(parameters, DELIVERY_PRICE),
+                   csomagkuldo_price=get_parameter_value(parameters, CSOMAGKULDO_PRICE),
+                   ajanlott_price=get_parameter_value(parameters, AJANLOTT_PRICE),
                    is_product_in_cart=is_product_in_cart,
                    current_amount=current_amount, session=request.session, notification=notification, api_key=api_key,
                    is_szemelyes_atvetel_enabled=is_szemelyes_atvetel_enabled,
