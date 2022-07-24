@@ -67,16 +67,11 @@
     <!-- Bootstrap CSS -->
     <link rel="preload" as="style" onload="this.rel='stylesheet'" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
           integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
-    <script src="https://unpkg.com/webp-hero@0.0.0-dev.21/dist-cjs/polyfills.js" defer></script>
     {% if index %}
       <link href="{% static "css/home.css" %}" rel="stylesheet" media="all"/>
       <link href="{% static "css/home_page_carousel.css" %}" rel="stylesheet"  media="all"/>
       <link rel="stylesheet" href="{% static "css/owl.carousel.min.css" %}" />
     {% endif %}
-    <script>
-     var webpMachine = new webpHero.WebpMachine();
-     webpMachine.polyfillDocument();
-    </script>
 <!--    <script src="https://cdn.jsdelivr.net/npm/lazyload@2.0.0-rc.2/lazyload.js"></script>-->
   </head>
   <body>

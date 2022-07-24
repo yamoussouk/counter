@@ -153,13 +153,13 @@ class OrderItemInline(admin.TabularInline):
 
 
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['id', 'first_name', 'last_name', 'email', 'phone', 'address', 'postal_code', 'city', 'created',
-                    'updated', 'paid', 'paid_by', 'total', 'shipped']
+    list_display = ['id', 'first_name', 'last_name', 'email', 'phone', 'address',
+                    'postal_code', 'city', 'created', 'updated', 'paid', 'paid_by', 'total', 'shipped']
     list_filter = ['paid', 'paid_by', 'created', 'updated']
     fieldsets = (
         ('Kötelező mezők', {
-            'fields': ('full_name', 'phone', 'email', 'billing_address', 'billing_postal_code', 'billing_city',
-                       'product_note',)
+            'fields': ('full_name', 'phone', 'email', 'billing_address', 'billing_address_number',
+                       'billing_postal_code', 'billing_city', 'product_note',)
         }),
         ('Szállítás módja', {
             'fields': ('delivery_type',)
@@ -174,7 +174,7 @@ class OrderAdmin(admin.ModelAdmin):
             'fields': ('csomagkuldo',)
         }),
         ('Házhozszállítás', {
-            'fields': ('delivery_name', 'address', 'postal_code', 'city', 'note',)
+            'fields': ('delivery_name', 'address', 'address_number', 'postal_code', 'city', 'note',)
         }),
         ('Ár', {
             'fields': ('products_price', 'products_price_with_discount', 'delivery_cost', 'subtotal', 'total',)
@@ -186,11 +186,12 @@ class OrderAdmin(admin.ModelAdmin):
             'fields': ('paid', 'paid_time', 'shipped',)
         })
     )
-    readonly_fields = ('full_name', 'phone', 'email', 'billing_address', 'billing_postal_code', 'billing_city',
-                       'product_note', 'delivery_type', 'first_name', 'last_name', 'fox_post', 'csomagkuldo',
-                       'delivery_name', 'address', 'postal_code', 'city', 'note', 'products_price',
-                       'products_price_with_discount', 'delivery_cost', 'subtotal', 'total', 'coupon', 'discount',
-                       'discount_amount', 'paid', 'paid_time', 'shipped',)
+    readonly_fields = ('full_name', 'phone', 'email', 'billing_address', 'billing_address_number',
+                       'billing_postal_code', 'billing_city', 'product_note', 'delivery_type', 'first_name',
+                       'last_name', 'fox_post', 'csomagkuldo', 'delivery_name', 'address', 'address_number',
+                       'postal_code', 'city', 'note', 'products_price', 'products_price_with_discount',
+                       'delivery_cost', 'subtotal', 'total', 'coupon', 'discount', 'discount_amount',
+                       'paid', 'paid_time', 'shipped',)
     list_editable = ['shipped']
     inlines = [OrderItemInline]
     actions = [export_to_csv, re_send_order_email, shipping]
