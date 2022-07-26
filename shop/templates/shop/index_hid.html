@@ -11,26 +11,16 @@
                 <div id="owl-home-carousel" class="owl-carousel owl-theme">
                     {% for i in '2431'|make_list %}
                     <picture>
-                        <source srcset="/static/images/home_page_carousel/hc{{ i }}-s.webp" media="(max-width: 300px)"
-                                type="image/webp"/>
-                        <source srcset="/static/images/home_page_carousel/hc{{ i }}-m.webp" media="(max-width: 600px)"
-                                type="image/webp"/>
-                        <source srcset="/static/images/home_page_carousel/hc{{ i }}-l.webp" media="(max-width: 1200px)"
-                                type="image/webp"/>
-                        <source srcset="/static/images/home_page_carousel/hc{{ i }}-xl.webp" media="(max-width: 1920px)"
-                                type="image/webp"/>
-                        <source srcset="/static/images/home_page_carousel/hc{{ i }}-s.png" media="(max-width: 300px)"
-                                type="image/png"/>
-                        <source srcset="/static/images/home_page_carousel/hc{{ i }}-m.png" media="(max-width: 600px)"
-                                type="image/png"/>
-                        <source srcset="/static/images/home_page_carousel/hc{{ i }}-l.png" media="(max-width: 1200px)"
-                                type="image/png"/>
-                        <source srcset="/static/images/home_page_carousel/hc{{ i }}-xl.png" media="(max-width: 1920px)"
-                                type="image/png"/>
-                        <img src="/static/images/home_page_carousel/hc{{ i }}-xl.png"
-                             alt="Fülbevalók süthető gyurmából és nikkelmentes elemekből."
-                             title="Fülbevalók süthető gyurmából és nikkelmentes elemekből." {% if forloop.counter> 1
-                        %}loading="lazy"{% endif %}/>
+                      <source srcset="/static/images/home_page_carousel/hc{{ i }}-s.webp" media="(max-width: 300px)" type="image/webp" />
+                      <source srcset="/static/images/home_page_carousel/hc{{ i }}-m.webp" media="(max-width: 600px)" type="image/webp" />
+                      <source srcset="/static/images/home_page_carousel/hc{{ i }}-l.webp" media="(max-width: 1200px)" type="image/webp" />
+                      <source srcset="/static/images/home_page_carousel/hc{{ i }}-xl.webp" media="(max-width: 1920px)" type="image/webp" />
+                      <source srcset="/static/images/home_page_carousel/hc{{ i }}-s.png" media="(max-width: 300px)" type="image/png" />
+                      <source srcset="/static/images/home_page_carousel/hc{{ i }}-m.png" media="(max-width: 600px)" type="image/png" />
+                      <source srcset="/static/images/home_page_carousel/hc{{ i }}-l.png" media="(max-width: 1200px)" type="image/png" />
+                      <source srcset="/static/images/home_page_carousel/hc{{ i }}-xl.png" media="(max-width: 1920px)" type="image/png" />
+                      <img src="/static/images/home_page_carousel/hc{{ i }}-xl.png" alt="Fülbevalók süthető gyurmából és nikkelmentes elemekből."
+                           title="Fülbevalók süthető gyurmából és nikkelmentes elemekből." {% if forloop.counter > 1 %}loading="lazy"{% endif %}/>
                     </picture>
                     {% endfor %}
                 </div>
@@ -65,24 +55,23 @@
         <div class="row" id="carousel-row">
             <div id="owl-products-carousel" class="owl-carousel owl-theme">
                 {% for product in basic_products %}
-                {% if product.image %}
-                <a href="{% url 'shop:product_detail' id=product.collection.slug slug=product.slug %}"
-                   title="{{ product.name }}">
-                    <picture>
-                        <source class="owl-lazy" data-srcset="{{ product.image.url|wp }}" type="image/webp">
-                        <source class="owl-lazy" data-srcset="{{ product.image.url }}" type="image/jpg">
-                        <img class="owl-lazy img-fluid" data-src="{{ product.image.url }}"
-                             alt="{% if product.seo_image_alt %}{{ product.seo_image_alt }}{% else %}{{ product.name }}{% endif %}"
-                             title="{{ product.name }} photo" width="394" height="394" style="aspect-ratio:394/394;"/>
-                    </picture>
-                </a>
-                {% endif %}
+                    {% if product.image %}
+                    <a href="{% url 'shop:product_detail' id=product.collection.slug slug=product.slug %}" title="{{ product.name }}">
+                        <picture>
+                          <source class="owl-lazy" data-srcset="{{ product.image.url|wp }}" type="image/webp">
+                          <source class="owl-lazy" data-srcset="{{ product.image.url }}" type="image/jpg">
+                          <img class="owl-lazy img-fluid" data-src="{{ product.image.url }}"
+                               alt="{% if product.seo_image_alt %}{{ product.seo_image_alt }}{% else %}{{ product.name }}{% endif %}"
+                               title="{{ product.name }} photo" width="394" height="394" style="aspect-ratio:394/394;"/>
+                        </picture>
+                    </a>
+                    {% endif %}
                 {% endfor %}
             </div>
         </div>
         <div class="fluid-text-anchor container-fluid" id="home-page-carousel-buy-button">
             {% with basic_collection|first as collection %}
-            <a title="Teljes kollekció" href="{% url 'shop:products_view' slug=collection.slug %}">Teljes kollekció</a>
+                <a title="Teljes kollekció" href="{% url 'shop:products_view' slug=collection.slug %}">Teljes kollekció</a>
             {% endwith %}
         </div>
         {% endif %}
@@ -97,25 +86,23 @@
         <div class="row" id="regular-collections-wrapper">
             <div class="home-collection-wrapper d-flex justify-content-center">
                 {% for collection in regular_collections %}
-                {% if collection.image %}
-                <div class="home-collection-item">
-                    <div class="text-on-image-image-wrapper">
-                        <picture>
-                            <source srcset="{{ collection.image.url|wp }}" type="image/webp">
-                            <source srcset="{{ collection.image.url }}" type="image/jpg">
-                            <img src="{{ collection.image.url }}"
-                                 alt="{% if collection.seo_image_alt %}{{ collection.seo_image_alt }}{% else %}{{ collection.name }}{% endif %}"
-                                 title="{{ collection.name }} photo" width="612" height="612" style="aspect-ratio: 1;"
-                                 loading="lazy"/>
-                        </picture>
-                    </div>
-                    <div class="text-on-image-wrapper">
-                        <a title="{{ collection.name }}" href="{% url 'shop:products_view' slug=collection.slug %}">
-                            <span class="home-collection-title">{{ collection.name }}</span>
-                        </a>
-                    </div>
-                </div>
-                {% endif %}
+                    {% if collection.image %}
+                        <div class="home-collection-item">
+                            <div class="text-on-image-image-wrapper">
+                                <picture>
+                                  <source srcset="{{ collection.image.url|wp }}" type="image/webp">
+                                  <source srcset="{{ collection.image.url }}" type="image/jpg">
+                                  <img src="{{ collection.image.url }}" alt="{% if collection.seo_image_alt %}{{ collection.seo_image_alt }}{% else %}{{ collection.name }}{% endif %}"
+                                       title="{{ collection.name }} photo" width="612" height="612" style="aspect-ratio: 1;" loading="lazy"/>
+                                </picture>
+                            </div>
+                            <div class="text-on-image-wrapper">
+                                <a title="{{ collection.name }}" href="{% url 'shop:products_view' slug=collection.slug %}">
+                                    <span class="home-collection-title">{{ collection.name }}</span>
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
                 {% endfor %}
             </div>
         </div>
@@ -128,24 +115,23 @@
         <div class="row" id="bs-carousel-row">
             <div id="owl-bs-products-carousel" class="owl-carousel owl-theme">
                 {% for product in bs_products %}
-                {% if product.image %}
-                <a href="{% url 'shop:product_detail' id=product.collection.slug slug=product.slug %}"
-                   title="{{ product.name }}">
-                    <picture>
-                        <source class="owl-lazy" data-srcset="{{ product.image.url|wp }}" type="image/webp">
-                        <source class="owl-lazy" data-srcset="{{ product.image.url }}" type="image/jpg">
-                        <img class="img-fluid owl-lazy" data-src="{{ product.image.url }}"
-                             alt="{% if product.seo_image_alt %}{{ product.seo_image_alt }}{% else %}{{ product.name }}{% endif %}"
-                             title="{{ product.name }} photo" width="394" height="394" style="aspect-ratio:394/394;"/>
-                    </picture>
-                </a>
-                {% endif %}
+                    {% if product.image %}
+                    <a href="{% url 'shop:product_detail' id=product.collection.slug slug=product.slug %}" title="{{ product.name }}">
+                        <picture>
+                          <source class="owl-lazy" data-srcset="{{ product.image.url|wp }}" type="image/webp">
+                          <source class="owl-lazy" data-srcset="{{ product.image.url }}" type="image/jpg">
+                          <img class="img-fluid owl-lazy" data-src="{{ product.image.url }}"
+                               alt="{% if product.seo_image_alt %}{{ product.seo_image_alt }}{% else %}{{ product.name }}{% endif %}"
+                               title="{{ product.name }} photo" width="394" height="394" style="aspect-ratio:394/394;"/>
+                        </picture>
+                    </a>
+                    {% endif %}
                 {% endfor %}
             </div>
         </div>
         <div class="fluid-text-anchor container-fluid" id="home-page-bs-carousel-buy-button">
             {% with best_sellers_collection|first as collection %}
-            <a title="Teljes kollekció" href="{% url 'shop:products_view' slug=collection.slug %}">Teljes kollekció</a>
+                <a title="Teljes kollekció" href="{% url 'shop:products_view' slug=collection.slug %}">Teljes kollekció</a>
             {% endwith %}
         </div>
         {% endif %}
@@ -161,25 +147,23 @@
         <div class="row">
             <div class="home-collection-wrapper">
                 {% for collection in temporary_collections %}
-                {% if collection.image %}
-                <div class="home-collection-item">
-                    <div class="text-on-image-image-wrapper">
-                        <picture>
-                            <source srcset="{{ collection.image.url|wp }}" type="image/webp">
-                            <source srcset="{{ collection.image.url }}" type="image/png">
-                            <img src="{{ collection.image.url }}"
-                                 alt="{% if collection.seo_image_alt %}{{ collection.seo_image_alt }}{% else %}{{ collection.name }}{% endif %}"
-                                 title="{{ collection.name }} photo" width="612" height="612" style="aspect-ratio: 1;"
-                                 loading="lazy"/>
-                        </picture>
-                    </div>
-                    <div class="text-on-image-wrapper">
-                        <a title="{{ collection.name }}" href="{% url 'shop:products_view' slug=collection.slug %}">
-                            <span class="home-collection-title">{{ collection.name }}</span>
-                        </a>
-                    </div>
-                </div>
-                {% endif %}
+                    {% if collection.image %}
+                        <div class="home-collection-item">
+                            <div class="text-on-image-image-wrapper">
+                                <picture>
+                                  <source srcset="{{ collection.image.url|wp }}" type="image/webp">
+                                  <source srcset="{{ collection.image.url }}" type="image/png">
+                                  <img src="{{ collection.image.url }}" alt="{% if collection.seo_image_alt %}{{ collection.seo_image_alt }}{% else %}{{ collection.name }}{% endif %}"
+                                       title="{{ collection.name }} photo" width="612" height="612" style="aspect-ratio: 1;" loading="lazy" />
+                                </picture>
+                            </div>
+                            <div class="text-on-image-wrapper">
+                                <a title="{{ collection.name }}" href="{% url 'shop:products_view' slug=collection.slug %}">
+                                    <span class="home-collection-title">{{ collection.name }}</span>
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
                 {% endfor %}
             </div>
         </div>
@@ -190,10 +174,8 @@
         <div class="row">
             <div class="fluid-image-wrapper">
                 <picture>
-                    <source srcset="{% static 'images/home2.webp' %}" type="image/webp">
-                    <img src="{% static 'images/home2.png' %}" alt="Minerva Studio home"
-                         title="Minerva Studio home image" width="1903" height="535" style="aspect-ratio:1903/535;"
-                         loading="lazy"/>
+                  <source srcset="{% static 'images/home2.webp' %}" type="image/webp">
+                  <img src="{% static 'images/home2.png' %}" alt="Minerva Studio home" title="Minerva Studio home image"  width="1903" height="535" style="aspect-ratio:1903/535;" loading="lazy"/>
                 </picture>
             </div>
         </div>
@@ -212,10 +194,8 @@
             <div class="home-image-with-text-wrapper">
                 <div class="home-image-wrapper">
                     <picture>
-                        <source srcset="{% static 'images/home3.webp' %}" type="image/webp">
-                        <img src="{% static 'images/home3.png' %}" alt="Környezetbarát csomagolás"
-                             title="Környezetbarát csomagolás" width="500" height="500" style="aspect-ratio:500/500;"
-                             loading="lazy">
+                      <source srcset="{% static 'images/home3.webp' %}" type="image/webp">
+                      <img src="{% static 'images/home3.png' %}" alt="Környezetbarát csomagolás" title="Környezetbarát csomagolás"  width="500" height="500" style="aspect-ratio:500/500;" loading="lazy">
                     </picture>
                 </div>
                 <div class="home-text-wrapper">
