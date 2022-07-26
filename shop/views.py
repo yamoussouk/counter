@@ -1,6 +1,7 @@
 import os
 import re
 import logging
+from django.db.models import Q
 
 from django.db.models import Case, When
 from django.conf import settings
@@ -37,20 +38,28 @@ def index_hid(request):
 
 
 def index(request):
-    basic_collection = Collection.objects.filter(available=True, custom=False, show_on_home_page=True,
-                                                 basic_collection=True, best_seller_collection=False)
+    coll = Collection.objects.filter(available=True, custom=False, show_on_home_page=True)
+    basic_collection = [c for c in coll if c.basic_collection and not c.best_seller_collection]
+    temp = [c for c in coll if c.regular_collection and not c.best_seller_collection]
+    regular_collections = sorted(temp, key=lambda x: x.created, reverse=True)[:3]
+    temp = [c for c in coll if not c.basic_collection and not c.regular_collection and not c.best_seller_collection]
+    temporary_collections = sorted(temp, key=lambda x: x.created, reverse=True)[:9]
+    temp = [c for c in coll if c.best_seller_collection]
+    best_sellers_collection = sorted(temp, key=lambda x: x.created)
+    # basic_collection = Collection.objects.filter(available=True, custom=False, show_on_home_page=True,
+    #                                              basic_collection=True, best_seller_collection=False)
     if len(basic_collection):
         basic_products = Product.objects.filter(collection=basic_collection[0])
     else:
         basic_products = []
-    regular_collections = Collection.objects.filter(available=True, custom=False, show_on_home_page=True,
-                                                    regular_collection=True, best_seller_collection=False).order_by('-created')[:3]
-    temporary_collections = (
-        Collection.objects.filter(available=True, custom=False, show_on_home_page=True, basic_collection=False,
-                                  regular_collection=False, best_seller_collection=False)
-            .order_by('-created')[:9])
-    best_sellers_collection = Collection.objects.filter(available=True, custom=False, show_on_home_page=True,
-                                                        best_seller_collection=True).order_by('-created')
+    # regular_collections = Collection.objects.filter(available=True, custom=False, show_on_home_page=True,
+    #                                                 regular_collection=True, best_seller_collection=False).order_by('-created')[:3]
+    # temporary_collections = (
+    #     Collection.objects.filter(available=True, custom=False, show_on_home_page=True, basic_collection=False,
+    #                               regular_collection=False, best_seller_collection=False)
+    #         .order_by('-created')[:9])
+    # best_sellers_collection = Collection.objects.filter(available=True, custom=False, show_on_home_page=True,
+    #                                                     best_seller_collection=True).order_by('-created')
     if len(best_sellers_collection):
         bs_products = Product.objects.filter(collection=best_sellers_collection[0])
     else:
@@ -60,12 +69,10 @@ def index(request):
     param = Parameter.objects.filter(name="shipping_information")
     shipping_information = param[0].value if len(param) and param[0].active else None
     ratio = 0.93 if is_mobile else 2.44
-    home_page_carousel_images = [f'images/home_page_carousel/homenew{i}-01.png' for i in range(1, 5)]
     context = dict(basic_collection=basic_collection, basic_products=basic_products,
                    regular_collections=regular_collections, temporary_collections=temporary_collections,
                    notification=notification, ratio=ratio, shipping_information=shipping_information,
-                   best_sellers_collection=best_sellers_collection, bs_products=bs_products,
-                   home_page_carousel_images=home_page_carousel_images)
+                   best_sellers_collection=best_sellers_collection, bs_products=bs_products)
     return render(request, 'shop/index_hid.html', context)
 
 

@@ -1,5 +1,5 @@
 {% load static %}
-
+{% spaceless %}
 <footer>
     <div class="container-fluid">
         <div class="row">
@@ -8,7 +8,7 @@
                     <a href="{% url 'shop:index' %}">
                         <picture>
                           <source srcset="{% static 'images/submark_150.webp' %}" type="image/webp">
-                          <img src="{% static 'images/submark_150.png' %}" alt="Minerva Logo" title="Minerva Logo image" width="200" height="200" style="aspect-ratio:200/200;">
+                          <img src="{% static 'images/submark_150.png' %}" alt="Minerva Logo" title="Minerva Logo image" width="200" height="200" style="aspect-ratio:200/200;" loading="lazy">
                         </picture>
                     </a>
                 </div>
@@ -21,7 +21,7 @@
                         <a href="https://www.facebook.com/minervastudio.hu">
                             <picture>
                               <source srcset="{% static 'images/facebook_150.webp' %}" type="image/webp">
-                              <img src="{% static 'images/facebook_150.png' %}" alt="facebook icon" title="facebook icon image" width="65" height="65" style="aspect-ratio:65/65;"/>
+                              <img src="{% static 'images/facebook_150.png' %}" alt="facebook icon" title="facebook icon image" width="65" height="65" style="aspect-ratio:65/65;" loading="lazy"/>
                             </picture>
                         </a>
                     </div>
@@ -29,7 +29,7 @@
                         <a href="https://www.instagram.com/minervastudio.hu/">
                             <picture>
                               <source srcset="{% static 'images/instagram_150.webp' %}" type="image/webp">
-                              <img src="{% static 'images/instagram_150.png' %}" alt="instagram icon" title="instagram icon" width="65" height="65" style="aspect-ratio:65/65;"/>
+                              <img src="{% static 'images/instagram_150.png' %}" alt="instagram icon" title="instagram icon" width="65" height="65" style="aspect-ratio:65/65;" loading="lazy"/>
                             </picture>
                         </a>
                     </div>
@@ -95,13 +95,14 @@
 		</div>
 	</div>
 </section>
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="{% static 'js/jquery-3.5.1.slim.min.js' %}" defer></script>
 {% if home %}
-    <script src="{% static 'js/owl.carousel.min.js' %}" defer></script>
-    <script src="{% static 'js/home_page_carousel.js' %}"></script>
+    <script src="{% static 'js/owl.carousel.min.js' %}" defer ></script>
+    <script src="{% static 'js/home_page_carousel.js' %}" defer></script>
     <script src="{% static 'js/home.js' %}" defer></script>
 {% endif %}
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" defer integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+<script src="{% static 'js/popper.min.js' %}" defer></script>
+<script src="{% static "js/js.cookie.min.js" %}" defer></script>
 <script>
 jQuery.event.special.touchstart = {
     setup: function( _, ns, handle ) {
@@ -114,9 +115,8 @@ jQuery.event.special.touchmove = {
     }
 };
 </script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" defer integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
-<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+<script src="{% static 'js/bootstrap.min.js' %}" defer></script>
+<link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet">
 <script src="{% static 'js/main.js' %}" defer></script>
 <script src="{% static 'js/cookies.js' %}" defer></script>
 {% if stripe %}
@@ -137,3 +137,4 @@ jQuery.event.special.touchmove = {
 {% endif %}
   </body>
 </html>
+{% endspaceless %}
