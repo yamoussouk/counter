@@ -25,19 +25,19 @@ class CartAddGiftCardProductForm(forms.Form):
 
 
 class CartDeliveryInfoForm(forms.Form):
-    full_name = forms.CharField(required=True, initial='Telek Elek')
-    email = forms.EmailField(required=True, initial='tamas.kakuszi@gmail.com')
-    phone = forms.CharField(required=True, initial='+36307138606', widget=forms.TextInput(
+    full_name = forms.CharField(required=True, initial='')
+    email = forms.EmailField(required=True, initial='')
+    phone = forms.CharField(required=True, initial='', widget=forms.TextInput(
         attrs={'placeholder': '+36301231234',
                'title': 'Az elfogadott formátum a következő: +36301231234',
                'pattern': '[+][0-9]{1,3}[0-9]{6,}'}))
-    billing_address = forms.CharField(required=True, initial='Telek utca', widget=forms.TextInput(
+    billing_address = forms.CharField(required=True, initial='', widget=forms.TextInput(
         attrs={'class': 'form-control'}))
-    billing_address_number = forms.CharField(required=True, initial='23')
-    billing_postal_code = forms.CharField(required=True, initial='1111', widget=forms.TextInput(
+    billing_address_number = forms.CharField(required=True, initial='')
+    billing_postal_code = forms.CharField(required=True, initial='', widget=forms.TextInput(
         attrs={'title': 'Kérem, adjon meg egy négyjegyű irányítószámot!',
                'pattern': '[0-9]{4}'}))
-    billing_city = forms.CharField(required=True, initial='Szeged', widget=forms.TextInput(
+    billing_city = forms.CharField(required=True, initial='', widget=forms.TextInput(
         attrs={'class': 'form-control'}))
     delivery_type_code = forms.CharField(required=True, widget=forms.HiddenInput, initial='0')
     first_name = forms.CharField(required=False, initial='', widget=forms.TextInput(
