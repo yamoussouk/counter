@@ -152,6 +152,18 @@ def set_personal_form(delivery_form, request):
 
 def initiate_the_cart_delivery_form(request) -> 'CartDeliveryInfoForm':
     delivery_form = CartDeliveryInfoForm()
+    if request.session.get('mandatory', None) is not None:
+        delivery_form.fields["full_name"].initial = request.session.get('mandatory')['full_name']
+        delivery_form.fields["email"].initial = request.session.get('mandatory')['email']
+        delivery_form.fields["phone"].initial = request.session.get('mandatory')['phone']
+    if request.session.get('billing', None) is not None:
+        delivery_form.fields["billing_address"].initial = request.session.get('billing')['billing_address']
+        delivery_form.fields["billing_address_number"].initial = \
+            request.session.get('billing')['billing_address_number']
+        delivery_form.fields["billing_postal_code"].initial = request.session.get('billing')['billing_postal_code']
+        delivery_form.fields["billing_city"].initial = request.session.get('billing')['billing_city']
+        delivery_form.fields["product_note"].initial = request.session.get('billing')['product_note']
+
     if request.session.get('delivery', None) is not None:
         delivery_code = request.session["delivery"].get("delivery_code")
         if delivery_code is not None:
