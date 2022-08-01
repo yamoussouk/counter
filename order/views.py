@@ -68,6 +68,155 @@ def get_client_ip(request):
     return ip
 
 
+def _create_or_update_order_item(cart, order):
+    for item in cart:
+        order_item = OrderItem.objects.filter(
+            order=order, price=item['price'],
+            color=item['color'] if 'color' in item else '',
+            stud=item['stud'] if 'stud' in item else '',
+            finding=item['findings'] if 'findings' in item else '',
+            first_initial=item[
+                'first_initial'] if 'first_initial' in item and item[
+                'first_initial'] != '--' else '',
+            second_initial=item[
+                'second_initial'] if 'second_initial' in item and item[
+                'second_initial'] != '--' else '',
+            custom_date=item['custom_date'] if 'custom_date' in item and
+                                               item[
+                                                   'custom_date'] != '1899-01-01' else '',
+            image=item['image'],
+            **({"product": item['product']} if item['type']
+                                               in ['product',
+                                                   'product_type']
+               else {"gift_card": item['product']}))
+        if len(order_item):
+            order_item[0].quantity = item['quantity']
+            order_item[0].save()
+        else:
+            OrderItem.objects.create(
+                order=order, price=item['price'], quantity=item['quantity'],
+                color=item['color'] if 'color' in item else '',
+                stud=item['stud'] if 'stud' in item else '',
+                finding=item['findings'] if 'findings' in item else '',
+                first_initial=item[
+                    'first_initial'] if 'first_initial' in item and item[
+                    'first_initial'] != '--' else '',
+                second_initial=item[
+                    'second_initial'] if 'second_initial' in item and item[
+                    'second_initial'] != '--' else '',
+                custom_date=item['custom_date'] if 'custom_date' in item and
+                                                   item[
+                                                       'custom_date'] != '1899-01-01' else '',
+                image=item['image'],
+                **({"product": item['product']} if item['type']
+                                                   in ['product',
+                                                       'product_type']
+                   else {"gift_card": item['product']}))
+
+
+def _append_session_data(request, cd):
+    request.session['delivery'] = dict(delivery_type=delivery_types[str(cd['delivery_type_code'])],
+                                       delivery_code=str(cd['delivery_type_code']),
+                                       address=cd['address'],
+                                       postal_code=cd['postal_code'], city=cd['city'], note=cd['note'],
+                                       fox_post=cd['fox_post'],
+                                       delivery_name=cd['delivery_name'],
+                                       first_name=cd['first_name'], last_name=cd['last_name'],
+                                       csomagkuldo=cd['csomagkuldo'], address_number=cd['address_number'])
+    request.session['mandatory'] = dict(full_name=cd['full_name'], email=cd['email'], phone=cd['phone'])
+    request.session['billing'] = dict(billing_address=cd['billing_address'],
+                                      billing_address_number=cd['billing_address_number'],
+                                      billing_postal_code=cd['billing_postal_code'],
+                                      billing_city=cd['billing_city'], product_note=cd['product_note'])
+    create_log_file(f'Delivery method: {request.session["delivery"]}, user: {get_client_ip(request)}')
+    return request
+
+
+def _create_order(request, cart, cd, form):
+    order = cart.order
+    if order:
+        order.full_name = cd['full_name']
+        order.phone = cd['phone']
+        order.email = cd['email']
+        order.billing_address = cd['billing_address']
+        order.billing_address_number = cd['billing_address_number']
+        order.billing_postal_code = cd['billing_postal_code']
+        order.billing_city = cd['billing_city']
+        order.first_name = cd['first_name']
+        order.last_name = cd['last_name']
+        order.delivery_name = cd["delivery_name"]
+        order.address = cd["address"]
+        order.address_number = cd["address_number"]
+        order.postal_code = cd["postal_code"]
+        order.city = cd["city"]
+        order.note = cd["note"]
+        order.delivery_type = delivery_types[str(cd['delivery_type_code'])]
+        order.fox_post = cd['fox_post']
+        order.csomagkuldo = cd['csomagkuldo']
+        order.product_note = cd['product_note']
+        create_log_file(f'Order "{order.id}" already exists, user: {get_client_ip(request)}')
+    else:
+        order = form.save(commit=False)
+        order.delivery_type = delivery_types[str(cd['delivery_type_code'])]
+    order.subtotal = cart.get_total_price_after_discount()  # delivery excluded
+    if cart.coupon:
+        order.coupon = cart.coupon
+        order.discount = cart.coupon.discount
+        order.discount_amount = float(cart.get_total_price()) - float(cart.get_total_price_after_discount())
+    order.save()
+    create_log_file(f'Order "{order.id}" is saved, user: {get_client_ip(request)}')
+    return order
+
+
+def _remove_items_from_the_cart(cart, order_items):
+    # some item was removed from the cart
+    for item in order_items:
+        color = item.color
+        stud = item.stud
+        finding = item.finding
+        product = item.product
+        found = len([i for i in cart if
+                     int(i.get('product_id')) == int(product.id) and i.get('color') == color and i.get(
+                         'stud') == stud and i.get('finding') == finding]) > 0
+        if not found:
+            item.delete()
+
+
+def _convert_values(request):
+    for key, value in request.session['cart'].items():
+        for key2, value2 in request.session['cart'][key].items():
+            if isinstance(request.session['cart'][key][key2], Decimal):
+                request.session['cart'][key][str(key2)] = str(request.session['cart'][key][key2])
+            if key2 == 'product':
+                try:
+                    request.session['cart'][key][str(key2)] = model_to_dict(request.session['cart'][key][key2])
+                except AttributeError:
+                    messages.error(request, 'Válassza ki a megfelelő szállítási módot!')
+                    return redirect('cart:cart_detail')
+                for key3, value3 in request.session['cart'][key][key2].items():
+                    if key3 == 'image':
+                        value = request.session['cart'][key][key2][key3].path \
+                            if request.session['cart'][key][key2][key3] != '' else ''
+                        request.session['cart'][key][key2][str(key3)] = value
+                    if isinstance(request.session['cart'][key][key2][key3], Decimal):
+                        request.session['cart'][key][key2][str(key3)] = str(
+                            request.session['cart'][key][key2][key3])
+    return request
+
+
+def _calculate_price(order, cart):
+    order.products_price = cart.get_total_price()
+    order.products_price_with_discount = cart.get_total_price() - order.discount_amount \
+        if cart.coupon else cart.get_total_price()
+    order.delivery_cost = prices[order.delivery_type.replace(' ', '')]
+    order.total = cart.get_total_price_after_discount() + order.delivery_cost
+    if Parameter.objects.filter(name="discount_service")[0].value == 'True' and len(cart) > 2:
+        order.coupon = None
+        order.discount = 0
+        order.discount_amount = 0
+    return order
+
+
 def order_create(request):
     cart = Cart(request)
     out_of_stock = False
@@ -88,116 +237,21 @@ def order_create(request):
                                    f'mennyisége {item_in_cart}.')
             create_log_file(f'Valid form, order received, user: {get_client_ip(request)}')
             if not out_of_stock:
-                request.session['delivery'] = dict(delivery_type=delivery_types[str(cd['delivery_type_code'])],
-                                                   delivery_code=str(cd['delivery_type_code']),
-                                                   address=cd['address'],
-                                                   postal_code=cd['postal_code'], city=cd['city'], note=cd['note'],
-                                                   fox_post=cd['fox_post'],
-                                                   delivery_name=cd['delivery_name'],
-                                                   first_name=cd['first_name'], last_name=cd['last_name'],
-                                                   csomagkuldo=cd['csomagkuldo'], address_number=cd['address_number'])
-                request.session['mandatory'] = dict(full_name=cd['full_name'], email=cd['email'], phone=cd['phone'])
-                request.session['billing'] = dict(billing_address=cd['billing_address'],
-                                                  billing_address_number=cd['billing_address_number'],
-                                                  billing_postal_code=cd['billing_postal_code'],
-                                                  billing_city=cd['billing_city'], product_note=cd['product_note'])
-                create_log_file(f'Delivery method: {request.session["delivery"]}, user: {get_client_ip(request)}')
-                order = cart.order
-                if order:
-                    order.full_name = cd['full_name']
-                    order.phone = cd['phone']
-                    order.email = cd['email']
-                    order.billing_address = cd['billing_address']
-                    order.billing_address_number = cd['billing_address_number']
-                    order.billing_postal_code = cd['billing_postal_code']
-                    order.billing_city = cd['billing_city']
-                    order.first_name = cd['first_name']
-                    order.last_name = cd['last_name']
-                    order.delivery_name = cd["delivery_name"]
-                    order.address = cd["address"]
-                    order.address_number = cd["address_number"]
-                    order.postal_code = cd["postal_code"]
-                    order.city = cd["city"]
-                    order.note = cd["note"]
-                    order.delivery_type = delivery_types[str(cd['delivery_type_code'])]
-                    order.fox_post = cd['fox_post']
-                    order.csomagkuldo = cd['csomagkuldo']
-                    order.product_note = cd['product_note']
-                    create_log_file(f'Order "{order.id}" already exists, user: {get_client_ip(request)}')
-                else:
-                    order = form.save(commit=False)
-                    order.delivery_type = delivery_types[str(cd['delivery_type_code'])]
-                order.subtotal = cart.get_total_price_after_discount()  # delivery excluded
-                if cart.coupon:
-                    order.coupon = cart.coupon
-                    order.discount = cart.coupon.discount
-                    order.discount_amount = float(cart.get_total_price()) - float(cart.get_total_price_after_discount())
-                order.save()
-                create_log_file(f'Order "{order.id}" is saved, user: {get_client_ip(request)}')
+                request = _append_session_data(request, cd)
+                order = _create_order(request, cart, cd, form)
                 order_items = Order.objects.prefetch_related('items').filter(id=order.id)[0].items.all()
-                # some item was removed from the cart
-                if len([i for i in cart]) < len(order_items):
-                    for item in order_items:
-                        color = item.color
-                        stud = item.stud
-                        product = item.product
-                        found = len([i for i in cart if
-                                     int(i.get('product_id')) == int(product.id) and i.get('color') == color and i.get(
-                                         'stud') == stud]) > 0
-                        if not found:
-                            item.delete()
-                for item in cart:
-                    OrderItem.objects.get_or_create(order=order, price=item['price'], quantity=item['quantity'],
-                                                    color=item['color'] if 'color' in item else '',
-                                                    stud=item['stud'] if 'stud' in item else '',
-                                                    first_initial=item[
-                                                        'first_initial'] if 'first_initial' in item and item[
-                                                        'first_initial'] != '--' else '',
-                                                    second_initial=item[
-                                                        'second_initial'] if 'second_initial' in item and item[
-                                                        'second_initial'] != '--' else '',
-                                                    custom_date=item['custom_date'] if 'custom_date' in item and item[
-                                                        'custom_date'] != '1899-01-01' else '',
-                                                    image=item['image'],
-                                                    **({"product": item['product']} if item['type']
-                                                                                       in ['product', 'product_type']
-                                                       else {"gift_card": item['product']}))
-                order.products_price = cart.get_total_price()
-                order.products_price_with_discount = cart.get_total_price() - order.discount_amount \
-                    if cart.coupon else cart.get_total_price()
-                order.delivery_cost = prices[order.delivery_type.replace(' ', '')]
-                order.total = cart.get_total_price_after_discount() + order.delivery_cost
-                if Parameter.objects.filter(name="discount_service")[0].value == 'True' and len(cart) > 2:
-                    order.coupon = None
-                    order.discount = 0
-                    order.discount_amount = 0
+                _remove_items_from_the_cart(cart, order_items)
+                _create_or_update_order_item(cart, order)
+                order = _calculate_price(order, cart)
                 create_log_file(f'Order process initiated, items: {", ".join([str(i["product_id"]) for i in cart])},'
                                 f' user: {get_client_ip(request)}')
                 order.save()
         else:
             print('error', form.errors.as_data())
         if not out_of_stock:
-            for key, value in request.session['cart'].items():
-                for key2, value2 in request.session['cart'][key].items():
-                    if isinstance(request.session['cart'][key][key2], Decimal):
-                        request.session['cart'][key][str(key2)] = str(request.session['cart'][key][key2])
-                    if key2 == 'product':
-                        try:
-                            request.session['cart'][key][str(key2)] = model_to_dict(request.session['cart'][key][key2])
-                        except AttributeError:
-                            messages.error(request, 'Válassza ki a megfelelő szállítási módot!')
-                            return redirect('cart:cart_detail')
-                        for key3, value3 in request.session['cart'][key][key2].items():
-                            if key3 == 'image':
-                                value = request.session['cart'][key][key2][key3].path \
-                                    if request.session['cart'][key][key2][key3] != '' else ''
-                                request.session['cart'][key][key2][str(key3)] = value
-                            if isinstance(request.session['cart'][key][key2][key3], Decimal):
-                                request.session['cart'][key][key2][str(key3)] = str(
-                                    request.session['cart'][key][key2][key3])
+            request = _convert_values(request)
             request.session['order_id'] = order.id
             request.session['delivery_type'] = order.delivery_type
-            # items = ", ".join(["NAME: {}, COLOR: {}".format(i["product"].name, i["color"]) for i in cart])
             return redirect(reverse('payment:process'))
     else:
         form = OrderCreateForm()

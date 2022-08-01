@@ -76,6 +76,10 @@ STUD_CHOICES = ((1, 'NORMAL'),
                 (2, 'NICKEL_FREE'),
                 (3, 'PLASTIC'))
 
+FINDINGS_CHOICES = ((1, 'GOLD'),
+                    (2, 'SILVER'),
+                    (3, 'BRONZE'))
+
 KEY_RING_CHOICES = ((1, 'KEREK'),
                     (2, 'KARABINER'),
                     (3, 'SZIV'))
@@ -119,6 +123,12 @@ class Product(models.Model):
                                                              "Ez sehol sem látszik a weboldalon.")
     product_name = models.CharField(max_length=200, db_index=True,
                                     blank=True, help_text="Termék neve, ami a h1 tagba fog kerülni")
+    findings = models.BooleanField(default=False)
+    findings_type = MultiSelectField(choices=FINDINGS_CHOICES, default=FINDINGS_CHOICES[0], null=True,
+                                     blank=True, max_length=250)
+    default_finding_type = models.CharField(choices=[("1", "Gold"), ("2", "Silver"), ("3", "Bronze")], default='1',
+                                            null=True,
+                                            blank=True, max_length=250)
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
@@ -140,6 +150,10 @@ class Product(models.Model):
     def get_stud_value(self, value):
         values = ['nemesacél alap', 'nikkelmentes fülbevaló alap - fém',
                   'műanyag fülbevaló alap - fém mentes']
+        return values[int(value) - 1]
+
+    def get_finding_value(self, value):
+        values = ['Arany színű szerelékkel', 'Ezüst színű szerelékkel', 'Bronz színű szerelékkel']
         return values[int(value) - 1]
 
     def get_key_ring_value(self, value):

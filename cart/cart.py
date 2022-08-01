@@ -93,7 +93,7 @@ class Cart(object):
         temp = self.discount_products
         return temp
 
-    def add(self, product, color, stud, delivery_size, first_initial='', second_initial='', custom_date='',
+    def add(self, product, color, stud, findings, delivery_size, first_initial='', second_initial='', custom_date='',
             quantity=1, update_quantity=False):
         item_type = 'product_type'
         try:
@@ -114,7 +114,8 @@ class Cart(object):
             found = False
             for key, value in self.cart.copy().items():
                 if self.cart[key]['product_id'] == product.id and self.cart[key]['type'] == item_type and \
-                        self.cart[key]['color'] == color and self.cart[key]['stud'] == stud:
+                        self.cart[key]['color'] == color and self.cart[key]['stud'] == stud \
+                        and self.cart[key]['findings'] == findings:
                     if product.custom:
                         # in case of custom product, custom properties must be preserved
                         # therefore a new item must be created in the cart.
@@ -132,6 +133,7 @@ class Cart(object):
         self.cart[new_cart_id]['type'] = item_type
         self.cart[new_cart_id]['color'] = p.color if hasattr(p, 'color') else ''
         self.cart[new_cart_id]['stud'] = stud
+        self.cart[new_cart_id]['findings'] = findings
         self.cart[new_cart_id]['image'] = p.image.url if hasattr(p, 'image') else ''
         self.cart[new_cart_id]['product_id'] = product.id
         self.cart[new_cart_id]['product_name'] = product.name
@@ -249,6 +251,10 @@ class Cart(object):
             log.info(f'Order property, order id: {self.order_id}')
             return Order.objects.prefetch_related('items').filter(id=self.order_id)[0]
         return None
+
+    @property
+    def quantity(self):
+        return sum(v['quantity'] for k, v in self.cart.items())
 
     @order.setter
     def clear_order(self):

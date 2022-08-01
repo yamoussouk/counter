@@ -139,7 +139,7 @@ def show_product(obj):
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
     raw_id_fields = ['product']
-    readonly_fields = ['id', 'product', 'price', 'quantity', 'color', 'stud', 'first_initial', 'second_initial',
+    readonly_fields = ['id', 'product', 'price', 'quantity', 'color', 'stud', 'finding', 'first_initial', 'second_initial',
                        'custom_date', show_product]
     exclude = ['gift_card', 'image']
     can_delete = False
