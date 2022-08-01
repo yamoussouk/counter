@@ -89,7 +89,7 @@ def cart_add(request, product_id):
             status, item_in_cart, stock = __validate_stock(cart.cart, product, cd)
         if status:
             cart.add(product=product, quantity=cd['quantity'],
-                     update_quantity=cd['update'], color=cd['color'], stud=cd['stud'],
+                     update_quantity=cd['update'], color=cd['color'], stud=cd['stud'], findings=cd['findings'],
                      first_initial=cd['first_initial'] if 'first_initial' in cd else '',
                      second_initial=cd['second_initial'] if 'second_initial' in cd else '',
                      custom_date=cd['custom_date'] if 'custom_date' in cd else '',
@@ -118,7 +118,8 @@ def cart_add_gift_card(request, card_id):
     form = CartAddGiftCardProductForm(request.POST)
     if form.is_valid():
         cd = form.cleaned_data
-        cart.add(product=gift_card, color='', stud='', quantity=1, update_quantity=cd['update'])
+        cart.add(product=gift_card, color='', stud='', findings='', delivery_size='',
+                 quantity=1, update_quantity=cd['update'])
     return redirect('cart:cart_detail')
 
 
@@ -150,7 +151,7 @@ def set_personal_form(delivery_form, request):
     delivery_form.fields["last_name"].initial = request.session["delivery"].get("last_name", "")
 
 
-def initiate_the_cart_delivery_form(request) -> 'CartDeliveryInfoForm':
+def initiate_the_cart_delivery_form(request, cart, ajanlott_cart_limit) -> 'CartDeliveryInfoForm':
     delivery_form = CartDeliveryInfoForm()
     if request.session.get('mandatory', None) is not None:
         delivery_form.fields["full_name"].initial = request.session.get('mandatory')['full_name']
@@ -167,10 +168,20 @@ def initiate_the_cart_delivery_form(request) -> 'CartDeliveryInfoForm':
     if request.session.get('delivery', None) is not None:
         delivery_code = request.session["delivery"].get("delivery_code")
         if delivery_code is not None:
-            delivery_form.fields["delivery_type_code"].initial = str(delivery_code)
             if delivery_code == "0":  # szemelyes atvetel
                 set_personal_form(delivery_form, request)
-            elif delivery_code in ["2", "4"]:  # hazhozszallitas, ajanlott
+            elif delivery_code == "2":  # ajanlott
+                if cart.quantity > ajanlott_cart_limit:
+                    messages.error(request, "Az általad kiválasztott ajánlott szállítási mód "
+                                            "4 termék felett nem lehetséges. "
+                                            "Kérlek, válassz egy másik szállítási módot!")
+                    delivery_code = "4"
+                    request.session["delivery"]["delivery_code"] = delivery_code
+                    request.session["delivery"]["delivery_type"] = "Házhozszállítás"
+                    set_delivery_form(delivery_form, request)
+                else:
+                    set_delivery_form(delivery_form, request)
+            elif delivery_code == "4":  # hazhozszallitas
                 set_delivery_form(delivery_form, request)
             elif delivery_code == "1":  # csomagkuldo
                 delivery_form.fields["csomagkuldo"].required = True
@@ -178,6 +189,7 @@ def initiate_the_cart_delivery_form(request) -> 'CartDeliveryInfoForm':
             elif delivery_code == "3":  # foxpost
                 delivery_form.fields["fox_post"].required = True
                 delivery_form.fields["fox_post"].initial = request.session["delivery"].get("fox_post", "")
+            delivery_form.fields["delivery_type_code"].initial = str(delivery_code)
     return delivery_form
 
 
@@ -213,9 +225,6 @@ def cart_detail(request):
             is_product_in_cart = True
     coupon_apply_form = CouponApplyForm()
     # gift_card_apply_form = GiftCardApplyForm()
-    delivery_form = initiate_the_cart_delivery_form(request)
-    current_amount = request.session.get('current_amount', 0)
-    notification = Notification.objects.all()
     parameters = Parameter.objects.filter(Q(name=CSOMAGKULDO_PRICE_API_KEY) |
                                           Q(name=SZEMELYES_ATVETEL_ENABLED) |
                                           Q(name=FOXPOST_ENABLED) |
@@ -235,8 +244,12 @@ def cart_detail(request):
     is_csomagkuldo_enabled = is_parameter_enabled(parameters, CSOMAGKULDO_ENABLED)
     is_ajanlott_enabled = is_parameter_enabled(parameters, AJANLOTT_ENABLED)
     ajanlott_cart_limit = int([param for param in parameters if param.name == AJANLOTT_CART_LIMIT][0].value)
+    over_the_limit = cart.quantity > ajanlott_cart_limit
     is_delivery_size_ok = sum(int(value['delivery_size']) for key, value in cart.cart.items()) <= 10
     is_discount_enabled = is_parameter_enabled(parameters, DISCOUNT_SERVICE)  # 3/2
+    delivery_form = initiate_the_cart_delivery_form(request, cart, ajanlott_cart_limit)
+    current_amount = request.session.get('current_amount', 0)
+    notification = Notification.objects.all()
     context = dict(cart=cart, coupon_apply_form=coupon_apply_form, delivery_form=delivery_form,
                    fox_price=get_parameter_value(parameters, FOXPOST_PRICE),
                    delivery_price=get_parameter_value(parameters, DELIVERY_PRICE),
@@ -247,7 +260,7 @@ def cart_detail(request):
                    is_szemelyes_atvetel_enabled=is_szemelyes_atvetel_enabled,
                    is_foxpost_enabled=is_foxpost_enabled, is_delivery_enabled=is_delivery_enabled,
                    is_csomagkuldo_enabled=is_csomagkuldo_enabled, is_ajanlott_enabled=is_ajanlott_enabled,
-                   ajanlott_cart_limit=ajanlott_cart_limit,
+                   over_the_limit=over_the_limit,
                    is_discount_enabled=is_discount_enabled,
                    is_delivery_size_ok=is_delivery_size_ok)  # 'gift_card_apply_form': gift_card_apply_form
     log.info(f'Cart details: {context.get("cart")}')

@@ -80,6 +80,7 @@ class OrderItem(models.Model):
     quantity = models.PositiveIntegerField(default=1)
     color = models.CharField(max_length=50, default='', blank=True, null=True)
     stud = models.CharField(max_length=100, default='', blank=True, null=True)
+    finding = models.CharField(max_length=100, default='', blank=True, null=True)
     image = models.CharField(max_length=250, null=True, default='', blank=True)
     first_initial = models.CharField(max_length=3, null=True, default='', blank=True)
     second_initial = models.CharField(max_length=3, null=True, default='', blank=True)

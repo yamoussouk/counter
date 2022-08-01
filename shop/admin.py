@@ -167,10 +167,48 @@ class ProductAdmin(admin.ModelAdmin):
     list_display = ['name', 'collection', 'studs', 'price', 'stock', 'available', 'created', 'updated']
     list_filter = ['available', 'created', 'updated', 'collection', 'custom']
     list_editable = ['price', 'available']
-    fields = (
-        'collection', 'name', 'product_name', 'image', 'description', 'size', 'price', 'custom', 'studs', 'key_ring',
-        'custom_date', 'initials', 'available', 'stock', 'price_api_id',
-        'delivery_size', 'seo_title', 'seo_description', 'seo_keywords', 'seo_image_alt')
+    fieldsets = (
+        ("Kötelező mezők", {
+            "fields": (
+                'collection', 'name', 'product_name', 'description', 'size',
+            )
+        }),
+        ("Ár", {
+            "fields": (
+                "price", "price_api_id",
+            )
+        }),
+        ("Státusz", {
+            "fields": (
+                'available', 'stock',
+            )
+        }),
+        ("Főkép", {
+            "fields": (
+                'image',
+            )
+        }),
+        ("Szállítás", {
+            "fields": (
+                'delivery_size',
+            )
+        }),
+        ("Karikák", {
+            "fields": (
+                'findings', 'findings_type', 'default_finding_type',
+            )
+        }),
+        ("Beszúrók", {
+            "fields": (
+                'custom', 'studs', 'key_ring', 'custom_date', 'initials',
+            )
+        }),
+        ("SEO", {
+            "fields": (
+                'seo_title', 'seo_description', 'seo_keywords', 'seo_image_alt',
+            )
+        })
+    )
     actions = [change_image]
 
     class Media:

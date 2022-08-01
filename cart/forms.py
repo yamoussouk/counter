@@ -7,12 +7,14 @@ class CartAddProductForm(forms.Form):
     color = forms.CharField(required=False, widget=forms.HiddenInput, initial='')
     stud = forms.CharField(required=False, widget=forms.HiddenInput)
     update = forms.BooleanField(required=False, initial=False, widget=forms.HiddenInput)
+    findings = forms.CharField(required=False, widget=forms.HiddenInput)
 
 
 class CartAddCustomProductForm(forms.Form):
     quantity = forms.IntegerField(validators=[django.core.validators.MinValueValidator(0)], initial=1)
     color = forms.CharField(required=False, widget=forms.HiddenInput, initial='')
     stud = forms.CharField(widget=forms.HiddenInput)
+    findings = forms.CharField(widget=forms.HiddenInput)
     first_initial = forms.CharField(widget=forms.HiddenInput, max_length=2)
     second_initial = forms.CharField(widget=forms.HiddenInput, max_length=2)
     custom_date = forms.CharField(widget=forms.HiddenInput)

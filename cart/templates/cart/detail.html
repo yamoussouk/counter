@@ -35,7 +35,7 @@
                   <div class="item-details-wrapper">
                     <span class="item-details-name">{{ value.quantity }}db {{ value.product_name }}</span>{% if value.collection %} <span class="item-details-collection-divider">- </span><span class="item-details-collection">{{ value.collection }}</span>{% endif %}
                     <span class="item-details-color">{% if value.color != '' %}{{ value.color|lower }}{% else %}&nbsp;{% endif %}</span>
-                    <span class="item-details-stud">{{ value.stud }}</span>
+                    <span class="item-details-stud">{{ value.stud }}</span>{% if value.findings %}<span class="item-details-stud">{{ value.findings }}</span>{% endif %}
                   </div>
                   <div class="clearfix"></div>
               </div>
@@ -183,7 +183,7 @@
          </div>
         </div>
           {% endif %}
-          {% if is_ajanlott_enabled and cart.cart|length <= ajanlott_cart_limit and is_delivery_size_ok %}
+          {% if is_ajanlott_enabled and not over_the_limit and is_delivery_size_ok %}
           <div class="card">
           <div class="card-header" id="envelope">
             <h5 class="mb-0">
@@ -288,7 +288,6 @@
         </div>
           {% endif %}
       </div>
-      <input type="hidden" id="delivery_safe" {% if 'delivery' in session and session.delivery.delivery_type == 'FoxPost' %}value="fp;{{ session.delivery.fox_post }}" {% elif 'delivery' in session and session.delivery.delivery_type == 'Csomagkuldo' %}value="cs;{{ session.delivery.csomagkuldo }}" {% endif %} />
       <div id="payment-form">
           {{ delivery_form.delivery_type_code }}
           {{ delivery_form.fox_post }}

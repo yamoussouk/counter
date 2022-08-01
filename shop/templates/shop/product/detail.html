@@ -128,6 +128,21 @@
 
                                 {% endfor %}
                             </div>
+                            {% if product.findings %}
+                            <div class="product-attributes-findings">
+                                <div class="product-question"><p>Más színű szerelékkel szeretnéd, mint amit a képen látsz? Válaszd ki!</p></div>
+                                    {% for finding in product.findings_type %}
+                                        <div>
+                                            <label class="studs-container"><span class="label-text">{{ product|get_finding:finding }}</span>
+                                            <input type="radio" {% if finding|make_string == product.default_finding_type|make_string %}checked="checked"{% endif %}
+                                                   name="finding" value="{{ product|get_finding:finding }}" >
+                                                <span class="checkmark"></span>
+                                            </label>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
                             {% endif %}
                         </div>
                         <div class="product-description">
