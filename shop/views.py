@@ -306,9 +306,7 @@ class ProductsView(ListView):
         return _get_stock_list(products)
 
     def get_queryset(self):
-        products = Product.objects.prefetch_related('product_types').filter(available=True, custom=False,
-                                                                            collection__available=True,
-                                                                            collection__studio_collection=False)
+        products = self.temp
         self.kwargs["stock_dict"] = stock_dict = _get_stock_list(products)
         keys = [[k, stock_dict[k]] for k in list(stock_dict.keys())]
         sorted_list = sorted(keys, key=lambda x: not x[1])
@@ -416,12 +414,18 @@ class StudioProductsView(ListView):
         return stock_dict
 
     def get_queryset(self):
-        products = Product.objects.prefetch_related('product_types').filter(available=True, custom=False,
-                                                                            collection__available=True,
-                                                                            collection__studio_collection=True)
+        products = self.temp
+        self.kwargs["stock_dict"] = stock_dict = _get_stock_list(products)
+        keys = [[k, stock_dict[k]] for k in list(stock_dict.keys())]
+        sorted_list = sorted(keys, key=lambda x: not x[1])
+        sorted_list = [sl[0] for sl in sorted_list]
+        preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(sorted_list)])
+        products = Product.objects.prefetch_related('product_types').filter(pk__in=sorted_list).order_by(preserved)
+
         slug = self.kwargs['slug'] if 'slug' in self.kwargs else None
         if slug:
-            collection = get_object_or_404(Collection, slug=slug)
+            collection = Collection.objects.filter(slug=slug)
+            collection = collection[0] if len(collection) else None
             products = products.filter(collection=collection)
         return products
 
