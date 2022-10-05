@@ -235,6 +235,9 @@ def order_create(request):
                                    f'A megvásárolni kívánt, illetve a kosaradban található termék összes mennyisége'
                                    f' meghaladja az elérhető mennyiséget, amely {stock}. A kosaradban az aktuális termék '
                                    f'mennyisége {item_in_cart}.')
+                    print('warning', f'Product is out of stock: {item["product"]}')
+                    return redirect('cart:cart_detail')
+
             create_log_file(f'Valid form, order received, user: {get_client_ip(request)}')
             if not out_of_stock:
                 request = _append_session_data(request, cd)
@@ -246,13 +249,14 @@ def order_create(request):
                 create_log_file(f'Order process initiated, items: {", ".join([str(i["product_id"]) for i in cart])},'
                                 f' user: {get_client_ip(request)}')
                 order.save()
+                request = _convert_values(request)
+                request.session['order_id'] = order.id
+                request.session['delivery_type'] = order.delivery_type
+                return redirect(reverse('payment:process'))
         else:
             print('error', form.errors.as_data())
-        if not out_of_stock:
-            request = _convert_values(request)
-            request.session['order_id'] = order.id
-            request.session['delivery_type'] = order.delivery_type
-            return redirect(reverse('payment:process'))
+            messages.error(request, form.errors.as_data())
+            return redirect('cart:cart_detail')
     else:
         form = OrderCreateForm()
     return redirect('cart:cart_detail')
