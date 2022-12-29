@@ -218,33 +218,36 @@ class ProductAdmin(admin.ModelAdmin):
         )
 
     def save_model(self, request, obj, form, change):
-        if change:
-            delete_image_path(request, obj)
-            super().save_model(request, obj, form, change)
-        else:
-            # obj_id = obj.id
-            # if obj_id is None:  # save as
-            #     previous_product_id = request.resolver_match.kwargs["object_id"]
-            #     pr = Product.objects.prefetch_related('product_types').get(id=int(previous_product_id))
-            #     types_ = pr.product_types.all()
-            #     if len(types_):
-            #         _mutable = form.data._mutable
-            #         form.data._mutable = True
-            #         for idx, type_ in enumerate(types_):
-            #             i = type_.image
-            #             form.data.__setitem__(f'product_types-{idx}-image', i)
-            #         form.data._mutable = _mutable
-            #     if obj.image is None or obj.image.name == '':
-            #         image_url = pr.image
-            #         obj.image = image_url
-            slug = slugify(obj.name)
-            product = Product.objects.filter(slug=slug)
-            if len(product):
-                self.error_while_saving = True
-                msg = f"Product with the given name \"{obj.name}\" already exists."
-                self.message_user(request, msg, messages.WARNING)
-            else:
+        try:
+            if change:
+                delete_image_path(request, obj)
                 super().save_model(request, obj, form, change)
+            else:
+                # obj_id = obj.id
+                # if obj_id is None:  # save as
+                #     previous_product_id = request.resolver_match.kwargs["object_id"]
+                #     pr = Product.objects.prefetch_related('product_types').get(id=int(previous_product_id))
+                #     types_ = pr.product_types.all()
+                #     if len(types_):
+                #         _mutable = form.data._mutable
+                #         form.data._mutable = True
+                #         for idx, type_ in enumerate(types_):
+                #             i = type_.image
+                #             form.data.__setitem__(f'product_types-{idx}-image', i)
+                #         form.data._mutable = _mutable
+                #     if obj.image is None or obj.image.name == '':
+                #         image_url = pr.image
+                #         obj.image = image_url
+                slug = slugify(obj.name)
+                product = Product.objects.filter(slug=slug)
+                if len(product):
+                    self.error_while_saving = True
+                    msg = f"Product with the given name \"{obj.name}\" already exists."
+                    self.message_user(request, msg, messages.WARNING)
+                else:
+                    super().save_model(request, obj, form, change)
+        except ValueError:
+            return HttpResponseRedirect("/admin/shop/product/add/")
 
     def response_add(self, request, obj, post_url_continue=None):
         if self.error_while_saving:
