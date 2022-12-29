@@ -232,7 +232,7 @@ def contact_message(request):
         message = cd['message']
         name = cd['name']
         result = MessageSender('Kapcsolat e-mail a minervastudio.hu oldalról', settings.EMAIL_HOST_USER, email,
-                               f'Feladó:\n{name}\nTárgy:\n{subject}\nÜzenet:\n{message}').send_mail()
+                               f'Feladó:\n{name}\nFeladó Email címe:{email}\nTárgy:\n{subject}\nÜzenet:\n{message}').send_mail()
         sent = True if result == 1 else False
         Message.objects.create(subject=subject, email=email, message=message, name=name,
                                sender='System message from Minerva Studio', sent=sent)
