@@ -70,6 +70,18 @@ def get_client_ip(request):
     return ip
 
 
+def create_message(pre_text, product_id, product, cd, ip_address):
+    message = f'{pre_text}ID: {product_id}, Name: {product.name}, '
+    if cd["color"] != '':
+        message += f'Color: {cd["color"]}, '
+    if cd["stud"] != '':
+        message += f'Stud: {cd["stud"]}, '
+    if cd["findings"] != '':
+        message += f'Findings: {cd["findings"]}, '
+    message += f'user: {ip_address}'
+    return message
+
+
 @require_http_methods(['POST'])
 def cart_add(request, product_id):
     ip_address = get_client_ip(request)
@@ -94,14 +106,13 @@ def cart_add(request, product_id):
                      second_initial=cd['second_initial'] if 'second_initial' in cd else '',
                      custom_date=cd['custom_date'] if 'custom_date' in cd else '',
                      delivery_size=product.delivery_size)
-            LogFile.objects.create(type='INFO',
-                                   message=f'Product with the id of {product_id} has been '
-                                           f'added to the cart, user: {ip_address}')
+            message = create_message('Product is added to the cart, ', product_id, product, cd, ip_address)
+            LogFile.objects.create(type='INFO', message=message)
             return redirect(reverse(redirect_url, args=[product.collection.slug, product.slug]))
         else:
-            LogFile.objects.create(
-                type='INFO', message=f'Tried to add product with the id of {product_id} '
-                                     f'to the cart but it was out of stock, user: {ip_address}')
+            message = create_message('Tried to add product to the cart but it was out of stock, ',
+                                     product_id, product, cd, ip_address)
+            LogFile.objects.create(type='INFO', message=message)
             messages.error(request, f'A hozzáadni kívánt, illetve a kosaradban található termék összes mennyisége'
                                     f' meghaladja az elérhető mennyiséget, amely {stock}. A kosaradban az aktuális termék '
                                     f'mennyisége {item_in_cart}.')
@@ -127,10 +138,17 @@ def cart_remove(request, item_id):
     cart = Cart(request)
     log.info(f'Requesting to remove an item from the cart with the item id of "{item_id}".\nCart object: {cart}')
     product_id = cart.cart[str(item_id)]["product_id"]
+    item_to_remove = cart.cart[str(item_id)]
     cart = cart.remove(item_id)
-    LogFile.objects.create(type='INFO',
-                           message=f'Item with the id of {product_id} was '
-                                   f'removed from the cart, user: {get_client_ip(request)}')
+    message = f'Item was removed from the cart. ID: {product_id}, Name: {item_to_remove["product_name"]}, '
+    if item_to_remove["color"] != '':
+        message += f'Color: {item_to_remove["color"]}, '
+    if item_to_remove["stud"] != '':
+        message += f'Stud: {item_to_remove["stud"]}, '
+    if item_to_remove["findings"] != '':
+        message += f'Findings: {item_to_remove["findings"]}, '
+    message += f'user: {get_client_ip(request)}'
+    LogFile.objects.create(type='INFO', message=message)
     log.info(f'Cart object after item removal: {cart}')
     return redirect(reverse('cart:cart_detail'))
 

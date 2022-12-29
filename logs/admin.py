@@ -8,6 +8,7 @@ class LogFileAdmin(admin.ModelAdmin):
     readonly_fields = ['type', 'message', 'created']
     list_filter = ['type']
     can_delete = False
+    search_fields = ['message']
 
     def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
         context.update({
