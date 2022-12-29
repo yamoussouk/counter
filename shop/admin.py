@@ -8,7 +8,7 @@ from django.http import HttpResponseRedirect
 from django.utils.text import slugify
 from unidecode import unidecode
 
-from .models import Collection, Product, Image, Notification, ProductType, GiftCard, Message
+from .models import Collection, Product, Image, Notification, ProductType, GiftCard, Message, Tag
 
 """
     Since we are trying to get better seo rank we change how the images are named. The logic is the following:
@@ -160,10 +160,15 @@ class ProductTypeInline(admin.StackedInline):
     extra = 0
 
 
+class ProductTagInline(admin.StackedInline):
+    model = Tag
+    extra = 0
+
+
 class ProductAdmin(admin.ModelAdmin):
     error_while_saving = False
     # save_as = True
-    inlines = [ProductImageAdmin, ProductTypeInline]
+    inlines = [ProductImageAdmin, ProductTypeInline, ProductTagInline]
     list_display = ['name', 'collection', 'studs', 'price', 'stock', 'available', 'created', 'updated']
     list_filter = ['available', 'created', 'updated', 'collection', 'custom']
     list_editable = ['price', 'available']
