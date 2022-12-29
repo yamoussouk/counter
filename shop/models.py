@@ -285,3 +285,15 @@ class Message(models.Model):
 
     def __str__(self):
         return self.subject
+
+
+class Tag(models.Model):
+    product = models.ForeignKey(Product, related_name='product_tage', on_delete=models.CASCADE)
+    name = models.CharField(max_length=200, default='')
+
+    class Meta:
+        verbose_name = 'Tag'
+        verbose_name_plural = 'Tags'
+
+    def __str__(self):
+        return self.name
