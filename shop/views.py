@@ -1,3 +1,4 @@
+import logging
 import os
 import re
 import logging
@@ -306,7 +307,9 @@ class ProductsView(ListView):
         return _get_stock_list(products)
 
     def get_queryset(self):
-        products = self.temp
+        products = Product.objects.prefetch_related('product_types').filter(available=True, custom=False,
+                                                                        collection__available=True,
+                                                                        collection__studio_collection=False)
         self.kwargs["stock_dict"] = stock_dict = _get_stock_list(products)
         keys = [[k, stock_dict[k]] for k in list(stock_dict.keys())]
         sorted_list = sorted(keys, key=lambda x: not x[1])
@@ -414,7 +417,9 @@ class StudioProductsView(ListView):
         return stock_dict
 
     def get_queryset(self):
-        products = self.temp
+        products = Product.objects.prefetch_related('product_types').filter(available=True, custom=False,
+                                                                        collection__available=True,
+                                                                        collection__studio_collection=True)
         self.kwargs["stock_dict"] = stock_dict = _get_stock_list(products)
         keys = [[k, stock_dict[k]] for k in list(stock_dict.keys())]
         sorted_list = sorted(keys, key=lambda x: not x[1])
