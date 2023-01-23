@@ -13,6 +13,7 @@ from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 from django.shortcuts import redirect, reverse
 from django.shortcuts import render, get_object_or_404
+from django.views.decorators.http import require_http_methods
 from django.views.generic.list import ListView
 
 from cart.forms import CartAddProductForm, CartAddCustomProductForm, CartAddGiftCardProductForm
@@ -361,6 +362,74 @@ class ProductsView(ListView):
         return context
 
 
+class SearchProductsView(ListView):
+    try:
+        model = Product
+        paginate_by = 12
+        template_name = 'shop/product/list.html'
+        context_object_name = 'products'
+        gift_card = GiftCard.objects.filter(available=True)
+        card_gift_cart_product_form = CartAddGiftCardProductForm()
+        param = Parameter.objects.filter(name="shipping_information")
+        shipping_information = param[0].value if len(param) and param[0].active else None
+        extra_context = {
+            'gift_card': gift_card,
+            'card_gift_cart_product_form': card_gift_cart_product_form,
+            'view': 'shop:products_view',
+            'product_view': 'shop:studio_product_detail'
+        }
+    except OperationalError:
+        pass
+
+    def get_queryset(self):
+        products = Product.objects.prefetch_related('product_types').filter(available=True, custom=False,
+                                                                            collection__studio_collection=False)
+        self.kwargs["stock_dict"] = _get_stock_list(products)
+        keys = [[k, self.kwargs["stock_dict"][k]] for k in list(self.kwargs["stock_dict"].keys())]
+        sorted_list = sorted(keys, key=lambda x: not x[1])
+        sorted_list = [sl[0] for sl in sorted_list]
+        preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(sorted_list)])
+        products = Product.objects \
+            .prefetch_related('product_types') \
+            .filter(pk__in=sorted_list, available=True, custom=False, collection__studio_collection=False) \
+            .order_by(preserved)
+        tag = self.request.GET['kulcsszo']
+        self.kwargs["keyword"] = tag
+        products = [product for product in products if product.is_tag(tag)]
+
+        return products
+
+    def get_context_data(self):
+        context = super().get_context_data(**self.kwargs)
+        context['product_stock'] = self.kwargs["stock_dict"]
+        context['keyword'] = self.kwargs["keyword"]
+        context['notification'] = Notification.objects.all()
+        context['collection'] = dict(seo_title='Fülbevaló választék, kézműves fülbevalók - Minervastudio',
+                                     seo_description='Egyedi, kézzel készített fülbevalók süthető gyurmából '
+                                                     'és nemesacél elemekkel, csak Neked.',
+                                     seo_keywords='fülbevalók, süthető gyurma fülbevalók, kézműves fülbevalók')
+        context['basic_collections'] = Collection.objects.filter(
+            available=True, basic_collection=True, custom=False, studio_collection=False).order_by('-created')
+        context['regular_collections'] = Collection.objects.filter(available=True, custom=False,
+                                                                   regular_collection=True,
+                                                                   studio_collection=False).order_by('-created')
+        temporary_collections = Collection.objects.filter(available=True, custom=False,
+                                                          basic_collection=False,
+                                                          regular_collection=False,
+                                                          studio_collection=False,
+                                                          best_seller_collection=False).order_by('-created')
+        # find if there is utolsó darabok
+        temp = list(temporary_collections)
+        upper = [e.name for e in temp if e.name.isupper()]
+        if len(upper):
+            idx_of_upper = [idx for idx, u in enumerate(temp) if u.name == upper[0]][0]
+            temp.append(temp.pop(idx_of_upper))
+        context['temporary_collections'] = temp
+        context['types'] = ProductType.objects.select_related('product')
+        context['custom'] = False
+        return context
+
+
 class StudioProductsView(ListView):
     try:
         collection = None
@@ -517,3 +586,7 @@ def generate_stripe_product(request, id: str):
     success = stripe_product_generator.generate_product(pr)
     status = 'success' if success else 'failure'
     return JsonResponse(data={'status': status})
+
+
+def view_404(request, exception=None):
+    return redirect('/')

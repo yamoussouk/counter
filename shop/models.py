@@ -160,6 +160,13 @@ class Product(models.Model):
         values = ['kerek kulcskarika - 25mm', 'karabíner - 32mm', 'szív alakú kulcskarika - 28mm']
         return values[int(value) - 1]
 
+    def get_tags(self):
+        return self.product_tage.all()
+
+    def is_tag(self, tag: str):
+        tags = [tag.name.lower() for tag in self.product_tage.all()]
+        return tag.lower() in tags
+
 
 @receiver(models.signals.post_delete, sender=Product)
 def auto_delete_image_on_delete(sender, instance, **kwargs):

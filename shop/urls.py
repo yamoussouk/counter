@@ -35,6 +35,7 @@ urlpatterns = [
     path('robots.txt', TemplateView.as_view(template_name="shop/robots.txt", content_type='text/plain')),
     path('icon/', views.get_icon, name='get_icon'),
     path('generate_stripe_product/<str:id>', views.generate_stripe_product, name='generate_stripe_product'),
+    path('termekek/kereses/', views.SearchProductsView.as_view(), name='products_view_search'),
 ]
 
 if Parameter.objects.filter(name="custom_service")[0].value == 'True':
