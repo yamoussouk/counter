@@ -164,8 +164,8 @@ class Product(models.Model):
         return self.product_tage.all()
 
     def is_tag(self, tag: str):
-        tags = [tag.name.lower() for tag in self.product_tage.all()]
-        return tag.lower() in tags
+        tags = [t.name.lower() for t in self.product_tage.all()]
+        return any(tag.lower() in t for t in tags)
 
 
 @receiver(models.signals.post_delete, sender=Product)
