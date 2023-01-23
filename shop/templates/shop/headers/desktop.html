@@ -1,0 +1,72 @@
+{% load static %}
+<div class="row">
+    <div class="col-md-12">
+        <div id="search-bar">
+            <form method="GET" action="{% url 'shop:products_view_search' %}">
+                <input class="form-control" type="search" placeholder="Keresés (név, szín, minta)"
+                       aria-label="Search" name="kulcsszo" maxlength="50" pattern="[a-z áéúőóüö A-Z ÁÉÚŐÓÜÖ]*"
+                       title="Kérlek, csak betűket használj!" minlength="3">
+                <button id="search-submit-button" type="submit"></button>
+            </form>
+        </div>
+        <div id="main-logo">
+            <a href="{% url 'shop:index' %}">
+                <picture>
+                    <source class="c_logo" srcset="{% static 'images/logo_150.webp' %}" type="image/webp">
+                    <img class="c_logo" src="{% static 'images/logo_150.png' %}" alt="Minerva Studio Logo"
+                         title="Minerva Studio Logo image" width="265" height="137"/>
+                </picture>
+            </a>
+        </div>
+        <div id="cart-icon-wrapper">
+            {% with total_items=cart|length %}
+            {% if cart|length > 0 %}
+            <a href="{% url 'cart:cart_detail' %}">
+                {% with total_items_plural=total_items|pluralize %}
+                <div class="item-in-cart-indicator"><span>{{ total_items }}</span></div>
+                <picture>
+                    <source class="c_logo" srcset="{% static 'images/cart_150.webp' %}" type="image/webp">
+                    <img class="c_logo" src="{% static 'images/cart_150.png' %}" alt="Minerva Studio Cart Icon"
+                         title="Minerva Studio Cart Icon" width="50" height="50"/>
+                </picture>
+                {% endwith %}
+            </a>
+            {% else %}
+            <div class="cart-icon-inner">
+                <picture>
+                    <source class="c_logo" srcset="{% static 'images/cart_150.webp' %}" type="image/webp">
+                    <img class="c_logo" src="{% static 'images/cart_150.png' %}" alt="Minerva Studio kosár ikon"
+                         title="Minerva Studio kosár ikon" width="50" height="50"/>
+                </picture>
+            </div>
+            {% endif %}
+            {% endwith %}
+        </div>
+    </div>
+</div>
+<div class="row desktop-menu">
+    <div class="navigation">
+        <ul class="mainmenu">
+            <li class="{% if request.path == '/' %}current{% endif %} menu-item">
+                <a title="Kezdőlap" href="{% url 'shop:index' %}">Kezdőlap</a>
+            </li>
+            <li class="{% if '/termek' in request.path %}current{% endif %} menu-item">
+                <a title="Termékek" href="{% url 'shop:products_view' %}">Termékek</a>
+            </li>
+            <li class="{% if '/gyik' in request.path %}current{% endif %} menu-item">
+                <a title="GYIK" href="{% url 'shop:faq' %}">GYIK</a>
+            </li>
+            <li class="{% if '/kapcsolat' in request.path %}current{% endif %} menu-item">
+                <a title="Kapcsolat" href="{% url 'shop:contact' %}">Kapcsolat</a>
+            </li>
+            <li class="{% if request.path == '/blog/' %}current{% endif %} menu-item">
+                <a title="Blog" href="{% url 'blog:blog-bejegyzesek' %}">Blog</a>
+            </li>
+            {% if CUSTOM %}
+            <li class="{% if '/egyedi-rendelés' in request.path %}current{% endif %} menu-item">
+                <a title="Kapcsolat" href="{% url 'shop:custom_products_view' %}">Egyedi rendelés</a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+</div>
