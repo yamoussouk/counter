@@ -62,12 +62,13 @@ def re_send_order_email(modeladmin, request, queryset):
                       Ajanlott=int(Parameter.objects.filter(name="ajanlott_price")[0].value))
         o = Order.objects.prefetch_related('items').filter(id=data_row.get("id"))[0]
         order_items = Order.objects.prefetch_related('items').filter(id=data_row.get("id"))[0].items.all()
+        order_data = {'Szállítási név': o.delivery_name, 'Szállítási cím': o.address,
+                      'Házszám, emelet, ajtó': o.address_number,
+                      'Postakód': o.postal_code, 'Település': o.city, 'Megjegyzés': o.note}
         delivery_info = dict(FoxPost={'Átvételi pont': o.fox_post},
                              Csomagkuldo={'Átvételi pont': o.csomagkuldo},
-                             Házhozszállítás={'Szállítási név': o.delivery_name, 'Szállítási cím': o.address,
-                                              'Postakód': o.postal_code, 'Település': o.city, 'Megjegyzés': o.note},
-                             Ajanlott={'Szállítási név': o.delivery_name, 'Szállítási cím': o.address,
-                                       'Postakód': o.postal_code, 'Település': o.city, 'Megjegyzés': o.note},
+                             Házhozszállítás=order_data,
+                             Ajanlott=order_data,
                              Személyesátvétel={'Vezetéknév': o.first_name, 'Keresztnév': o.last_name})
         delivery_price = prices[o.delivery_type.replace(' ', '')]
         delivery_data = delivery_info[o.delivery_type.replace(' ', '')]
@@ -139,7 +140,8 @@ def show_product(obj):
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
     raw_id_fields = ['product']
-    readonly_fields = ['id', 'product', 'price', 'quantity', 'color', 'stud', 'finding', 'first_initial', 'second_initial',
+    readonly_fields = ['id', 'product', 'price', 'quantity', 'color', 'stud', 'finding', 'first_initial',
+                       'second_initial',
                        'custom_date', show_product]
     exclude = ['gift_card', 'image']
     can_delete = False

@@ -158,12 +158,13 @@ def __save_order_items(order):
 
 
 def __send_order_confirmation_email(o, prices):
+    order_data = {'Szállítási név': o.delivery_name, 'Szállítási cím': o.address,
+                  'Házszám, emelet, ajtó': o.address_number,
+                  'Postakód': o.postal_code, 'Település': o.city, 'Megjegyzés': o.note}
     delivery_info = dict(FoxPost={'Átvételi pont': o.fox_post},
                          Csomagkuldo={'Átvételi pont': o.csomagkuldo},
-                         Házhozszállítás={'Szállítási név': o.delivery_name, 'Szállítási cím': o.address,
-                                          'Postakód': o.postal_code, 'Település': o.city, 'Megjegyzés': o.note},
-                         Ajanlott={'Szállítási név': o.delivery_name, 'Szállítási cím': o.address,
-                                   'Postakód': o.postal_code, 'Település': o.city, 'Megjegyzés': o.note},
+                         Házhozszállítás=order_data,
+                         Ajanlott=order_data,
                          Személyesátvétel={'Vezetéknév': o.first_name, 'Keresztnév': o.last_name})
     delivery_price = prices[o.delivery_type.replace(' ', '')]
     delivery_data = delivery_info[o.delivery_type.replace(' ', '')]
