@@ -1,7 +1,16 @@
+import re
+
 from django.views import generic
-from django.urls import resolve
 
 from .models import Post
+
+
+def mobile(request):
+    MOBILE_AGENT_RE = re.compile(r".*(iphone|mobile|androidtouch)", re.IGNORECASE)
+    if MOBILE_AGENT_RE.match(request.META['HTTP_USER_AGENT']):
+        return True
+    else:
+        return False
 
 
 class PostList(generic.ListView):
@@ -12,6 +21,7 @@ class PostList(generic.ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["canonical"] = f'https://{self.request.META["HTTP_HOST"]}{self.request.META["PATH_INFO"]}'
+        context['device'] = mobile(self.request)
         return context
 
 
@@ -37,4 +47,5 @@ class PostDetail(generic.DetailView):
         context["seo_title"] = images[0].title + ' - Minervastudio'
         context["seo_description"] = images[0].short_description
         context["canonical"] = f'https://{self.request.META["HTTP_HOST"]}{self.request.META["PATH_INFO"]}'
+        context['device'] = mobile(self.request)
         return context

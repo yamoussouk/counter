@@ -22,6 +22,7 @@ from shop.MessageSender import MessageSender
 from .StripeProductGenerator import StripeProductGenerator
 from .forms import ContactForm
 from .models import Collection, Product, Notification, ProductType, GiftCard, Message
+from django_user_agents.utils import get_user_agent
 
 stripe_product_generator = StripeProductGenerator()
 log = logging.getLogger(__name__)
@@ -74,7 +75,7 @@ def index(request):
     context = dict(basic_collection=basic_collection, basic_products=basic_products,
                    regular_collections=regular_collections, temporary_collections=temporary_collections,
                    notification=notification, ratio=ratio, shipping_information=shipping_information,
-                   best_sellers_collection=best_sellers_collection, bs_products=bs_products)
+                   best_sellers_collection=best_sellers_collection, bs_products=bs_products, device=mobile(request))
     return render(request, 'shop/index_hid.html', context)
 
 
@@ -152,7 +153,8 @@ def __get_product_details(request, id: str, slug: str, custom: bool, studio: boo
                    'nemes_acel': nemes_acel,
                    'muanyag': muanyag,
                    'nikkel_mentes': nikkel_mentes,
-                   'referer': referer
+                   'referer': referer,
+                   'device': mobile(request)
                    })
 
 
@@ -185,7 +187,8 @@ def faq(request):
                   {'csomagkuldo': csomagkuldo, 'foxpost': foxpost, 'delivery': delivery,
                    'ajanlott': ajanlott, 'notification': notification, 'shipping_information': shipping_information,
                    'seo_title': seo_title,
-                   'seo_description': seo_description})
+                   'seo_description': seo_description,
+                   'device': mobile(request)})
 
 
 def contact(request):
@@ -198,7 +201,8 @@ def contact(request):
     return render(request, 'shop/contact.html', {'contact_form': contact_form, 'notification': notification,
                                                  'shipping_information': shipping_information,
                                                  'seo_title': seo_title,
-                                                 'seo_description': seo_description})
+                                                 'seo_description': seo_description,
+                                                 'device': mobile(request)})
 
 
 def data_handling(request):
@@ -210,7 +214,8 @@ def data_handling(request):
     return render(request, 'shop/data_handling.html', {'notification': notification,
                                                        'shipping_information': shipping_information,
                                                        'seo_title': seo_title,
-                                                       'seo_description': seo_description})
+                                                       'seo_description': seo_description,
+                                                       'device': mobile(request)})
 
 
 def aszf(request):
@@ -222,7 +227,8 @@ def aszf(request):
     return render(request, 'shop/aszf.html', {'notification': notification,
                                               'shipping_information': shipping_information,
                                               'seo_title': seo_title,
-                                              'seo_description': seo_description})
+                                              'seo_description': seo_description,
+                                              'device': mobile(request)})
 
 
 def contact_message(request):
@@ -242,7 +248,7 @@ def contact_message(request):
     else:
         print('error', form.errors.as_data())
         contact_form = ContactForm()
-    return render(request, 'shop/contact.html', {'contact_form': contact_form})
+    return render(request, 'shop/contact.html', {'contact_form': contact_form, 'device': mobile(request)})
 
 
 def thank_you(request):
@@ -258,7 +264,8 @@ def impresszum(request):
     return render(request, 'shop/impresszum.html', {'notification': notification,
                                                     'shipping_information': shipping_information,
                                                     'seo_title': seo_title,
-                                                    'seo_description': seo_description})
+                                                    'seo_description': seo_description,
+                                                    'device': mobile(request)})
 
 
 def _get_stock_list(temp):
@@ -309,8 +316,8 @@ class ProductsView(ListView):
 
     def get_queryset(self):
         products = Product.objects.prefetch_related('product_types').filter(available=True, custom=False,
-                                                                        collection__available=True,
-                                                                        collection__studio_collection=False)
+                                                                            collection__available=True,
+                                                                            collection__studio_collection=False)
         self.kwargs["stock_dict"] = stock_dict = _get_stock_list(products)
         keys = [[k, stock_dict[k]] for k in list(stock_dict.keys())]
         sorted_list = sorted(keys, key=lambda x: not x[1])
@@ -359,6 +366,7 @@ class ProductsView(ListView):
         context['temporary_collections'] = temp
         context['types'] = ProductType.objects.select_related('product')
         context['custom'] = False
+        context['device'] = mobile(self.request)
         return context
 
 
@@ -427,6 +435,7 @@ class SearchProductsView(ListView):
         context['temporary_collections'] = temp
         context['types'] = ProductType.objects.select_related('product')
         context['custom'] = False
+        context['device'] = mobile(self.request)
         return context
 
 
@@ -434,7 +443,7 @@ class StudioProductsView(ListView):
     try:
         collection = None
         model = Product
-        paginate_by = 12
+        paginate_by = 24
         template_name = 'shop/product/list.html'
         context_object_name = 'products'
         stock_dict = dict()
@@ -487,8 +496,8 @@ class StudioProductsView(ListView):
 
     def get_queryset(self):
         products = Product.objects.prefetch_related('product_types').filter(available=True, custom=False,
-                                                                        collection__available=True,
-                                                                        collection__studio_collection=True)
+                                                                            collection__available=True,
+                                                                            collection__studio_collection=True)
         self.kwargs["stock_dict"] = stock_dict = _get_stock_list(products)
         keys = [[k, stock_dict[k]] for k in list(stock_dict.keys())]
         sorted_list = sorted(keys, key=lambda x: not x[1])
@@ -523,6 +532,7 @@ class StudioProductsView(ListView):
         context['temporary_collections'] = temp
         context['types'] = ProductType.objects.select_related('product')
         context['custom'] = False
+        context['device'] = mobile(self.request)
         return context
 
 
@@ -572,6 +582,7 @@ class CustomProductsView(ListView):
         context['temporary_collections'] = temp
         context['types'] = ProductType.objects.select_related('product')
         context['custom'] = True
+        context['device'] = mobile(self.request)
         return context
 
 
@@ -587,6 +598,5 @@ def generate_stripe_product(request, id: str):
     status = 'success' if success else 'failure'
     return JsonResponse(data={'status': status})
 
-
-def view_404(request, exception=None):
-    return redirect('/')
+# def view_404(request, exception=None):
+#     return redirect('/')
