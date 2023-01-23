@@ -97,6 +97,14 @@
         </div>
         <div class="row">
           <div class="col-md-12">
+            <div id="search-bar">
+              <form method="GET" action="{% url 'shop:products_view_search' %}">
+                <input class="form-control" type="search" placeholder="Keresés (név, szín, minta)"
+                       aria-label="Search" name="kulcsszo" maxlength="50" pattern="[a-z áéúőóüö A-Z ÁÉÚŐÓÜÖ]*"
+                        title="Kérlek, csak betűket használj!">
+                <button id="search-submit-button" type="submit"></button>
+              </form>
+            </div>
             <div id="main-logo">
               <a href="{% url 'shop:index' %}">
                 <picture>

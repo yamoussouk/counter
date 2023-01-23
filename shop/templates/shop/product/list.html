@@ -12,35 +12,41 @@
             </div>
             <div class="col-sm-9">
                 <div id="products-wrapper">
-                    {% for product in products %}
-                    <div class="{% if not product_stock.items|is_stock:product.id %}out-of-stock{% endif %} product-element">
-                        <div class="product-element-image-wrapper">
-                            {% if product.image %}
-                            <a href="{% url product_view id=product.collection.slug slug=product.slug %}" title="Termék oldal">
-                                <picture>
-                                  <source class="product-element-image" srcset="{{ product.image.url|wp }}" type="image/webp">
-                                  <source class="product-element-image" srcset="{{ product.image.url }}" type="image/png">
-                                  <img src="{{ product.image.url }}" alt="{% if product.seo_image_alt %}{{ product.seo_image_alt }}{% else %}{{ product.name }}{% endif %}" title="{{ product.name }} photo"
-                                     class="product-element-image" width="625" height="625" style="aspect-ratio: 1;"/>
-                                </picture>
-                                {% endif %}
-                                <picture>
-                                  <source class="sold-out-icon" srcset="{% static 'images/sold_out_150.webp' %}" type="image/webp">
-                                  <source class="sold-out-icon" srcset="{% static 'images/sold_out_150.png' %}" type="image/png">
-                                  <img src="{% static 'images/sold_out_150.png' %}" alt="Elfogyott" title="Elfogyott"
-                                     class="sold-out-icon" width="204" height="206" style="aspect-ratio: 204/206;"/>
-                                </picture>
+                    {% if products %}
+                        {% for product in products %}
+                        <div class="{% if not product_stock.items|is_stock:product.id %}out-of-stock{% endif %} product-element">
+                            <div class="product-element-image-wrapper">
+                                {% if product.image %}
+                                <a href="{% url product_view id=product.collection.slug slug=product.slug %}" title="Termék oldal">
+                                    <picture>
+                                      <source class="product-element-image" srcset="{{ product.image.url|wp }}" type="image/webp">
+                                      <source class="product-element-image" srcset="{{ product.image.url }}" type="image/png">
+                                      <img src="{{ product.image.url }}" alt="{% if product.seo_image_alt %}{{ product.seo_image_alt }}{% else %}{{ product.name }}{% endif %}" title="{{ product.name }} photo"
+                                         class="product-element-image" width="625" height="625" style="aspect-ratio: 1;"/>
+                                    </picture>
+                                    {% endif %}
+                                    <picture>
+                                      <source class="sold-out-icon" srcset="{% static 'images/sold_out_150.webp' %}" type="image/webp">
+                                      <source class="sold-out-icon" srcset="{% static 'images/sold_out_150.png' %}" type="image/png">
+                                      <img src="{% static 'images/sold_out_150.png' %}" alt="Elfogyott" title="Elfogyott"
+                                         class="sold-out-icon" width="204" height="206" style="aspect-ratio: 204/206;"/>
+                                    </picture>
 
-                            </a>
+                                </a>
+                            </div>
+                            <div class="product-element-description-wrapper">
+                                <a href="{% url 'shop:product_detail' id=product.collection.slug slug=product.slug %}" title="Termék oldal">
+                                    <span class="product-element-name">{{ product.name }} | {{ product.price }} Ft.-</span>
+                                </a>
+                                <span class="product-element-collection">{{ product.collection.name }}</span>
+                            </div>
                         </div>
-                        <div class="product-element-description-wrapper">
-                            <a href="{% url 'shop:product_detail' id=product.collection.slug slug=product.slug %}" title="Termék oldal">
-                                <span class="product-element-name">{{ product.name }} | {{ product.price }} Ft.-</span>
-                            </a>
-                            <span class="product-element-collection">{{ product.collection.name }}</span>
-                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <div id="no-result-wrapper">
+                        <p>A "{{ keyword }}" kulcsszóra nincs találat!<p>
                     </div>
-                    {% endfor %}
+                    {% endif %}
 
                     <div class="clearfix"></div>
 

@@ -23,24 +23,38 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'vx7=8568%&#%hf0cg&vc&_%eteg#=aq=4mgou@r25b$=ecxf$l'
 
 # SECURITY WARNING: don't run with debug turned on in production!
+# DEBUG = False
+# ALLOWED_HOSTS = ["*"]
 DEBUG = True
 
+# BASE_URL = 'https://www.minervastudio.hu'
+BASE_URL = 'http://localhost:8000'
+
+# ALLOWED_HOSTS = ['3b48-178-48-204-46.ngrok.io']
 ALLOWED_HOSTS = []
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'shop',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'django.contrib.sitemaps',
     'django.contrib.staticfiles',
-    'shop',
+    'django.contrib.humanize',
     'cart',
     'coupon',
     'order',
+    'multiselectfield',
+    'payment',
+    'giftcardpayment',
+    'logs',
+    'parameters',
+    'blog',
 ]
 
 MIDDLEWARE = [
@@ -50,7 +64,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware'
 ]
 
 ROOT_URLCONF = 'counter.urls'
@@ -67,6 +81,9 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'cart.context_processors.cart',
+                'shop.context_processors.ga_tracking_id',
+                'shop.context_processors.use_ga',
+                'shop.context_processors.custom_settings',
             ],
         },
     },
@@ -79,18 +96,14 @@ WSGI_APPLICATION = 'counter.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    'new': {
-             'ENGINE': 'django.db.backends.sqlite3',
-             'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-         },
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'myproject',
-        'USER': 'root',
-        'PASSWORD': 'TEST1234',
-        'HOST': 'localhost',
-        'PORT': '3306',
-    },
+         'ENGINE': 'django.db.backends.mysql',
+         'NAME': 'counter1030',
+         'USER': 'root',
+         'PASSWORD': 'TEST1234',
+         'HOST': 'localhost',
+         'PORT': '3306',
+    }
 }
 
 
@@ -130,16 +143,100 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
+# STATIC_URL = '/static/'
+# STATIC_ROOT = os.path.join(BASE_DIR, 'shop', 'static')
+#
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+#
+# CART_SESSION_ID = 'cart'
+#
+# FOXPOST_PRICE = 870
+# FOXPOST_PRICE_API_KEY = 'price_1HsbQGASeeDQewa1HefPDLj6'
+# DELIVERY_PRICE = 1500
+# DELIVERY_PRICE_API_KEY = 'price_1HsbQtASeeDQewa1NX8B1xQ2'
+# CSOMAGKULDO_PRICE = 600
+# CSOMAGKULDO_PRICE_API_KEY = 'price_1HyNvXASeeDQewa1LFkDpJgm'
+#
+# CURRENCY = 'huf'
+#
+# ##
+#
+# STRIPE_PUBLISHABLE_KEY = 'pk_live_51Hpb76ASeeDQewa1hEN1jTDdhFx8GvEMDJoPQLuNT5s5ofsRm06O5G45DsJToUs8SZ2nmJtYOrMjeTFPBPocRd3g00HW73VbMl'
+# STRIPE_SECRET_KEY = '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'
+# STRIPE_ENDPOINT_SECRET = 'whsec_l3I8pakYWtlXi0YCM0dd3AN1rKJORlCT'
+#
+# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+# EMAIL_HOST = "smtp.gmail.com"
+# EMAIL_USE_TLS = True
+# EMAIL_PORT = 587
+# EMAIL_HOST_USER = "minervaearrings@gmail.com"
+# EMAIL_HOST_PASSWORD = "oXe4R5i6uuG4"
+#
+# CSOMAGKULDO_API_KEY = '59e121b28055a399'
+# CSOMAGKULDO_API_PASSWORD = '59e121b28055a3990d57df6c23c9acd4'
+#
+# SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'shop', 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 CART_SESSION_ID = 'cart'
 
-FOXPOST_PRICE = 862
-DELIVERY_PRICE = 1735
+FOXPOST_PRICE = 870
+FOXPOST_PRICE_API_KEY = 'price_1ISq5MEDD83OtAN4tYUmLtYm'
+DELIVERY_PRICE = 1500
+DELIVERY_PRICE_API_KEY = 'price_1HtzyqEDD83OtAN4LOpSNS4g'
 CSOMAGKULDO_PRICE = 460
+CSOMAGKULDO_PRICE_API_KEY = 'price_1HsDMmEDD83OtAN47Sr3RXUT'
+AJANLOTT_PRICE = 630
+AJANLOTT_PRICE_API_KEY = 'price_1IefUJEDD83OtAN4QQihXBSn'
 
 CURRENCY = 'huf'
+
+MAIN_URL = 'http://localhost:8000/'
+
+##
+
+STRIPE_PUBLISHABLE_KEY = 'pk_test_51Ftx1KEDD83OtAN4Mvv57MmZnSK16w6BEuywiG8nOT56QxQVloQVURKni4REG0YrtV7LplVtNxSU9zLqDDKSIjia001oXN5W3L'
+STRIPE_SECRET_KEY = 'sk_test_51Ftx1KEDD83OtAN4a2dEVWLDQNYy3YmQee18A4wGkKWaHT0Zx5oa8f7ElfK8FBcFm3kj47JsXiLlBIiO6Lf5TP5t00jTLj682A'
+STRIPE_ENDPOINT_SECRET = 'whsec_189932a682c6b2a67b2c8d9e46cd7e59b01c63cf672cb3a423d3d2a34dd79935'
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = "tamas.kakuszis@gmail.com"
+EMAIL_HOST_PASSWORD = "eqwewqwqewq"
+
+CSOMAGKULDO_API_KEY = '59e121b28055a399'
+CSOMAGKULDO_API_PASSWORD = '59e121b28055a3990d57df6c23c9acd4'
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+# GA
+GA_TRACKING_ID = ''  # 'G-7S7SB1L4S5'
+USE_GA = os.environ.get('DJANGO_USE_GA', True)
+USE_GA = {'True': True, 'False': False}.get(USE_GA, True)
+
+# coupon creation
+COUPON_EXCEPTIONS = ['prod_INPjA3mKEqeh0G', 'prod_INPi1usMJCQPa0', 'prod_IT9gEEUbisvrij', 'prod_ITY5al0x66Bk1O']  # hh, fp, csk, test
+COUPON_PERCENTAGE = 15
+COUPON_ID = 'MINERVAKLUB'
+
+# custom products
+CUSTOM_SERVICE = False
+
+# 3 - 2
+DISCOUNT = True
+
+STATICFILES_STORAGE = 'static_compress.CompressedStaticFilesStorage'
+STATIC_COMPRESS_FILE_EXTS = ['js', 'css', 'svg']
+STATIC_COMPRESS_METHODS = ['gz', 'br']
+STATIC_COMPRESS_KEEP_ORIGINAL = True
+STATIC_COMPRESS_MIN_SIZE_KB = 30
 
