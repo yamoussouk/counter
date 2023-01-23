@@ -1,4 +1,5 @@
 import logging
+import re
 
 from django.contrib import messages
 from django.db.models import Q
@@ -28,6 +29,14 @@ DELIVERY_PRICE = 'delivery_price'
 CSOMAGKULDO_PRICE = 'csomagkuldo_price'
 AJANLOTT_PRICE = 'ajanlott_price'
 AJANLOTT_CART_LIMIT = 'ajanlott_cart_limit'
+
+
+def mobile(request):
+    MOBILE_AGENT_RE = re.compile(r".*(iphone|mobile|androidtouch)", re.IGNORECASE)
+    if MOBILE_AGENT_RE.match(request.META['HTTP_USER_AGENT']):
+        return True
+    else:
+        return False
 
 
 def __validate_stock(cart, product, cd):
@@ -280,6 +289,7 @@ def cart_detail(request):
                    is_csomagkuldo_enabled=is_csomagkuldo_enabled, is_ajanlott_enabled=is_ajanlott_enabled,
                    over_the_limit=over_the_limit,
                    is_discount_enabled=is_discount_enabled,
-                   is_delivery_size_ok=is_delivery_size_ok)  # 'gift_card_apply_form': gift_card_apply_form
+                   is_delivery_size_ok=is_delivery_size_ok,
+                   device=mobile(request))  # 'gift_card_apply_form': gift_card_apply_form
     log.info(f'Cart details: {context.get("cart")}')
     return render(request, 'cart/detail.html', context)
