@@ -3,12 +3,14 @@ import os
 import re
 import logging
 from django.db.models import Q
+from django.utils.text import slugify
 
 from django.db.models import Case, When
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db.utils import OperationalError
 from django.http import HttpResponse
+import json
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 from django.shortcuts import redirect, reverse
@@ -597,6 +599,21 @@ def generate_stripe_product(request, id: str):
     success = stripe_product_generator.generate_product(pr)
     status = 'success' if success else 'failure'
     return JsonResponse(data={'status': status})
+
+
+def name_validation(request, name: str):
+    slug = slugify(name)
+    response_data = {"exist": Product.objects.filter(slug=slug).exists()}
+    return HttpResponse(json.dumps(response_data), content_type="application/json")
+
+
+def price_api_key(request, price: str):
+    try:
+        api_key = getattr(settings, f'PA_{price}')
+    except AttributeError:
+        api_key = f'No API Key found by {price}. Please create one in stripe and let me know!'
+    response_data = {"api_key": api_key}
+    return HttpResponse(json.dumps(response_data), content_type="application/json")
 
 # def view_404(request, exception=None):
 #     return redirect('/')

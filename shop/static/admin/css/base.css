@@ -985,3 +985,22 @@ table#change-history tbody th {
 .popup #header {
     padding: 10px 20px;
 }
+
+#id_name, #id_price {
+    float: left;
+}
+
+#name-validation, #offered-price-api {
+    margin-left: 5px;
+    float: left;
+    height: 27px;
+    position: relative;
+}
+
+#name-validation div, #offered-price-api div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    font-weight: bold;
+}

@@ -176,6 +176,41 @@
                 showRelatedObjectLookupPopup(this);
             }
         });
+        var url = window.location.href;
+        if (url.indexOf('admin/shop/product/') > 0) {
+            $('#id_name').keyup(function() {
+                var value = $(this).val();
+                $.ajax({
+                  type: 'get',
+                  url: '/name-validation/' + value,
+                  success: function(r) {
+                    var text = r["exist"] ? 'The name is already taken!!!' : 'The name is free!';
+                    $('#name-validation div').text(text);
+                  }
+                });
+              });
+            $('#id_name').blur(function() {
+                if( !$(this).val() ) {
+                  $('#name-validation div').text('');
+                }
+            });
+            $('#id_price').keyup(function() {
+                var value = $(this).val();
+                $.ajax({
+                  type: 'get',
+                  url: '/price-api-key/' + String(value),
+                  success: function(r) {
+                    var text = r["api_key"];
+                    $('#offered-price-api div').text(text);
+                  }
+                });
+              });
+            $('#id_price').blur(function() {
+                if( !$(this).val() ) {
+                  $('#offered-price-api div').text('');
+                }
+            });
+        }
     });
 
 })(django.jQuery);

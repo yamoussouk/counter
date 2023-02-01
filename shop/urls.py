@@ -11,7 +11,6 @@ sitemaps = {
     'static': StaticViewsSitemap,
     'product': ProductSitemap,
     'collection': CollectionSitemap,
-    'blog-category': BlogCategorySitemap,
     'post': PostSitemap
 }
 
@@ -36,6 +35,8 @@ urlpatterns = [
     path('icon/', views.get_icon, name='get_icon'),
     path('generate_stripe_product/<str:id>', views.generate_stripe_product, name='generate_stripe_product'),
     path('termekek/kereses/', views.SearchProductsView.as_view(), name='products_view_search'),
+    path('name-validation/<str:name>', views.name_validation, name='name-validation'),
+    path('price-api-key/<str:price>', views.price_api_key, name='price-api-key'),
 ]
 
 if Parameter.objects.filter(name="custom_service")[0].value == 'True':

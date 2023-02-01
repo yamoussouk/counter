@@ -142,7 +142,7 @@ class CollectionAdmin(admin.ModelAdmin):
 
     def response_add(self, request, obj, post_url_continue=None):
         if self.error_while_saving:
-            return HttpResponseRedirect("/admin/shop/collection/add/")
+            return HttpResponseRedirect("/admin/shop/collection/add/", obj)
         else:
             return super(CollectionAdmin, self).response_add(request, obj, post_url_continue)
 

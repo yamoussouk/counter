@@ -446,6 +446,10 @@ input[type="submit"], button {
     pre.literal-block {
         overflow: auto;
     }
+
+    #name-validation, #offered-price-api {
+        height: 36px;
+    }
 }
 
 /* Mobile */
@@ -992,5 +996,9 @@ input[type="submit"], button {
     table.model tbody th, table.model tbody td {
         font-size: 13px;
         word-break: break-word;
+    }
+
+    #name-validation, #offered-price-api {
+        height: 36px;
     }
 }
