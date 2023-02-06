@@ -347,8 +347,7 @@ class ProductsView(ListView):
         else:
             context['collection'] = dict(seo_title='Fülbevaló választék, kézműves fülbevalók - Minervastudio',
                                          seo_description='Egyedi, kézzel készített fülbevalók süthető gyurmából '
-                                                         'és nemesacél elemekkel, csak Neked.',
-                                         seo_keywords='fülbevalók, süthető gyurma fülbevalók, kézműves fülbevalók')
+                                                         'és nemesacél elemekkel, csak Neked.')
         context['basic_collections'] = Collection.objects.filter(
             available=True, basic_collection=True, custom=False, studio_collection=False).order_by('-created')
         context['regular_collections'] = Collection.objects.filter(available=True, custom=False,
@@ -416,8 +415,7 @@ class SearchProductsView(ListView):
         context['notification'] = Notification.objects.all()
         context['collection'] = dict(seo_title='Fülbevaló választék, kézműves fülbevalók - Minervastudio',
                                      seo_description='Egyedi, kézzel készített fülbevalók süthető gyurmából '
-                                                     'és nemesacél elemekkel, csak Neked.',
-                                     seo_keywords='fülbevalók, süthető gyurma fülbevalók, kézműves fülbevalók')
+                                                     'és nemesacél elemekkel, csak Neked.')
         context['basic_collections'] = Collection.objects.filter(
             available=True, basic_collection=True, custom=False, studio_collection=False).order_by('-created')
         context['regular_collections'] = Collection.objects.filter(available=True, custom=False,

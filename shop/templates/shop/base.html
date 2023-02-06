@@ -3,9 +3,19 @@
 <!DOCTYPE html>
 <html{% if cart_border %} id="cart"{% endif %} lang="hu">
   <head>
+    <meta name="robots" content="index, follow">
+    {% if product_details %}
+      <meta property="og:type" content="product">
+      <meta property="og:title" content="{{ seo_description }}">
+      <meta property="og:url" content="https://www.minervastudio.hu{{ request.get_full_path }}">
+      <meta property="og:site_name" content="Minervastudió">
+      <meta property="og:image" content="https://www.minervastudio.hu{{ product.image.url }}">
+      <meta property="product:price:amount" content="{{ product.price }}">
+      <meta property="product:price:currency" content="HUF">
+      <meta property="og:description" content="{{ product.og_description }}"> <!-- ezt meg kell változtatni -->
+    {% endif %}
     <meta name="description" content="{% if seo_description %}{{ seo_description }}{% else %}A Minerva Studio ékszerei kis darabszámban kézzel készült, egyedi termékek.
      A fülbevalók modernek, elegánsak, letisztultak.{% endif %}">
-    <meta name="keywords" content="{% if seo_keywords %}{{ seo_keywords }}{% else %}fülbevalók, süthető gyurma fülbevaló, orvosi fém, nemesacél fülbevalók{% endif %}" >
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="icon" sizes="192x192" href="{% url 'shop:get_icon' %}">
