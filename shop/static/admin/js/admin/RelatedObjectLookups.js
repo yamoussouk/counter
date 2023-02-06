@@ -210,6 +210,12 @@
                   $('#offered-price-api div').text('');
                 }
             });
+            $('label[for="id_image"] + p').hover(function() {
+                url = $('label[for="id_image"] + p a').attr('href');
+                $('#image-wrapper img').attr("src", "https://www.minervastudio.hu" + url);
+            }, function() {
+                $('#image-wrapper img').attr("src", "");
+            });
         }
     });
 

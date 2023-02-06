@@ -28,6 +28,9 @@
                     {% if field.field.help_text %}
                         <div class="help">{{ field.field.help_text|safe }}</div>
                     {% endif %}
+                    {% if field.field.name == 'image' %}
+                        <div id="image-wrapper"><div><img /></div></div>
+                    {% endif %}
                 </div>
             {% endfor %}
         </div>

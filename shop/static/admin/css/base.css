@@ -1004,3 +1004,12 @@ table#change-history tbody th {
     height: 100%;
     font-weight: bold;
 }
+
+#image-wrapper {
+    position: absolute;
+}
+
+#image-wrapper img {
+    width: 200px;
+    height: auto;
+}
