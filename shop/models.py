@@ -129,6 +129,9 @@ class Product(models.Model):
     default_finding_type = models.CharField(choices=[("1", "Gold"), ("2", "Silver"), ("3", "Bronze")], default='1',
                                             null=True,
                                             blank=True, max_length=250)
+    og_description = models.CharField(
+        max_length=200, db_index=True, blank=True, help_text="SEO leírás csakis a google megjelenés számára "
+                                                             "Ez sehol sem látszik a weboldalon.")
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
