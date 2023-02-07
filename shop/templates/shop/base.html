@@ -3,7 +3,11 @@
 <!DOCTYPE html>
 <html{% if cart_border %} id="cart"{% endif %} lang="hu">
   <head>
-    <meta name="robots" content="index, follow">
+    {% if follow %}
+      <meta name="robots" content="index, follow">
+    {% else %}
+      <meta name="robots" content="noindex">
+    {% endif %}
     {% if product_details %}
       <meta property="og:type" content="product">
       <meta property="og:title" content="{{ seo_description }}">
