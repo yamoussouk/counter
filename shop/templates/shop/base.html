@@ -16,7 +16,15 @@
       <meta property="og:image" content="https://www.minervastudio.hu{{ product.image.url }}">
       <meta property="product:price:amount" content="{{ product.price }}">
       <meta property="product:price:currency" content="HUF">
-      <meta property="og:description" content="{{ product.og_description }}"> <!-- ezt meg kell változtatni -->
+      <meta property="og:description" content="{{ product.og_description }}">
+    {% endif %}
+    {% if collection %}
+      <meta property="og:type" content="website">
+      <meta property="og:title" content="{{ collection.seo_description }}">
+      <meta property="og:url" content="https://www.minervastudio.hu{{ request.get_full_path }}">
+      <meta property="og:site_name" content="Minervastudió">
+      <meta property="og:image" content="https://www.minervastudio.hu{% if collection.image.url %}{{ collection.image.url }}{% else %}{{ collection.image }}{% endif %}">
+      <meta property="og:description" content="{{ collection.og_description }}">
     {% endif %}
     <meta name="description" content="{% if seo_description %}{{ seo_description }}{% else %}A Minerva Studio ékszerei kis darabszámban kézzel készült, egyedi termékek.
      A fülbevalók modernek, elegánsak, letisztultak.{% endif %}">

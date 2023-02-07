@@ -1,4 +1,4 @@
-{% include "shop/base.html" with notification=notification product_list=True notfound=False seo_title=collection.seo_title seo_description=collection.seo_description device=device follow=True %}
+{% include "shop/base.html" with notification=notification product_list=True notfound=False seo_title=collection.seo_title seo_description=collection.seo_description device=device follow=True collection=collection %}
 {% load static %}
 
 {% block content %}

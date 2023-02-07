@@ -49,6 +49,9 @@ class Collection(models.Model):
     seo_image_alt = models.CharField(
         max_length=200, db_index=True, blank=True, help_text="SEO alt a google crawler számára. "
                                                              "Ez sehol sem látszik a weboldalon.")
+    og_description = models.CharField(
+        max_length=200, db_index=True, blank=True, help_text="SEO leírás csakis a google megjelenés számára "
+                                                             "Ez sehol sem látszik a weboldalon.")
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
