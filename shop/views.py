@@ -388,7 +388,7 @@ class SearchProductsView(ListView):
             'gift_card': gift_card,
             'card_gift_cart_product_form': card_gift_cart_product_form,
             'view': 'shop:products_view',
-            'product_view': 'shop:studio_product_detail'
+            'product_view': 'shop:product_detail'
         }
     except OperationalError:
         pass
