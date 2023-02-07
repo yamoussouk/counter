@@ -48,6 +48,46 @@
         }
     });
 </script>
+<style>
+    #id_name, #id_price {
+        float: left;
+    }
+
+    #name-validation, #offered-price-api {
+        margin-left: 5px;
+        float: left;
+        height: 27px;
+        position: relative;
+    }
+
+    #name-validation div, #offered-price-api div {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        font-weight: bold;
+    }
+
+    #image-wrapper {
+        position: absolute;
+    }
+
+    #image-wrapper img {
+        width: 200px;
+        height: auto;
+    }
+    @media (max-width: 1024px) {
+        #name-validation, #offered-price-api {
+            height: 36px;
+        }
+    }
+    @media (max-width: 767px) {
+        #name-validation, #offered-price-api {
+            height: 36px;
+        }
+    }
+
+</style>
 {{ media }}
 {% endblock %}
 
