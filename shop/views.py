@@ -350,7 +350,8 @@ class ProductsView(ListView):
                                                          'és nemesacél elemekkel, csak Neked.',
                                          og_description='Fedezd fel a Minervastudió egyedi fülbevalóit. '
                                                         'Kérd a termékeket az általad választott színben!',
-                                         image='/media/carmen_main.jpg')
+                                         image='/media/carmen_main.jpg',
+                                         name='Egyedi fülbevalók nagy választékban.')
         context['basic_collections'] = Collection.objects.filter(
             available=True, basic_collection=True, custom=False, studio_collection=False).order_by('-created')
         context['regular_collections'] = Collection.objects.filter(available=True, custom=False,

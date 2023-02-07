@@ -10,7 +10,7 @@
     {% endif %}
     {% if product_details %}
       <meta property="og:type" content="product">
-      <meta property="og:title" content="{{ seo_description }}">
+      <meta property="og:title" content="{{ product.product_name }}">
       <meta property="og:url" content="https://www.minervastudio.hu{{ request.get_full_path }}">
       <meta property="og:site_name" content="Minervastudió">
       <meta property="og:image" content="https://www.minervastudio.hu{{ product.image.url }}">
@@ -20,7 +20,7 @@
     {% endif %}
     {% if collection %}
       <meta property="og:type" content="website">
-      <meta property="og:title" content="{{ collection.seo_description }}">
+      <meta property="og:title" content="{{ collection.name }}">
       <meta property="og:url" content="https://www.minervastudio.hu{{ request.get_full_path }}">
       <meta property="og:site_name" content="Minervastudió">
       <meta property="og:image" content="https://www.minervastudio.hu{% if collection.image.url %}{{ collection.image.url }}{% else %}{{ collection.image }}{% endif %}">
