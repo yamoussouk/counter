@@ -16,7 +16,7 @@ class StaticViewsSitemap(Sitemap):
 
 class CollectionSitemap(Sitemap):
     def items(self):
-        return Collection.objects.filter(available=True)
+        return Collection.objects.filter(available=True).exclude(name='Studio')
 
     def lastmod(self, obj):
         return obj.updated
@@ -24,7 +24,7 @@ class CollectionSitemap(Sitemap):
 
 class ProductSitemap(Sitemap):
     def items(self):
-        return Product.objects.filter(available=True)
+        return Product.objects.filter(available=True, collection__studio_collection=False)
 
     def location(self, obj):
         return reverse('shop:product_detail', args=[obj.collection.slug, obj.slug])
