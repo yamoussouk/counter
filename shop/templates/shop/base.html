@@ -23,7 +23,7 @@
       <meta property="og:title" content="{{ collection.name }}">
       <meta property="og:url" content="https://www.minervastudio.hu{{ request.get_full_path }}">
       <meta property="og:site_name" content="Minervastudió">
-      <meta property="og:image" content="https://www.minervastudio.hu{% if collection.image.url %}{{ collection.image.url }}{% else %}{{ collection.image }}{% endif %}">
+      <meta property="og:image" content="{% if collection.image %}https://www.minervastudio.hu{% if collection.image.url %}{{ collection.image.url }}{% else %}{{ collection.image }}{% endif %}{% else %}https://www.minervastudio.hu/static/images/kollekcio.jpg{% endif %}">
       <meta property="og:description" content="{{ collection.og_description }}">
     {% endif %}
     <meta name="description" content="{% if seo_description %}{{ seo_description }}{% else %}A Minerva Studio ékszerei kis darabszámban kézzel készült, egyedi termékek.
