@@ -94,7 +94,7 @@ DELIVERY_SIZES = ((1, 'S'),
 
 class Product(models.Model):
     collection = models.ForeignKey(Collection, related_name='products', on_delete=models.CASCADE)
-    collections = models.ManyToManyField(Collection)
+    collections = models.ManyToManyField(Collection, blank=True)
     name = models.CharField(max_length=200, db_index=True)
     slug = models.SlugField(max_length=200, db_index=True, unique=True, default='')
     image = models.ImageField(blank=True)
