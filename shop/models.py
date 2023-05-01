@@ -94,6 +94,7 @@ DELIVERY_SIZES = ((1, 'S'),
 
 class Product(models.Model):
     collection = models.ForeignKey(Collection, related_name='products', on_delete=models.CASCADE)
+    collections = models.ManyToManyField(Collection)
     name = models.CharField(max_length=200, db_index=True)
     slug = models.SlugField(max_length=200, db_index=True, unique=True, default='')
     image = models.ImageField(blank=True)
@@ -172,6 +173,9 @@ class Product(models.Model):
     def is_tag(self, tag: str):
         tags = [t.name.lower() for t in self.product_tage.all()]
         return any(tag.lower() in t for t in tags)
+
+    def get_collections(self):
+        return "\n".join([c.name for c in self.collections.all()])
 
 
 @receiver(models.signals.post_delete, sender=Product)

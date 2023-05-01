@@ -175,7 +175,7 @@ class ProductAdmin(admin.ModelAdmin):
     fieldsets = (
         ("Kötelező mezők", {
             "fields": (
-                'collection', 'name', 'product_name', 'description', 'size',
+                'collection', 'collections', 'name', 'product_name', 'description', 'size',
             )
         }),
         ("Ár", {
