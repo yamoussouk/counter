@@ -177,6 +177,9 @@ class Product(models.Model):
     def get_collections(self):
         return "\n".join([c.name for c in self.collections.all()])
 
+    def get_serializable(self):
+        return [c.name for c in self.collections.all()]
+
 
 @receiver(models.signals.post_delete, sender=Product)
 def auto_delete_image_on_delete(sender, instance, **kwargs):

@@ -198,6 +198,11 @@ def _convert_values(request):
                         value = request.session['cart'][key][key2][key3].path \
                             if request.session['cart'][key][key2][key3] != '' else ''
                         request.session['cart'][key][key2][str(key3)] = value
+                    if key3 == 'collections':
+                        collections = request.session['cart'][key][key2][key3]
+                        collection_names = [cn.name for cn in collections]
+                        value = ', '.join(collection_names)
+                        request.session['cart'][key][key2][str(key3)] = value
                     if isinstance(request.session['cart'][key][key2][key3], Decimal):
                         request.session['cart'][key][key2][str(key3)] = str(
                             request.session['cart'][key][key2][key3])
