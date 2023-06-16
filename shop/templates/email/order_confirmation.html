@@ -400,9 +400,9 @@
                                   </div>
                                   <div class="item-details-wrapper">
                                       <div class="item-details-inner">
-                                        <span class="item-details-name">{{ item.product.name }}</span>{% if item.product.collection.name %}
+                                        <span class="item-details-name">{{ item.product.name }}</span>{% if item.product.get_collection.name %}
                                           <span class="item-details-collection-divider">- </span>
-                                          <span class="item-details-collection">{{ item.product.collection.name }} kollekció</span>{% endif %}
+                                          <span class="item-details-collection">{{ item.product.get_collection.name }} kollekció</span>{% endif %}
                                         <span class="item-details-color">{% if item.color != '' %}{{ item.color|lower }}{% else %}&nbsp;{% endif %}</span>
                                         <span class="item-details-stud">{{ item.stud }}</span>
                                         </div>

@@ -96,14 +96,14 @@ def cart_add(request, product_id):
     ip_address = get_client_ip(request)
     cart = Cart(request)
     product = get_object_or_404(Product, id=product_id)
-    redirect_url = 'shop:studio_product_detail' if product.collection.studio_collection \
+    redirect_url = 'shop:studio_product_detail' if product.get_collection().studio_collection \
         else ('shop:custom_product_detail' if product.custom else 'shop:product_detail')
     form = CartAddCustomProductForm(request.POST) if product.custom else CartAddProductForm(request.POST)
     if form.is_valid():
         cd = form.cleaned_data
         if cd.get('color') == '' and product.product_types.all().exists():
             messages.error(request, f'Kérem válasszon színt!')
-            return redirect(reverse(redirect_url, args=[product.collection.slug, product.slug]))
+            return redirect(reverse(redirect_url, args=[product.get_collection_slug(), product.slug]))
         if product.custom:
             status, item_in_cart, stock = True, 0, 0
         else:
@@ -117,7 +117,7 @@ def cart_add(request, product_id):
                      delivery_size=product.delivery_size)
             message = create_message('Product is added to the cart, ', product_id, product, cd, ip_address)
             LogFile.objects.create(type='INFO', message=message)
-            return redirect(reverse(redirect_url, args=[product.collection.slug, product.slug]))
+            return redirect(reverse(redirect_url, args=[product.get_collection_slug(), product.slug]))
         else:
             message = create_message('Tried to add product to the cart but it was out of stock, ',
                                      product_id, product, cd, ip_address)
@@ -125,10 +125,10 @@ def cart_add(request, product_id):
             messages.error(request, f'A hozzáadni kívánt, illetve a kosaradban található termék összes mennyisége'
                                     f' meghaladja az elérhető mennyiséget, amely {stock}. A kosaradban az aktuális termék '
                                     f'mennyisége {item_in_cart}.')
-            return redirect(reverse(redirect_url, args=[product.collection.slug, product.slug]))
+            return redirect(reverse(redirect_url, args=[product.get_collection_slug(), product.slug]))
     # messages.error(request, 'Hiba történt, kérlek, próbáld meg újra.')
     messages.error(request, 'Kérem, töltse ki az összes mezőt!')
-    return redirect(reverse(redirect_url, args=[product.collection.slug, product.slug]))
+    return redirect(reverse(redirect_url, args=[product.get_collection_slug(), product.slug]))
 
 
 @require_http_methods(['POST'])

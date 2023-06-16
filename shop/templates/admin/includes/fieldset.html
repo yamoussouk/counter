@@ -19,7 +19,8 @@
                             {{ field.field }}
                         {% endif %}
                     {% endif %}
-                    {% if field.field.name == 'name' %}
+
+                    {% if field.field.name == 'name' and field.field.label == 'Név' %}
                         <div id="name-validation"><div></div></div>
                     {% endif %}
                     {% if field.field.name == 'price' %}

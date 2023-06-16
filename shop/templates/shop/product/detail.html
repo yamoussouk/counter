@@ -60,7 +60,7 @@
                             <h1>{% if product.product_name %}{{ product.product_name }}{% else %}{{ product.name }}{% endif %}</h1>
                         </div>
                         <div class="product-collection-name">
-                            {{ product.collection.name }}
+                            {{ product.get_collection.name }}
                         </div>
                         <div class="product-price">
                             {{ product.price }} Ft.-
@@ -73,14 +73,7 @@
                                 <div class="plus"><span>+</span></div>
                               {% csrf_token %}
                                 <input id="add_to_cart_button" type="submit" value="Kosárba">
-                                {% if not product.studs %}
-                                <div class="form-check" id="product-detail-check">
-                                  <input type="checkbox" class="form-check-input" id="timeframe-check" required>
-                                  <label class="form-check-label" for="timeframe-check">
-                                      Megértettem, hogy hűtőmágnesek esetén az elkészülési idő 2-3 nap.
-                                  </label>
-                                </div>
-                                {% endif %}
+
                             </form>
                             {% else %}
                                 <div id="out_of_stock_button"><span>Elfogyott</span></div>

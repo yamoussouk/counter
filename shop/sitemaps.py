@@ -27,7 +27,7 @@ class ProductSitemap(Sitemap):
         return Product.objects.filter(available=True, collection__studio_collection=False)
 
     def location(self, obj):
-        return reverse('shop:product_detail', args=[obj.collection.slug, obj.slug])
+        return reverse('shop:product_detail', args=[obj.get_collection_slug(), obj.slug])
 
     def lastmod(self, obj):
         return obj.updated

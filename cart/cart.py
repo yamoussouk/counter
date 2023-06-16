@@ -138,7 +138,7 @@ class Cart(object):
         self.cart[new_cart_id]['product_id'] = product.id
         self.cart[new_cart_id]['product_name'] = product.name
         self.cart[new_cart_id]['product_total_price'] = product.price * quantity
-        self.cart[new_cart_id]['collection'] = product.collection.name if hasattr(product, 'collection') else ''
+        self.cart[new_cart_id]['collection'] = product.get_collection().name if hasattr(product, 'collection') else ''
         self.cart[new_cart_id]['collections'] = product.get_serializable() if hasattr(product, 'collections') else ''
         self.cart[new_cart_id]['first_initial'] = first_initial
         self.cart[new_cart_id]['second_initial'] = second_initial

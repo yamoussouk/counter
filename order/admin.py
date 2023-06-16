@@ -132,7 +132,7 @@ def order_detail(obj):
 
 def show_product(obj):
     return mark_safe('<a target="_blank" href="/termek/{}/{}">Product</a>'
-                     .format(obj.product.collection.slug, obj.product.slug))
+                     .format(obj.product.get_collection_slug(), obj.product.slug))
 
 
 # order_detail.allow_tags=True

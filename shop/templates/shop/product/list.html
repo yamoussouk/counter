@@ -17,7 +17,7 @@
                         <div class="{% if not product_stock.items|is_stock:product.id %}out-of-stock{% endif %} product-element">
                             <div class="product-element-image-wrapper">
                                 {% if product.image %}
-                                <a href="{% url product_view id=product.collection.slug slug=product.slug %}" title="Termék oldal">
+                                <a href="{% url product_view id=product.get_collection_slug slug=product.slug %}" title="Termék oldal">
                                     <picture>
                                       <source class="product-element-image" srcset="{{ product.image.url|wp }}" type="image/webp">
                                       <source class="product-element-image" srcset="{{ product.image.url }}" type="image/png">
@@ -35,10 +35,10 @@
                                 </a>
                             </div>
                             <div class="product-element-description-wrapper">
-                                <a href="{% url 'shop:product_detail' id=product.collection.slug slug=product.slug %}" title="Termék oldal">
+                                <a href="{% url 'shop:product_detail' id=product.get_collection_slug slug=product.slug %}" title="Termék oldal">
                                     <span class="product-element-name">{{ product.name }} | {{ product.price }} Ft.-</span>
                                 </a>
-                                <span class="product-element-collection">{{ product.collection.name }}</span>
+                                <span class="product-element-collection">{{ product.get_collection_names }}</span>
                             </div>
                         </div>
                         {% endfor %}

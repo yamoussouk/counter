@@ -56,7 +56,7 @@
             <div id="owl-products-carousel" class="owl-carousel owl-theme">
                 {% for product in basic_products %}
                     {% if product.image %}
-                    <a href="{% url 'shop:product_detail' id=product.collection.slug slug=product.slug %}" title="{{ product.name }}">
+                    <a href="{% url 'shop:product_detail' id=product.get_collection_slug slug=product.slug %}" title="{{ product.name }}">
                         <picture>
                           <source class="owl-lazy" data-srcset="{{ product.image.url|wp }}" type="image/webp">
                           <source class="owl-lazy" data-srcset="{{ product.image.url }}" type="image/jpg">
@@ -116,7 +116,7 @@
             <div id="owl-bs-products-carousel" class="owl-carousel owl-theme">
                 {% for product in bs_products %}
                     {% if product.image %}
-                    <a href="{% url 'shop:product_detail' id=product.collection.slug slug=product.slug %}" title="{{ product.name }}">
+                    <a href="{% url 'shop:product_detail' id=product.get_collection_slug slug=product.slug %}" title="{{ product.name }}">
                         <picture>
                           <source class="owl-lazy" data-srcset="{{ product.image.url|wp }}" type="image/webp">
                           <source class="owl-lazy" data-srcset="{{ product.image.url }}" type="image/jpg">
@@ -166,6 +166,9 @@
                     {% endif %}
                 {% endfor %}
             </div>
+        </div>
+        <div class="fluid-text-anchor container-fluid" id="home-page-more-collections-btn">
+            <a title="További kollekciók" href="{% url 'shop:products_view' %}">További kollekciók</a>
         </div>
         {% endif %}
         <!-- end of temporary collections -->

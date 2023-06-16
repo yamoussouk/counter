@@ -77,11 +77,13 @@
         cursor: pointer;
     }
     .product-element-collection {
+        display: none !important;
         font-family: light;
         color: rgba(117, 134, 137, 0.3);
         text-transform: uppercase;
         display: block;
         letter-spacing: 1px;
+        height: 16px;
     }
     #products-wrapper {
         margin-top: 60px;
@@ -481,6 +483,12 @@
     .pagination-inner,
     .pagination-wrapper {
         width: 100%;
+    }
+}
+@media only screen and (max-width: 480px) {
+    .list-filter-row .col-sm-9 {
+        width: 100%;
+        margin-left: 0;
     }
 }
 @media only screen and (max-width: 375px) {

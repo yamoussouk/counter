@@ -93,13 +93,13 @@ DELIVERY_SIZES = ((1, 'S'),
 
 
 class Product(models.Model):
-    collection = models.ForeignKey(Collection, related_name='products', on_delete=models.CASCADE)
-    collections = models.ManyToManyField(Collection, blank=True)
-    name = models.CharField(max_length=200, db_index=True)
+    collection = models.ForeignKey(Collection, related_name='products', on_delete=models.CASCADE, verbose_name="Kollekció")
+    collections = models.ManyToManyField(Collection, blank=True, verbose_name="Kollekciók")
+    name = models.CharField(max_length=200, db_index=True, verbose_name="Név")
     slug = models.SlugField(max_length=200, db_index=True, unique=True, default='')
     image = models.ImageField(blank=True)
-    description = models.TextField(blank=True)
-    size = models.TextField(blank=True)
+    description = models.TextField(blank=True, verbose_name="Termékleírás")
+    size = models.TextField(blank=True, verbose_name="Méret")
     price = models.IntegerField()
     stock = models.IntegerField(blank=True, default=0)
     studs = MultiSelectField(choices=STUD_CHOICES, max_choices=3, default=STUD_CHOICES[0], null=True, blank=True)
@@ -126,7 +126,7 @@ class Product(models.Model):
         max_length=200, db_index=True, blank=True, help_text="SEO alt a google crawler számára. "
                                                              "Ez sehol sem látszik a weboldalon.")
     product_name = models.CharField(max_length=200, db_index=True,
-                                    blank=True, help_text="Termék neve, ami a h1 tagba fog kerülni")
+                                    blank=True, help_text="Termék neve, ami a h1 tagba fog kerülni", verbose_name="A termék látható neve")
     findings = models.BooleanField(default=False)
     findings_type = MultiSelectField(choices=FINDINGS_CHOICES, default=FINDINGS_CHOICES[0], null=True,
                                      blank=True, max_length=250)
@@ -152,7 +152,7 @@ class Product(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('shop:product_detail', args=[self.collection.slug, self.slug])
+        return reverse('shop:product_detail', args=[self.get_collection_slug(), self.slug])
 
     def get_stud_value(self, value):
         values = ['nemesacél alap', 'nikkelmentes fülbevaló alap - fém',
@@ -174,11 +174,34 @@ class Product(models.Model):
         tags = [t.name.lower() for t in self.product_tage.all()]
         return any(tag.lower() in t for t in tags)
 
-    def get_collections(self):
-        return "\n".join([c.name for c in self.collections.all()])
+    # def get_collections(self):
+    #     return "\n".join([c.name for c in self.collections.all()])
+
+    def get_collection(self):
+        non_basic = [c for c in self.collections.all() if not c.basic_collection]
+        cols = [c for c in self.collections.all()]
+        if len(non_basic):
+            return non_basic[0]
+        elif len(cols):
+            return cols[0]
+        else:
+            return {}
+
+    def get_collection_slug(self):
+        non_basic = [c.slug for c in self.collections.all() if not c.basic_collection]
+        cols = [c.slug for c in self.collections.all()]
+        if len(non_basic):
+            return non_basic[0]
+        elif len(cols):
+            return cols[0]
+        else:
+            return self.collection.slug
 
     def get_serializable(self):
         return [c.name for c in self.collections.all()]
+
+    def get_collection_names(self):
+        return ', '.join([c.name for c in self.collections.all()])
 
 
 @receiver(models.signals.post_delete, sender=Product)

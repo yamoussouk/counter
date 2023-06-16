@@ -1,21 +1,17 @@
+import json
 import logging
 import os
 import re
-import logging
-from django.db.models import Q
-from django.utils.text import slugify
 
-from django.db.models import Case, When
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.db.models import Case, When
 from django.db.utils import OperationalError
 from django.http import HttpResponse
-import json
-from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 from django.shortcuts import redirect, reverse
 from django.shortcuts import render, get_object_or_404
-from django.views.decorators.http import require_http_methods
+from django.utils.text import slugify
 from django.views.generic.list import ListView
 
 from cart.forms import CartAddProductForm, CartAddCustomProductForm, CartAddGiftCardProductForm
@@ -24,7 +20,6 @@ from shop.MessageSender import MessageSender
 from .StripeProductGenerator import StripeProductGenerator
 from .forms import ContactForm
 from .models import Collection, Product, Notification, ProductType, GiftCard, Message
-from django_user_agents.utils import get_user_agent
 
 stripe_product_generator = StripeProductGenerator()
 log = logging.getLogger(__name__)
@@ -82,20 +77,32 @@ def index(request):
 
 
 def __get_product_details(request, id: str, slug: str, custom: bool, studio: bool, referer: str):
+    old_collection = False
     try:
         collection = Collection.objects.filter(slug=id)[0]
     except (Collection.DoesNotExist, IndexError):
         log.info(f'Exception in getting product details - Collection slug {id}')
         return render(request, 'shop/404_termek.html', {})
     try:
-        product = Product.objects.filter(collection=collection, slug=slug, available=True, custom=custom)[0]
+        product = Product.objects.filter(collections=collection.id, slug=slug, available=True, custom=custom)[0]
     except (Product.DoesNotExist, IndexError):
-        log.info(f'Exception in getting product details - Product slug {slug}')
-        return render(request, 'shop/404_termek.html', {})
-    product_types = Product.objects.prefetch_related('product_types').filter(collection=collection, slug=slug,
-                                                                             available=True, custom=custom)
-    images = Product.objects.prefetch_related('images').filter(collection=collection, slug=slug, available=True,
-                                                               custom=custom)
+        product = Product.objects.filter(collection=collection, slug=slug, available=True, custom=custom)
+        if not len(product):
+            log.info(f'Exception in getting product details - Product slug {slug}')
+            return render(request, 'shop/404_termek.html', {})
+        else:
+            old_collection = True
+            product = product[0]
+    if old_collection:
+        product_types = Product.objects.prefetch_related('product_types').filter(collection=collection, slug=slug,
+                                                                                 available=True, custom=custom)
+        images = Product.objects.prefetch_related('images').filter(collection=collection, slug=slug, available=True,
+                                                                   custom=custom)
+    else:
+        product_types = Product.objects.prefetch_related('product_types').filter(collections=collection.id, slug=slug,
+                                                                                 available=True, custom=custom)
+        images = Product.objects.prefetch_related('images').filter(collections=collection.id, slug=slug, available=True,
+                                                                   custom=custom)
     imgs = images[0].images.all()
     types = product_types[0].product_types.all()
     is_stock = False
@@ -125,7 +132,7 @@ def __get_product_details(request, id: str, slug: str, custom: bool, studio: boo
         idx_of_upper = [idx for idx, u in enumerate(temp) if u.name == upper[0]][0]
         temp.append(temp.pop(idx_of_upper))
     notification = Notification.objects.all()
-    collection_slug = '' if studio else product.collection.slug
+    collection_slug = '' if studio else product.get_collection_slug()
     view = 'shop:studio_products_view' if studio else ('shop:custom_products_view' if custom else 'shop:products_view')
     template = 'shop/product/custom_detail.html' if custom else 'shop/product/detail.html'
     param = Parameter.objects.filter(name="shipping_information")
@@ -137,7 +144,7 @@ def __get_product_details(request, id: str, slug: str, custom: bool, studio: boo
         if studio:
             referer = settings.MAIN_URL + 'slowstudio'
         else:
-            referer = settings.MAIN_URL + 'termekek/' + product.collection.slug
+            referer = settings.MAIN_URL + 'termekek/' + product.get_collection_slug()
     return render(request, template,
                   {'product': product,
                    'notification': notification,
@@ -331,7 +338,7 @@ class ProductsView(ListView):
         if slug:
             collection = Collection.objects.filter(slug=slug)
             collection = collection[0] if len(collection) else None
-            products = products.filter(collection=collection)
+            products = products.filter(collections=int(collection.id))
         return products
 
     def get_context_data(self):

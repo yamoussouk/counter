@@ -17,6 +17,17 @@ from .models import Collection, Product, Image, Notification, ProductType, GiftC
     We delete the original webps.
 """
 
+if not hasattr(admin, "display"):
+    def display(description):
+        def decorator(fn):
+            fn.short_description = description
+            return fn
+
+        return decorator
+
+
+    setattr(admin, "display", display)
+
 
 def change_image(modeladmin, request, queryset):
     opts = modeladmin.model._meta
@@ -169,8 +180,9 @@ class ProductAdmin(admin.ModelAdmin):
     error_while_saving = False
     # save_as = True
     inlines = [ProductImageAdmin, ProductTypeInline, ProductTagInline]
-    list_display = ['name', 'collection', 'studs', 'price', 'stock', 'available', 'created', 'updated']
-    list_filter = ['available', 'created', 'updated', 'collection', 'custom']
+    list_display = ['name', 'collection', 'studs', 'price', 'stock', 'available', 'created', 'updated',
+                    'collections_', ]
+    list_filter = ['available', 'created', 'updated', 'collections', 'custom']
     list_editable = ['price', 'available']
     fieldsets = (
         ("Kötelező mezők", {
@@ -216,6 +228,10 @@ class ProductAdmin(admin.ModelAdmin):
     )
     actions = [change_image]
 
+    @admin.display(description="Kollekciók")
+    def collections_(self, obj):
+        return obj.get_serializable()
+
     class Media:
         js = (
             '//ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js',
@@ -259,6 +275,14 @@ class ProductAdmin(admin.ModelAdmin):
             return HttpResponseRedirect("/admin/shop/product/add/")
         else:
             return super(ProductAdmin, self).response_add(request, obj, post_url_continue)
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "collection":
+            id_ = request.GET.get('collections__id__exact')
+            if id_ is None:
+                return super(ProductAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+            kwargs["queryset"] = Product.objects.filter(collections=int(id_))
+        return super(ProductAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 admin.site.register(Product, ProductAdmin)

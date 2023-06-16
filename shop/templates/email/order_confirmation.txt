@@ -7,7 +7,7 @@ Vásárlásod részleteit lejjebb találod.
 {{ order.updated|convert_date }}
 
 {% for item in order.items.all %}
-{{ forloop.counter }} {{ item.product.name }} - {{ item.product.collection.name }} kollekció
+{{ forloop.counter }} {{ item.product.name }} - {{ item.product.get_collection.name }} kollekció
 {{ item.color|lower }}
 {{ item.stud }}
 {{ item.price|calculate_item_price:item.quantity }} Ft.
