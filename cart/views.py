@@ -96,7 +96,7 @@ def cart_add(request, product_id):
     ip_address = get_client_ip(request)
     cart = Cart(request)
     product = get_object_or_404(Product, id=product_id)
-    redirect_url = 'shop:studio_product_detail' if product.get_collection()["studio_collection"] \
+    redirect_url = 'shop:studio_product_detail' if product.get_collection().studio_collection \
         else ('shop:custom_product_detail' if product.custom else 'shop:product_detail')
     form = CartAddCustomProductForm(request.POST) if product.custom else CartAddProductForm(request.POST)
     if form.is_valid():
